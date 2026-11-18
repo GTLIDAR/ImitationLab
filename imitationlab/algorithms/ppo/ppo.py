@@ -1,0 +1,2213 @@
+from __future__ import annotations
+
+import math
+import sys
+import time
+from collections.abc import Iterator
+from contextlib import contextmanager
+from dataclasses import dataclass, field
+from typing import Any, Generic, TypeVar, cast
+
+import numpy as np
+import torch
+import torch.nn
+import torch.optim
+from tensordict import TensorDict
+from tensordict.nn import (
+    InteractionType,
+    TensorDictModule,
+    TensorDictSequential,
+)
+from torch import Tensor
+from torch.nn.utils import clip_grad_norm_
+from torchrl._utils import timeit
+from torchrl.collectors import Collector
+from torchrl.data import (
+    Bounded,
+    LazyTensorStorage,
+    ReplayBuffer,
+    TensorDictReplayBuffer,
+)
+from torchrl.data.replay_buffers.samplers import SamplerWithoutReplacement
+from torchrl.envs import Compose, ExplorationType, TransformedEnv
+from torchrl.envs.transforms import InitTracker
+from torchrl.envs.utils import set_exploration_type
+from torchrl.modules import (
+    MLP,
+    ActorValueOperator,
+    IndependentNormal,
+    LSTMModule,
+    ProbabilisticActor,
+    TanhNormal,
+    ValueOperator,
+)
+from torchrl.objectives import ClipPPOLoss
+from torchrl.objectives.value.advantages import GAE
+from torchrl.record.loggers import Logger
+from tqdm.rich import tqdm
+
+from imitationlab.algorithms.ppo.mixed_precision import (
+    AMP_OLD_LOG_PROB_KEY,
+    install_update_amp_boundaries,
+    resolve_update_amp_dtype,
+    update_autocast,
+)
+from imitationlab.algorithms.ppo.kl_schedule import KLLearningRate
+from imitationlab.runners.algorithm_runtime import (
+    AlgorithmRuntime,
+    honours_train_time_budget,
+)
+from imitationlab.runners.metrics import IterationData, TrainingMetadata
+from imitationlab.algorithms.common.config import NetworkConfig, AlgorithmConfig
+from imitationlab.algorithms.common.gaussian_policy import GaussianPolicyHead
+from imitationlab.algorithms.common.type_aliases import OptimizerClass
+from imitationlab.algorithms.common.utils import get_activation_class
+
+PpoCfgT = TypeVar("PpoCfgT", bound="PPOTrainerConfig")
+
+UPDATE_SCHEDULE_KEYS: tuple[str, ...] = (
+    "actor_learning_rate",
+    "critic_learning_rate",
+    "critic_lr_schedule",
+    "critic_lr_final",
+    "critic_extra_epochs",
+    "critic_extra_minibatches",
+    "first_layer_bias_lr_scale",
+)
+"""``PPOConfig`` fields that shape the main optimizer and its schedule."""
+
+
+def _normalize_advantage_over_rollout(advantage: Tensor) -> Tensor:
+    """Normalize advantages over every rollout batch dimension once."""
+    reduce_dims = tuple(range(max(advantage.ndim - 1, 1)))
+    advantage_mean = advantage.mean(dim=reduce_dims, keepdim=True)
+    advantage_std = advantage.std(
+        dim=reduce_dims,
+        keepdim=True,
+        correction=1,
+    )
+    return (advantage - advantage_mean) / (advantage_std + 1.0e-8)
+
+
+def _first_linear_bias(module: torch.nn.Module) -> torch.nn.Parameter:
+    """The bias of the first ``nn.Linear`` in ``module.modules()`` order.
+
+    Wrappers (TensorDictModule, the running-mean-std input normalizer) register
+    no linear layers, so the first one met is the first hidden layer of the
+    MLP.
+    """
+    for sub in module.modules():
+        if isinstance(sub, torch.nn.Linear) and sub.bias is not None:
+            return sub.bias
+    msg = "first_layer_bias_lr_scale: no nn.Linear with a bias found in the module."
+    raise ValueError(msg)
+
+
+class CatInputs(torch.nn.Module):
+    """Concatenate multiple input tensors along the last dimension.
+
+    Used to adapt modules that expect a single tensor (e.g. MLP) when
+    ``TensorDictModule`` feeds multiple ``in_keys`` as separate positional
+    arguments (the ``concatenate_terms=False`` / multi-key case).
+    """
+
+    def __init__(self, module: torch.nn.Module) -> None:
+        super().__init__()
+        self.module = module
+
+    def forward(self, *inputs: Tensor) -> Tensor:
+        if len(inputs) == 1:
+            return self.module(inputs[0])
+        return self.module(torch.cat(inputs, dim=-1))
+
+
+class RunningMeanStdCatInputs(torch.nn.Module):
+    """Concatenate inputs and apply SONIC-style running normalization."""
+
+    def __init__(
+        self,
+        module: torch.nn.Module,
+        feature_dim: int,
+        *,
+        epsilon: float = 1.0e-5,
+        clip: float = 5.0,
+        normalize_mask: Tensor | None = None,
+        frozen: bool = False,
+    ) -> None:
+        super().__init__()
+        if feature_dim <= 0:
+            msg = "feature_dim must be positive."
+            raise ValueError(msg)
+        # Frozen statistics never move, in train mode included: a fine-tune
+        # off a checkpoint keeps the parent's input scale so its exported
+        # bundle and the parent's stay comparable. Not a buffer: the flag is
+        # a run setting, not part of the model state.
+        self.frozen = bool(frozen)
+        if epsilon <= 0.0:
+            msg = "epsilon must be positive."
+            raise ValueError(msg)
+        if clip <= 0.0:
+            msg = "clip must be positive."
+            raise ValueError(msg)
+        self.module = module
+        self.epsilon = float(epsilon)
+        self.clip = float(clip)
+        module_device = next(module.parameters(), torch.empty(0)).device
+        self.register_buffer(
+            "running_mean", torch.zeros(feature_dim, device=module_device)
+        )
+        self.register_buffer(
+            "running_var", torch.ones(feature_dim, device=module_device)
+        )
+        self.register_buffer(
+            "count", torch.ones((), dtype=torch.float32, device=module_device)
+        )
+        if normalize_mask is None:
+            self.normalize_mask: Tensor | None = None
+        else:
+            normalize_mask = normalize_mask.reshape(-1).to(torch.bool)
+            if normalize_mask.shape[0] != feature_dim:
+                msg = (
+                    "normalize_mask length "
+                    f"{normalize_mask.shape[0]} != feature_dim {feature_dim}."
+                )
+                raise ValueError(msg)
+            # All-True masks are equivalent to no mask; store None to skip the
+            # extra where() in forward.
+            if bool(normalize_mask.all()):
+                self.normalize_mask = None
+            else:
+                self.register_buffer("normalize_mask", normalize_mask.to(module_device))
+
+    def _concatenate(self, inputs: tuple[Tensor, ...]) -> Tensor:
+        if len(inputs) == 1:
+            return inputs[0]
+        return torch.cat(inputs, dim=-1)
+
+    @torch.no_grad()
+    def _update(self, value: Tensor, *, moments=None) -> None:
+        flat = value.detach().reshape(-1, value.shape[-1]).to(torch.float32)
+        if flat.shape[0] == 0:
+            return
+        if moments is None:
+            batch_mean = flat.mean(dim=0)
+            batch_var = flat.var(dim=0, correction=1 if flat.shape[0] > 1 else 0)
+            batch_count = float(flat.shape[0])
+        else:
+            batch_mean, batch_var, batch_count = moments
+        delta = batch_mean - self.running_mean
+        total_count = self.count + batch_count
+        new_mean = self.running_mean + delta * batch_count / total_count
+        mean_a = self.running_var * self.count
+        mean_b = batch_var * batch_count
+        second_moment = (
+            mean_a + mean_b + delta.square() * self.count * batch_count / total_count
+        )
+        self.running_mean.copy_(new_mean)
+        self.running_var.copy_(second_moment / total_count)
+        self.count.copy_(total_count)
+
+    def forward(self, *inputs: Tensor) -> Tensor:
+        value = self._concatenate(inputs)
+        normalized = (value - self.running_mean) / torch.sqrt(
+            self.running_var + self.epsilon
+        )
+        normalized = torch.clamp(normalized, -self.clip, self.clip)
+        if self.normalize_mask is not None:
+            # Excluded features (e.g. pretrained latent commands) pass through
+            # with their original scale and geometry.
+            normalized = torch.where(self.normalize_mask, normalized, value)
+        # Match SONIC: normalize with the prior statistics, then update them.
+        if self.training and not self.frozen:
+            self._update(value)
+        return self.module(normalized)
+
+
+@dataclass
+class PPOConfig:
+    """PPO-specific configuration."""
+
+    gae_lambda: float = 0.95
+    """GAE lambda parameter."""
+
+    clip_epsilon: float = 0.2
+    """Clipping epsilon for PPO."""
+
+    clip_value: bool = True
+    """Whether to clip value function."""
+
+    anneal_clip_epsilon: bool = False
+    """Whether to anneal clip epsilon."""
+
+    critic_coeff: float = 1.0
+    """Critic coefficient."""
+
+    entropy_coeff: float = 0.008
+    """Entropy coefficient."""
+
+    normalize_advantage: bool = True
+    """Whether to normalize the advantage estimates."""
+
+    update_normalizers_after_rollout: bool = True
+    """Keep updating the running input statistics of the actor and critic.
+
+    ``False`` freezes ``RunningMeanStdCatInputs`` at the values a checkpoint
+    restores (or the constructor's zero mean / unit variance for a fresh run),
+    so a fine-tune keeps its parent's input scale. Before 2026-09-13 this key
+    did not exist and was accepted silently by the Hydra path; every campaign
+    that passed it still updated the statistics on every minibatch.
+    """
+
+    freeze_normalizers: bool = False
+    """Never move the running input statistics: neither on the forward pass
+    nor after the rollout. They stay at the values the checkpoint restored
+    (or the zero-mean / unit-variance prior for a fresh run). This is the
+    "frozen normalizer" the 2026-09 fine-tune campaigns mean; it overrides
+    `update_normalizers_after_rollout` in both places that read it.
+    """
+
+    normalize_advantage_global: bool = False
+    """Normalize once over the complete rollout instead of per mini-batch."""
+
+    log_std_init: float = 0.0
+    """Initial value for the policy log standard deviation (log std)."""
+
+    clip_log_std: bool = True
+    """Whether to clip the learned log standard deviation."""
+
+    log_std_min: float = -7.0
+    """Minimum log standard deviation (when clipping is enabled)."""
+
+    log_std_max: float = 2.0
+    """Maximum log standard deviation (when clipping is enabled)."""
+
+    lcp_coeff: float = 0.0
+    """Lipschitz-constrained-policy gradient penalty coefficient.
+
+    Adds ``lcp_coeff * mean(||d loc / d obs||^2)`` to the actor loss — the
+    soft Lipschitz constraint of arXiv:2410.11825, computed with the
+    vector-Jacobian ones-trick on the policy MEAN (the ``loc`` head; the
+    sampled action and ``scale`` are untouched). ``0`` (default) skips the
+    extra forward/backward entirely and reproduces every existing arm.
+    """
+
+    lcp_batch_cap: int = 65536
+    """Rows of the mini-batch the LCP penalty is computed on.
+
+    The penalty needs ``create_graph=True`` through the actor, whose memory
+    scales with the rows it sees; a production mini-batch (300k+ rows) does
+    not fit. The first ``lcp_batch_cap`` rows of the mini-batch are an
+    unbiased-enough sample because the collector interleaves environments.
+    """
+
+    rnn_hidden_size: int = 0
+    """LSTM hidden size for a recurrent ACTOR. ``0`` (default) keeps the
+    plain MLP actor and changes nothing.
+
+    When positive, the actor becomes normalize/concat -> ``LSTMModule`` ->
+    MLP head, the environment gains ``InitTracker`` and the LSTM's
+    ``TensorDictPrimer`` (so the collector carries recurrent states across
+    steps and zero-fills them on reset), and PPO mini-batches become
+    time-contiguous ``[env, T]`` sequences instead of shuffled flat rows.
+    TorchRL loss modules run their forward under ``set_recurrent_mode(True)``,
+    so the sequence batches give true BPTT over the rollout window with
+    ``is_init`` resetting the hidden state at episode boundaries. The critic
+    stays a plain MLP, so GAE is untouched.
+
+    """
+
+    rnn_num_layers: int = 1
+    """Number of LSTM layers when ``rnn_hidden_size > 0``."""
+
+    update_amp_dtype: str | None = None
+    """Autocast dtype for the actor-critic loss forward of each gradient step.
+
+    ``None`` (default) keeps the whole update in float32 and is bit-identical
+    to the code before the key existed. ``"bf16"`` runs the PPO loss-module
+    forward (actor and critic MLP trunks) under ``torch.autocast`` with
+    bfloat16; the backward follows. Master weights, optimizer state, the
+    running input normalizers, each trunk's output projection, the
+    log-prob / entropy / ratio / critic-loss math, GAE, the collector and the
+    post-update KL diagnostic stay float32 -- see
+    ``ppo/mixed_precision.py``. ``"fp16"`` is rejected (it needs
+    a gradient scaler). Honoured by ``PPO.update``. An
+    algorithm that overrides those without opting in raises at construction
+    instead of ignoring the key.
+    """
+
+    capture_update: bool = False
+    """Run each PPO gradient step as one CUDA-graph replay (opt-in).
+
+    ``False`` (default) leaves the update exactly as before. ``True`` captures
+    the per-minibatch step -- loss forward, backward, gradient clipping, the
+    optimizer step and the post-update KL forward of the adaptive-LR rule --
+    once on static buffers, then per update gathers the sampled rows into
+    those buffers, writes the step's optimizer scalars (learning rate, bias
+    corrections) to device memory and replays it. Learning-rate changes need
+    no recapture. With ``capture_update_optimizer="exact"`` the result is
+    bit-identical to the eager update; the configurations it does not cover
+    (minibatches that do not divide the rollout, recurrent actors,
+    ``torch.compile``, critic-only extra steps, BC / reward-gradient terms
+    inside the step, ...) run eagerly and log why once. See
+    ``ppo/captured_update.py``.
+    """
+
+    capture_update_optimizer: str = "exact"
+    """Optimizer step inside the captured update (``capture_update=True``).
+
+    ``"exact"`` (default) replays the arithmetic of the eager foreach
+    Adam/AdamW step with the step's scalars read from device memory, so the
+    captured update is bit-identical to the eager one. ``"fused"`` runs
+    PyTorch's fused Adam/AdamW kernel with a device learning rate: fewer
+    kernels, NOT bit-identical (different rounding of the bias corrections).
+    """
+
+    actor_learning_rate: float | None = None
+    """Optional actor-specific learning rate.
+
+    When set together with ``critic_learning_rate``, the main optimizer uses
+    separate actor and critic parameter groups. The adaptive KL schedule updates
+    only the actor group, matching asymmetric actor/critic PPO recipes. Unset,
+    one group at ``optim.lr`` holds both networks and the KL rule moves the
+    critic's rate too.
+    """
+
+    critic_learning_rate: float | None = None
+    """Optional critic-specific learning rate."""
+
+    critic_lr_schedule: str = "constant"
+    """Decay shape for the critic group: ``"constant"``, ``"linear"`` or ``"cosine"``.
+
+    The adaptive KL rule owns the ACTOR group only (``adaptive_lr=True``), so the
+    critic learning rate is otherwise fixed for the whole run. A non-constant
+    schedule interpolates ``critic_learning_rate`` -> ``critic_lr_final`` on
+    cumulative environment frames, not on the in-segment iteration counter, so a
+    walltime-chained resume continues the decay instead of restarting it.
+    """
+
+    critic_lr_final: float | None = None
+    """End-of-budget critic learning rate. Required when the schedule is not constant."""
+
+    critic_extra_epochs: int = 0
+    """Critic-only passes over the rollout AFTER the joint PPO epochs.
+
+    ``0`` (default) changes nothing. Each pass shuffles the collected rollout
+    into ``critic_extra_minibatches`` minibatches and, per minibatch, steps the
+    main optimizer on the PPO critic loss alone (the recipe's
+    ``loss.loss_critic_type``, ``ppo.clip_value`` and ``ppo.critic_coeff``,
+    against the GAE ``value_target`` computed once for this rollout, with the
+    collected ``state_value`` as the clip anchor). The actor's parameters get no
+    gradient, so the joint epochs -- and therefore the actor update, the KL
+    learning-rate rule and the reported PPO loss metrics -- are unchanged. The
+    critic's input normalizers are frozen during these passes so their running
+    statistics still see each transition exactly as many times as before.
+
+    Why this knob exists (2026-10-25): the full-batch recipe gives the critic
+    3 optimizer steps per 393k-frame rollout, the WMBPTT critic gets 20 per
+    41k-frame iteration. This isolates "more, smaller critic steps on the same
+    targets" as the one PPO-side change. Requires split actor/critic learning
+    rates (the critic parameter group). Extra steps are NOT counted in
+    ``updates_completed``, so reward/BC/HL-skill cadences keyed on it are
+    unaffected.
+    """
+
+    critic_extra_minibatches: int = 1
+    """Minibatches per critic-only pass (``critic_extra_epochs``). ``1`` = full batch."""
+
+    first_layer_bias_lr_scale: float = 1.0
+    """Learning-rate multiplier for the FIRST linear layer's bias, actor and critic.
+
+    ``1.0`` (default) changes nothing. Any other value moves each network's
+    first-layer bias into its own parameter group at ``scale x`` the parent
+    group's learning rate: ``actor_first_bias`` (adaptive with the actor, so the
+    KL rule keeps the ratio; ``lr_min``/``lr_max`` scaled to match) and
+    ``critic_first_bias`` (follows ``critic_lr_schedule``). Weight decay is the
+    parent group's. Requires split actor/critic learning rates.
+
+    Why this knob exists (2026-09-01): a constant input channel (the hold-1
+    sin/cos phase pair, which is ``(0, 1)`` on every step) has a weight column
+    whose gradient equals the bias gradient, so under Adam the effective
+    first-layer bias moves at exactly twice the rate. This scale reproduces
+    that effect without the channel, to test whether it is what separates the
+    64-D hold-1 arms that train from those that stall.
+    """
+
+    def validate_update_schedule(self, section: str = "ppo") -> None:
+        """Normalize and check the optimizer-schedule keys of one config section.
+
+        ``section`` names the config section in error messages.
+        """
+        self.first_layer_bias_lr_scale = float(self.first_layer_bias_lr_scale)
+        if self.first_layer_bias_lr_scale <= 0.0:
+            msg = (
+                f"{section}.first_layer_bias_lr_scale must be > 0, got "
+                f"{self.first_layer_bias_lr_scale}."
+            )
+            raise ValueError(msg)
+        if self.first_layer_bias_lr_scale != 1.0 and self.actor_learning_rate is None:
+            msg = (
+                f"{section}.first_layer_bias_lr_scale != 1 requires split "
+                f"actor/critic learning rates ({section}.actor_learning_rate and "
+                f"{section}.critic_learning_rate)."
+            )
+            raise ValueError(msg)
+        if self.actor_learning_rate is not None and self.actor_learning_rate <= 0.0:
+            msg = (
+                f"{section}.actor_learning_rate must be > 0 when configured, got "
+                f"{self.actor_learning_rate!r}."
+            )
+            raise ValueError(msg)
+        if self.critic_learning_rate is not None and self.critic_learning_rate <= 0.0:
+            msg = (
+                f"{section}.critic_learning_rate must be > 0 when configured, got "
+                f"{self.critic_learning_rate!r}."
+            )
+            raise ValueError(msg)
+        if (self.actor_learning_rate is None) != (self.critic_learning_rate is None):
+            msg = (
+                f"{section}.actor_learning_rate and {section}.critic_learning_rate "
+                "must be configured together."
+            )
+            raise ValueError(msg)
+        self.critic_lr_schedule = str(self.critic_lr_schedule).strip().lower()
+        if self.critic_lr_schedule not in {"constant", "linear", "cosine"}:
+            msg = (
+                f"{section}.critic_lr_schedule must be 'constant', 'linear' or "
+                f"'cosine', got {self.critic_lr_schedule!r}."
+            )
+            raise ValueError(msg)
+        if self.critic_lr_schedule != "constant":
+            if self.critic_learning_rate is None:
+                msg = (
+                    f"{section}.critic_lr_schedule="
+                    f"{self.critic_lr_schedule!r} requires "
+                    f"{section}.critic_learning_rate (the schedule drives the "
+                    "named critic parameter group, which only exists under split "
+                    "actor/critic learning rates)."
+                )
+                raise ValueError(msg)
+            if self.critic_lr_final is None or self.critic_lr_final <= 0.0:
+                msg = (
+                    f"{section}.critic_lr_final must be > 0 when "
+                    f"{section}.critic_lr_schedule={self.critic_lr_schedule!r}, got "
+                    f"{self.critic_lr_final!r}."
+                )
+                raise ValueError(msg)
+        if int(self.critic_extra_epochs) < 0:
+            msg = (
+                f"{section}.critic_extra_epochs must be >= 0, got "
+                f"{self.critic_extra_epochs!r}."
+            )
+            raise ValueError(msg)
+        self.critic_extra_epochs = int(self.critic_extra_epochs)
+        self.critic_extra_minibatches = int(self.critic_extra_minibatches)
+        if self.critic_extra_minibatches <= 0:
+            msg = (
+                f"{section}.critic_extra_minibatches must be > 0, got "
+                f"{self.critic_extra_minibatches!r}."
+            )
+            raise ValueError(msg)
+        if self.critic_extra_epochs > 0 and self.critic_learning_rate is None:
+            msg = (
+                f"{section}.critic_extra_epochs > 0 requires "
+                f"{section}.critic_learning_rate (the critic-only steps drive the "
+                "named critic parameter group, which only exists under split "
+                "actor/critic learning rates)."
+            )
+            raise ValueError(msg)
+
+    def changed_update_schedule_keys(self) -> list[str]:
+        """Update-schedule keys that differ from their defaults."""
+        default = PPOConfig()
+        return [
+            key
+            for key in UPDATE_SCHEDULE_KEYS
+            if getattr(self, key) != getattr(default, key)
+        ]
+
+
+@dataclass
+class PPOTrainerConfig(AlgorithmConfig):
+    """PPO configuration that extends AlgorithmConfig."""
+
+    ppo: PPOConfig = field(default_factory=PPOConfig)
+    """PPO configuration."""
+
+    use_value_function: bool = True
+    """PPO always trains a value function; declared so the resolved config
+    carries no undeclared attributes."""
+
+    abort_on_nonfinite: bool = True
+    """Stop the run the first time a rollout metric or policy weight is not
+    finite.
+
+    A NaN policy keeps training at full speed and silently poisons every later
+    checkpoint; two chains lost about a day each that way (2026-08-23 fsq64,
+    2026-08-24 emastack) before eval caught it. Set false only to reproduce
+    such a failure on purpose."""
+
+    def __post_init__(self):
+        self.use_value_function = True
+        # Initialize value_function config if not set.
+        # input_keys=None → resolves to ["policy"] (IsaacLab default).
+        if self.value_function is None:
+            self.value_function = NetworkConfig(
+                num_cells=[256, 256],
+                activation_fn="relu",
+                output_dim=1,
+            )
+
+
+@dataclass(kw_only=True)
+class PPOTrainingMetadata(TrainingMetadata):
+    """PPO-specific extension of the generic train-metadata state."""
+
+    collector_iter: Iterator[TensorDict]
+    """ Iterator that yields collected rollouts from the TorchRL collector. """
+
+    policy_operator: TensorDictModule
+    """ Policy snapshot used for KL diagnostics around each policy update. """
+
+    updates_completed: int
+    """ Number of optimizer updates completed so far in this training metadata. """
+
+    minibatches_per_epoch: int
+    """ Number of replay-buffer minibatches consumed per PPO epoch. """
+
+    epochs_per_rollout: int
+    """ Number of PPO epochs to run for each collected rollout. """
+
+    anneal_clip_epsilon: bool
+    """ Whether clip epsilon is annealed by the loss module over training. """
+
+    base_clip_epsilon: float
+    """ Configured clip epsilon before any annealing is applied. """
+
+
+@dataclass(kw_only=True)
+class PPOIterationData(IterationData):
+    """One collected rollout flowing through the shared PPO phases."""
+
+    rollout: TensorDict
+    """ Raw rollout TensorDict produced by the collector for this outer-metadata iteration. """
+
+
+class PPO(KLLearningRate, AlgorithmRuntime[PpoCfgT], Generic[PpoCfgT]):
+    """On-policy PPO with shuffled minibatches or recurrent sequence updates.
+
+    The learner owns the rollout, GAE, clipped objective, optimizer schedule,
+    and training state used to resume from a checkpoint.
+    """
+
+    # Config section holding the update-schedule keys (UPDATE_SCHEDULE_KEYS).
+    _update_cfg_section = "ppo"
+
+    # This class's ``update`` runs its loss forward through
+    # ``_update_loss_forward``, so it honours ``ppo.update_amp_dtype``. A class
+    # that overrides the update must set
+    # this in its own body after routing through the helper; otherwise
+    # ``_validate_update_amp_support`` refuses the key instead of ignoring it.
+    _update_amp_aware = True
+
+    def __init__(
+        self,
+        env: TransformedEnv,
+        config: PpoCfgT,
+        policy_net: torch.nn.Module | None = None,
+        value_net: torch.nn.Module | None = None,
+        q_net: torch.nn.Module | None = None,
+        replay_buffer: type[ReplayBuffer] = ReplayBuffer,
+        logger: Logger | None = None,
+        feature_extractor_net: torch.nn.Module | None = None,
+        **kwargs,
+    ):
+        # Before super(): AlgorithmRuntime.__init__ builds the optimizer from these.
+        self.config = config
+        self._update_cfg.validate_update_schedule(self._update_cfg_section)
+        self._max_grad_norm: float = self._resolve_max_grad_norm()
+
+        super().__init__(
+            env=env,
+            config=config,
+            policy_net=policy_net,
+            value_net=value_net,
+            q_net=q_net,
+            replay_buffer=replay_buffer,
+            logger=logger,
+            feature_extractor_net=feature_extractor_net,
+            **kwargs,
+        )
+
+        # construct the advantage module
+        self.adv_module = self._construct_adv_module()
+
+        # Cache optimizer parameters for compile-friendly grad clipping.
+        self._refresh_grad_clip_params()
+
+        # Opt-in mixed precision for the update forward (ppo.update_amp_dtype).
+        # Unset, nothing is installed and the update is unchanged.
+        self._update_amp_dtype = resolve_update_amp_dtype(
+            getattr(self.config.ppo, "update_amp_dtype", None)
+        )
+        self._update_amp_hooks: list[Any] = []
+        if self._update_amp_dtype is not None:
+            self._validate_update_amp_support()
+            self._update_amp_hooks = self._install_update_amp_boundaries()
+
+        # Compile if requested
+        self._compile_components()
+
+        # Initialize total network updates
+        self.total_network_updates = 0
+
+    @property
+    def _update_cfg(self) -> PPOConfig:
+        """The config section holding the update-schedule keys."""
+        return getattr(self.config, self._update_cfg_section)
+
+    def _resolve_max_grad_norm(self) -> float:
+        """Clip threshold; a large finite value when clipping is disabled.
+
+        Clipping always runs so ``grad_norm`` is reported either way.
+        """
+        max_grad = self.config.optim.max_grad_norm
+        return float(max_grad) if max_grad is not None and max_grad > 0 else 1e10
+
+    def _refresh_grad_clip_params(self) -> None:
+        """Refresh the cached optimizer parameter list used for grad clipping."""
+        self._grad_clip_params = [  # type: ignore[attr-defined]
+            param for group in self.optim.param_groups for param in group["params"]
+        ]
+
+    def _construct_feature_extractor(
+        self, feature_extractor_net: torch.nn.Module | None = None
+    ) -> TensorDictModule:
+        """Build feature extractor (optional for PPO)."""
+        msg = "PPO does not require a feature extractor by default."
+        raise NotImplementedError(msg)
+
+    def _normalizers_frozen(self) -> bool:
+        """Whether the forward pass leaves running input statistics alone.
+
+        `update_normalizers_after_rollout` means the statistics move ONCE,
+        from `_update_normalizers_after_rollout`, after optimization and
+        before checkpointing. The forward pass must therefore stay frozen:
+        the two paths together would count every visited state twice and
+        change the likelihood under which the rollout was collected.
+        """
+        ppo = getattr(self.config, "ppo", None)
+        if bool(getattr(ppo, "freeze_normalizers", False)):
+            return True
+        return bool(getattr(ppo, "update_normalizers_after_rollout", True))
+
+    def _construct_policy(
+        self, policy_net: torch.nn.Module | None = None
+    ) -> TensorDictModule:
+        """Construct the configured PPO policy."""
+        assert isinstance(self.config, PPOTrainerConfig)
+        return self._construct_policy_from_config(self.config.policy, policy_net)
+
+    def _construct_policy_from_config(
+        self,
+        policy_config: NetworkConfig,
+        policy_net: torch.nn.Module | None = None,
+    ) -> TensorDictModule:
+        """Construct one Gaussian actor from an explicit network config.
+
+        Keeping this builder independent of ``config.policy`` lets asymmetric
+        imitationlab.algorithms create deployable actors with different observation keys
+        while preserving PPO's distribution, normalization, and action-spec
+        behavior exactly.
+        """
+
+        action_spec = self.env.action_spec_unbatched  # type: ignore
+        action_dim = int(action_spec.shape[-1])  # type: ignore[attr-defined]
+        if isinstance(action_spec, Bounded):
+            distribution_class = TanhNormal
+            distribution_kwargs = {
+                "low": action_spec.space.low,  # type: ignore[union-attr]
+                "high": action_spec.space.high,  # type: ignore[union-attr]
+                "tanh_loc": False,
+            }
+        else:
+            distribution_class = IndependentNormal
+            distribution_kwargs = {}
+
+        if int(self.config.ppo.rnn_hidden_size) > 0 and policy_net is None:
+            return self._construct_recurrent_policy_from_config(
+                policy_config,
+                action_dim=action_dim,
+                distribution_class=distribution_class,
+                distribution_kwargs=distribution_kwargs,
+            )
+
+        # Build policy network
+        if policy_net is None:
+            policy_mlp = MLP(
+                in_features=policy_config.input_dim,
+                activation_class=get_activation_class(policy_config.activation_fn),
+                out_features=action_dim,
+                num_cells=list(policy_config.num_cells),
+                device=self.device,
+            )
+        else:
+            policy_mlp = policy_net
+
+        if getattr(policy_config, "normalize_input", False):
+            # SONIC-style running observation normalization for the actor.
+            # GaussianPolicyHead concatenates multi-key inputs before calling
+            # the base module, so the normalizer always receives one tensor.
+            policy_in_keys = policy_config.get_input_keys()
+            feature_dim = sum(
+                self.observation_feature_size(key) for key in policy_in_keys
+            )
+            policy_mlp = RunningMeanStdCatInputs(
+                policy_mlp,
+                feature_dim,
+                epsilon=policy_config.normalization_epsilon,
+                clip=policy_config.normalization_clip,
+                normalize_mask=self._input_normalize_mask(policy_config),
+                frozen=self._normalizers_frozen(),
+            )
+
+        net = GaussianPolicyHead(
+            base=policy_mlp,
+            action_dim=action_dim,
+            log_std_init=self.config.ppo.log_std_init,
+            log_std_min=self.config.ppo.log_std_min,
+            log_std_max=self.config.ppo.log_std_max,
+            clip_log_std=self.config.ppo.clip_log_std,
+            device=self.device,
+        )
+
+        # Wrap in TensorDictModule
+        policy_td = TensorDictModule(
+            module=net,
+            in_keys=policy_config.get_input_keys(),
+            out_keys=["loc", "scale"],
+        )
+
+        # Add probabilistic sampling of the actions
+        return ProbabilisticActor(
+            policy_td,
+            in_keys=["loc", "scale"],
+            spec=self.env.full_action_spec_unbatched.to(self.device),  # type: ignore
+            distribution_class=distribution_class,
+            distribution_kwargs=distribution_kwargs,
+            return_log_prob=True,
+            default_interaction_type=ExplorationType.RANDOM,
+        )
+
+    def _construct_recurrent_policy_from_config(
+        self,
+        policy_config: NetworkConfig,
+        *,
+        action_dim: int,
+        distribution_class: type,
+        distribution_kwargs: dict,
+    ) -> TensorDictModule:
+        """Build the LSTM actor: normalize/concat -> LSTMModule -> MLP head.
+
+        The critic stays feed-forward. The LSTM's primer and ``InitTracker``
+        are attached to ``self.env`` here — the policy is constructed before
+        the collector, so the collector sees the transformed env.
+        """
+        hidden_size = int(self.config.ppo.rnn_hidden_size)
+        num_layers = int(self.config.ppo.rnn_num_layers)
+        policy_in_keys = list(policy_config.get_input_keys())
+        feature_dim = sum(self.observation_feature_size(key) for key in policy_in_keys)
+
+        class _CatInputs(torch.nn.Module):
+            def forward(self, *inputs: Tensor) -> Tensor:
+                if len(inputs) == 1:
+                    return inputs[0]
+                return torch.cat(inputs, dim=-1)
+
+        if getattr(policy_config, "normalize_input", False):
+            pre_module: torch.nn.Module = RunningMeanStdCatInputs(
+                torch.nn.Identity(),
+                feature_dim,
+                epsilon=policy_config.normalization_epsilon,
+                clip=policy_config.normalization_clip,
+                normalize_mask=self._input_normalize_mask(policy_config),
+                frozen=self._normalizers_frozen(),
+            ).to(self.device)
+        else:
+            pre_module = _CatInputs()
+        pre = TensorDictModule(
+            module=pre_module,
+            in_keys=policy_in_keys,
+            out_keys=["_actor_features"],
+        )
+        lstm = LSTMModule(
+            input_size=feature_dim,
+            hidden_size=hidden_size,
+            num_layers=num_layers,
+            device=self.device,
+            in_key="_actor_features",
+            out_key="_actor_rnn",
+        )
+        self._actor_lstm = lstm
+        head_mlp = MLP(
+            in_features=hidden_size,
+            activation_class=get_activation_class(policy_config.activation_fn),
+            out_features=action_dim,
+            num_cells=list(policy_config.num_cells),
+            device=self.device,
+        )
+        head = GaussianPolicyHead(
+            base=head_mlp,
+            action_dim=action_dim,
+            log_std_init=self.config.ppo.log_std_init,
+            log_std_min=self.config.ppo.log_std_min,
+            log_std_max=self.config.ppo.log_std_max,
+            clip_log_std=self.config.ppo.clip_log_std,
+            device=self.device,
+        )
+        post = TensorDictModule(
+            module=head,
+            in_keys=["_actor_rnn"],
+            out_keys=["loc", "scale"],
+        )
+        policy_td = TensorDictSequential(pre, lstm, post)
+
+        # Env plumbing: InitTracker for episode boundaries, the primer so the
+        # collector knows the recurrent-state specs. Guard against double
+        # attachment when an asymmetric algorithm builds a second actor.
+        if not getattr(self, "_recurrent_transforms_attached", False):
+            env = self.env
+            transform = getattr(env, "transform", None)
+            transforms = (
+                tuple(transform) if isinstance(transform, Compose) else (transform,)
+            )
+            if not any(isinstance(item, InitTracker) for item in transforms):
+                if hasattr(env, "append_transform"):
+                    env.append_transform(InitTracker())
+                elif transform is not None:
+                    env.transform = Compose(transform, InitTracker())
+            primer = lstm.make_tensordict_primer()
+            if hasattr(env, "append_transform"):
+                env.append_transform(primer)
+            elif hasattr(env, "transform") and env.transform is not None:
+                if isinstance(env.transform, Compose):
+                    env.transform.append(primer)
+                else:
+                    env.transform = Compose(env.transform, primer)
+            else:
+                msg = (
+                    "ppo.rnn_hidden_size > 0 requires an env that accepts "
+                    "transforms (TransformedEnv); got "
+                    f"{type(self.env).__name__}."
+                )
+                raise TypeError(msg)
+            self.env = env
+            self._recurrent_transforms_attached = True
+
+        return ProbabilisticActor(
+            policy_td,
+            in_keys=["loc", "scale"],
+            spec=self.env.full_action_spec_unbatched.to(self.device),  # type: ignore
+            distribution_class=distribution_class,
+            distribution_kwargs=distribution_kwargs,
+            return_log_prob=True,
+            default_interaction_type=ExplorationType.RANDOM,
+        )
+
+    def _construct_value_function(
+        self, value_net: torch.nn.Module | None = None
+    ) -> TensorDictModule:
+        """Construct value function"""
+        if self.config.value_function is None:
+            msg = "PPO requires a value function configuration."
+            raise ValueError(msg)
+
+        # Build value network
+        if value_net is None:
+            value_mlp = MLP(
+                in_features=self.config.value_function.input_dim,
+                activation_class=get_activation_class(
+                    self.config.value_function.activation_fn
+                ),
+                out_features=1,
+                num_cells=list(self.config.value_function.num_cells),
+                device=self.device,
+            )
+        else:
+            value_mlp = value_net
+
+        in_keys = self.config.value_function.get_input_keys()
+        # When multiple in_keys (concatenate_terms=False), TensorDictModule
+        # passes each as a separate positional arg. MLP expects a single
+        # tensor, so wrap it to concatenate first.
+        if self.config.value_function.normalize_input:
+            feature_dim = sum(self.observation_feature_size(key) for key in in_keys)
+            module = RunningMeanStdCatInputs(
+                value_mlp,
+                feature_dim,
+                epsilon=self.config.value_function.normalization_epsilon,
+                clip=self.config.value_function.normalization_clip,
+                normalize_mask=self._input_normalize_mask(self.config.value_function),
+                frozen=self._normalizers_frozen(),
+            )
+        else:
+            module = CatInputs(value_mlp) if len(in_keys) > 1 else value_mlp
+        return ValueOperator(module=module, in_keys=in_keys)
+
+    def _input_normalize_mask(self, network_cfg) -> Tensor | None:
+        """Per-feature mask for running input normalization (True = normalize).
+
+        Keys listed in ``network_cfg.normalize_input_exclude_keys`` keep their
+        raw values (e.g. pretrained latent commands, sin/cos phases).
+        """
+        exclude = getattr(network_cfg, "normalize_input_exclude_keys", None)
+        if not exclude:
+            return None
+
+        def _as_key(key) -> tuple[str, ...]:
+            if isinstance(key, (list, tuple)):
+                return tuple(str(part) for part in key)
+            return (str(key),)
+
+        excluded_keys = {_as_key(key) for key in exclude}
+        mask_parts: list[Tensor] = []
+        for key in network_cfg.get_input_keys():
+            size = int(self.observation_feature_size(key))
+            keep = _as_key(key) not in excluded_keys
+            mask_parts.append(torch.full((size,), keep, dtype=torch.bool))
+        return torch.cat(mask_parts)
+
+    def _construct_q_function(self) -> TensorDictModule:  # type: ignore[override]
+        """PPO does not use a state-action value function explicitly.
+        This method is not used but required by AlgorithmRuntime interface.
+        """
+        return TensorDictModule(
+            module=torch.nn.Identity(),
+            in_keys=[],
+            out_keys=[],
+        )
+
+    def _construct_actor_critic(self) -> TensorDictModule:
+        """Construct actor-critic network"""
+        assert isinstance(self.value_function, TensorDictModule)
+        assert isinstance(self.policy, TensorDictModule)
+
+        # Use feature extractor if available, otherwise use identity
+        if self.feature_extractor:
+            common_operator = self.feature_extractor
+        else:
+            # Identity pass-through: each input key is forwarded unchanged.
+            class IdentityModule(torch.nn.Module):
+                def forward(self, *x):
+                    return x[0] if len(x) == 1 else x
+
+            in_keys = self.config.policy.get_input_keys()
+            common_operator = TensorDictModule(
+                module=IdentityModule(),
+                in_keys=in_keys,
+                out_keys=in_keys,
+            )
+
+        return ActorValueOperator(
+            common_operator=common_operator,
+            policy_operator=self.policy,
+            value_operator=self.value_function,
+        )
+
+    def _construct_loss_module(self) -> torch.nn.Module:
+        """Construct loss module"""
+        assert isinstance(self.config, PPOTrainerConfig)
+        loss_config = self.config.loss
+        ppo_config = self.config.ppo
+
+        # Initialize lazy layers by performing a forward pass with dummy data
+        fake_tensordict = self.env.fake_tensordict()
+        with torch.no_grad():
+            _ = self.actor_critic(fake_tensordict)
+
+        return ClipPPOLoss(
+            actor_network=self.actor_critic.get_policy_operator(),
+            critic_network=self.actor_critic.get_value_operator(),
+            clip_epsilon=ppo_config.clip_epsilon,
+            loss_critic_type=loss_config.loss_critic_type,
+            entropy_coeff=ppo_config.entropy_coeff,
+            critic_coeff=ppo_config.critic_coeff,
+            normalize_advantage=(
+                ppo_config.normalize_advantage
+                and not ppo_config.normalize_advantage_global
+            ),
+            clip_value=ppo_config.clip_value,
+        )
+
+    def _construct_adv_module(self) -> torch.nn.Module:
+        """Construct advantage module"""
+        assert isinstance(self.config, PPOTrainerConfig)
+        # Create advantage module
+        return GAE(
+            gamma=self.config.loss.gamma,
+            lmbda=self.config.ppo.gae_lambda,
+            value_network=self.actor_critic.get_value_operator(),  # type: ignore
+            average_gae=False,
+            device=self.device,
+            vectorized=False,
+        )
+
+    def _set_optimizers(  # type: ignore[override]
+        self, optimizer_cls: OptimizerClass, optimizer_kwargs: dict[str, Any]
+    ) -> list[torch.optim.Optimizer]:
+        """Create the main optimizer: one group, or split actor/critic groups."""
+        if self._update_cfg.actor_learning_rate is not None:
+            return [optimizer_cls(self._split_lr_param_groups(), **optimizer_kwargs)]
+        params = list(self.actor_critic.parameters())
+        return [optimizer_cls(params, **optimizer_kwargs)]
+
+    def _split_lr_param_groups(self) -> list[dict[str, Any]]:
+        """Actor, critic and log-std groups for asymmetric learning rates."""
+        cfg = self._update_cfg
+        assert cfg.critic_learning_rate is not None
+        actor_lr = float(cfg.actor_learning_rate)
+        critic_lr = float(cfg.critic_learning_rate)
+        # The exploration std is a bare nn.Parameter, so AdamW's decoupled
+        # weight decay would pull it toward log_std=0, i.e. sigma toward
+        # 1.0 rad -- against the anneal that carries this recipe. Give it
+        # its own group at weight_decay=0 so optim.weight_decay can be
+        # tuned on the networks alone. The group stays adaptive, so the KL
+        # rule scales it with the rest of the actor.
+        log_std_params = [
+            param for name, param in self.policy.named_parameters() if "log_std" in name
+        ]
+        log_std_ids = {id(param) for param in log_std_params}
+        policy_params = [
+            param for param in self.policy.parameters() if id(param) not in log_std_ids
+        ]
+        value_params = list(self.value_function.parameters())
+        weight_decay = float(self.config.optim.weight_decay)
+        min_lr = self.config.optim.min_lr
+        max_lr = self.config.optim.max_lr
+        groups: list[dict[str, Any]] = [
+            {
+                "params": policy_params,
+                "lr": actor_lr,
+                "adaptive_lr": True,
+                "lr_min": min_lr,
+                "lr_max": max_lr,
+                "weight_decay": weight_decay,
+                "name": "actor",
+            },
+            {
+                "params": value_params,
+                "lr": critic_lr,
+                "adaptive_lr": False,
+                "weight_decay": weight_decay,
+                "name": "critic",
+            },
+        ]
+        if log_std_params:
+            groups.append(
+                {
+                    "params": log_std_params,
+                    "lr": actor_lr,
+                    "adaptive_lr": True,
+                    "lr_min": min_lr,
+                    "lr_max": max_lr,
+                    "weight_decay": 0.0,
+                    "name": "actor_log_std",
+                }
+            )
+        bias_scale = float(cfg.first_layer_bias_lr_scale)
+        if bias_scale != 1.0:
+            actor_bias = _first_linear_bias(self.policy)
+            critic_bias = _first_linear_bias(self.value_function)
+            groups[0]["params"] = [p for p in policy_params if p is not actor_bias]
+            groups[1]["params"] = [p for p in value_params if p is not critic_bias]
+
+            def _scaled(value: float | None) -> float | None:
+                return None if value is None else float(value) * bias_scale
+
+            groups.append(
+                {
+                    "params": [actor_bias],
+                    "lr": actor_lr * bias_scale,
+                    "adaptive_lr": True,
+                    "lr_min": _scaled(min_lr),
+                    "lr_max": _scaled(max_lr),
+                    "weight_decay": weight_decay,
+                    "name": "actor_first_bias",
+                }
+            )
+            groups.append(
+                {
+                    "params": [critic_bias],
+                    "lr": critic_lr * bias_scale,
+                    "adaptive_lr": False,
+                    "weight_decay": weight_decay,
+                    "name": "critic_first_bias",
+                }
+            )
+        return groups
+
+    def _construct_data_buffer(self) -> ReplayBuffer:
+        """Construct data buffer"""
+        # Create data buffer
+        cfg = self.config
+        sampler = (
+            SamplerWithoutReplacement()
+        )  # Removed True parameter to match ppo_mujoco.py
+        if int(cfg.ppo.rnn_hidden_size) > 0:
+            # Recurrent actor: the buffer stores whole per-env rollout
+            # sequences and samples along the ENV dimension, so every
+            # mini-batch is [env_rows, T] and BPTT sees real time order.
+            # mini_batch_size stays in FRAMES; it converts to env rows here.
+            num_envs = int(self.env.batch_size[0])
+            seq_len = max(1, int(cfg.collector.frames_per_batch) // num_envs)
+            env_rows = max(1, int(cfg.loss.mini_batch_size) // seq_len)
+            return TensorDictReplayBuffer(
+                storage=LazyTensorStorage(
+                    num_envs,
+                    compilable=cfg.compile.compile,  # type: ignore
+                    device=self.device,
+                ),
+                sampler=sampler,
+                batch_size=env_rows,
+                compilable=cfg.compile.compile,
+            )
+        return TensorDictReplayBuffer(
+            storage=LazyTensorStorage(
+                cfg.collector.frames_per_batch,
+                compilable=cfg.compile.compile,  # type: ignore
+                device=self.device,
+            ),
+            sampler=sampler,
+            batch_size=cfg.loss.mini_batch_size,
+            compilable=cfg.compile.compile,
+        )
+
+    def _compile_components(self) -> None:
+        """Compile the loss forward and GAE with torch.compile (if enabled).
+
+        Deliberately narrower than ``torch.compile(self.update)``: ``update``
+        interleaves optimizer stepping and host-side bookkeeping, which force
+        Dynamo graph breaks, and the optimizer's Python-float learning rates
+        would guard-fail on every KL adaptation. Compiling ``loss_module``
+        captures the actor+critic forward that autograd then differentiates;
+        ``adv_module`` covers the GAE scan.
+
+        Measured 2026-08-18 on the tuned G1 recipe (8,192 envs, RTX PRO
+        6000): the loss step is GEMM-bound, so the win is small and comes
+        from GAE (80 -> 57 ms); ``update/ppo_terms`` moves ~1%. ``max-autotune``
+        ties ``default`` and its CUDA-graphs variant crashes on latent-sampler
+        tensor reuse -- use ``max-autotune-no-cudagraphs`` if autotuning.
+        """
+        if not self.config.compile.compile:
+            return
+        if not hasattr(self, "adv_module"):
+            # Base-class __init__ calls this hook before PPO.__init__ has
+            # built the advantage module; the second call compiles.
+            return
+        if getattr(self, "_components_compiled", False):
+            return
+        compile_mode = self.config.compile.compile_mode or "default"
+        self.loss_module = torch.compile(self.loss_module, mode=compile_mode)
+        self.adv_module = torch.compile(self.adv_module, mode=compile_mode)
+        self._components_compiled = True
+
+    @staticmethod
+    def _policy_action_from_dist(dist: Any) -> Tensor | None:
+        """Extract a deterministic action representative from a policy distribution."""
+        for attr_name in ("mean", "loc", "mode"):
+            try:
+                value = getattr(dist, attr_name, None)
+            except Exception:
+                continue
+            if value is None:
+                continue
+            if callable(value):
+                try:
+                    value = value()
+                except TypeError:
+                    continue
+            if isinstance(value, Tensor):
+                return value
+        return None
+
+    def _clip_policy_action(self, action: Tensor) -> Tensor:
+        """Clamp deterministic actions to the action-spec bounds when available."""
+        action_spec = getattr(self.env, "action_spec_unbatched", self.env.action_spec)
+        if not isinstance(action_spec, Bounded):
+            return action
+        low = torch.as_tensor(
+            action_spec.space.low,
+            device=action.device,
+            dtype=action.dtype,
+        )
+        high = torch.as_tensor(
+            action_spec.space.high,
+            device=action.device,
+            dtype=action.dtype,
+        )
+        return torch.clamp(action, min=low, max=high)
+
+    def _lcp_penalty(self, batch: TensorDict) -> tuple[Tensor, dict[str, Tensor]]:
+        """Soft Lipschitz constraint on the policy mean (arXiv:2410.11825).
+
+        ``lcp_coeff * mean_over_rows(sum_over_obs (d sum(loc) / d obs)^2)``,
+        the vector-Jacobian ones-trick surrogate for the Jacobian norm. Runs
+        a second actor forward on a leaf copy of the observations, so the PPO
+        objective's graph is untouched.
+        """
+        coeff = float(self.config.ppo.lcp_coeff)
+        if coeff <= 0.0:
+            return torch.zeros((), device=self.device), {}
+        policy_op = self.actor_critic.get_policy_operator()
+        obs_keys = [key for key in policy_op.in_keys if key not in ("loc", "scale")]
+        cap = max(1, int(self.config.ppo.lcp_batch_cap))
+        rows = min(int(batch.batch_size[0]), cap)
+        sub = batch[:rows].select(*obs_keys).clone()
+        grad_inputs: list[Tensor] = []
+        for key in obs_keys:
+            leaf = sub.get(key).detach().requires_grad_(True)
+            sub.set(key, leaf)
+            grad_inputs.append(leaf)
+        with torch.enable_grad():
+            loc = policy_op(sub).get("loc")
+            grads = torch.autograd.grad(
+                outputs=loc.sum(),
+                inputs=grad_inputs,
+                create_graph=True,
+            )
+            penalty = sum(g.pow(2).sum(dim=-1) for g in grads).mean()
+        return coeff * penalty, {"loss_lcp_penalty": penalty.detach()}
+
+    def _validate_update_amp_support(self) -> None:
+        """Refuse ``ppo.update_amp_dtype`` on an update path that would ignore it.
+
+        The class that defines each update entry point this agent uses must
+        declare ``_update_amp_aware = True`` in its own body, i.e. route its
+        loss forward through :meth:`_update_loss_forward`.
+        """
+        for name in ("update", "_backward_ppo_terms"):
+            owner = next(
+                (cls for cls in type(self).__mro__ if name in cls.__dict__), None
+            )
+            if owner is None:
+                continue
+            if not owner.__dict__.get("_update_amp_aware", False):
+                msg = (
+                    "ppo.update_amp_dtype is set, but "
+                    f"{owner.__name__}.{name} does not run its loss forward "
+                    "through _update_loss_forward; the key would be inert. "
+                    "Unset it for this algorithm."
+                )
+                raise ValueError(msg)
+        ppo_cfg = getattr(getattr(self, "config", None), "ppo", None)
+        if int(getattr(ppo_cfg, "rnn_hidden_size", 0) or 0) > 0:
+            # The old log-prob re-evaluation (_attach_amp_old_log_prob) runs
+            # flat row chunks; recurrent minibatches are [env, T] sequences.
+            msg = "ppo.update_amp_dtype is not supported with a recurrent actor."
+            raise ValueError(msg)
+
+    def _install_update_amp_boundaries(self) -> list[Any]:
+        """Hook float32 boundaries onto the networks the PPO loss evaluates."""
+        actor = self.loss_module.actor_network
+        heads = [m for m in actor.modules() if isinstance(m, GaussianPolicyHead)]
+        if not heads:
+            msg = (
+                "ppo.update_amp_dtype needs the actor's GaussianPolicyHead to "
+                "return float32 loc/scale; none was found in the loss actor."
+            )
+            raise ValueError(msg)
+        output_modules: list[torch.nn.Module] = list(heads)
+        trunks: list[torch.nn.Module] = [head.base for head in heads]
+        critic = getattr(self.loss_module, "critic_network", None)
+        if critic is not None:
+            value_operators = [
+                m for m in critic.modules() if isinstance(m, ValueOperator)
+            ]
+            if not value_operators:
+                msg = (
+                    "ppo.update_amp_dtype needs a ValueOperator critic so the "
+                    "state value can be returned as float32; none was found."
+                )
+                raise ValueError(msg)
+            for operator in value_operators:
+                output_modules.append(operator.module)
+                trunks.append(operator.module)
+        return install_update_amp_boundaries(output_modules, trunks)
+
+    @contextmanager
+    def _frozen_policy_normalizers(self):
+        """Normalize actor inputs without moving their running statistics."""
+        actor = self.loss_module.actor_network
+        normalizers = [
+            m for m in actor.modules() if isinstance(m, RunningMeanStdCatInputs)
+        ]
+        training_states = [m.training for m in normalizers]
+        try:
+            for module in normalizers:
+                module.eval()
+            yield
+        finally:
+            for module, training in zip(normalizers, training_states, strict=True):
+                module.train(training)
+
+    def _attach_amp_old_log_prob(self, buffer_td: TensorDict) -> TensorDict:
+        """Store the bf16 re-evaluation of the old log-prob for the PPO ratio.
+
+        A no-op unless ``ppo.update_amp_dtype`` is set. Called on the rows
+        about to enter the replay buffer, i.e. before the first optimizer step
+        of the iteration, so the weights are still the collection weights.
+        The forward runs exactly as the autocast loss forward does
+        (``ClipPPOLoss._get_cur_log_prob`` under the same autocast and float32
+        boundaries) in chunks of exactly ``loss.mini_batch_size`` rows: the
+        GEMM kernels and their rounding depend on the row count, so a
+        different chunking leaves the noise in. The stored behaviour
+        log-prob, ``loc`` and ``scale`` are not modified.
+        """
+        amp_dtype = getattr(self, "_update_amp_dtype", None)
+        if amp_dtype is None:
+            return buffer_td
+        loss_module = self.loss_module
+        log_prob_key = loss_module.tensor_keys.sample_log_prob
+        action_key = loss_module.tensor_keys.action
+        stored = buffer_td.get(log_prob_key)
+        if not isinstance(stored, Tensor) or buffer_td.batch_dims != 1:
+            msg = (
+                "ppo.update_amp_dtype needs flat rollout rows with a tensor "
+                f"{log_prob_key!r}; got batch dims {buffer_td.batch_dims}."
+            )
+            raise RuntimeError(msg)
+        in_keys = [
+            key
+            for key in loss_module.actor_network.in_keys
+            if key not in ("loc", "scale")
+        ]
+        rows = int(buffer_td.batch_size[0])
+        chunk = max(1, min(int(self.config.loss.mini_batch_size), rows))
+        old_log_prob = torch.empty_like(stored)
+        with (
+            torch.no_grad(),
+            self._frozen_policy_normalizers(),
+            update_autocast(self.device, amp_dtype),
+        ):
+            for start in range(0, rows, chunk):
+                # Only the actor inputs and the action: the actor writes its
+                # loc/scale into this small tensordict, not into the rollout.
+                part = buffer_td[start : start + chunk].select(*in_keys, action_key)
+                log_prob, _dist, is_composite = loss_module._get_cur_log_prob(part)
+                if is_composite or not isinstance(log_prob, Tensor):
+                    msg = (
+                        "ppo.update_amp_dtype does not support composite "
+                        "action distributions."
+                    )
+                    raise RuntimeError(msg)
+                old_log_prob[start : start + chunk] = log_prob.reshape(
+                    old_log_prob[start : start + chunk].shape
+                ).to(old_log_prob.dtype)
+        buffer_td.set(AMP_OLD_LOG_PROB_KEY, old_log_prob)
+        return buffer_td
+
+    def _update_loss_forward(self, batch: TensorDict) -> TensorDict:
+        """Evaluate the PPO loss module for a gradient step.
+
+        Runs under bf16 autocast when ``ppo.update_amp_dtype`` is set and is
+        a plain ``self.loss_module(batch)`` call otherwise. Under autocast the
+        PPO ratio's old log-prob is the bf16 re-evaluation stored by
+        :meth:`_attach_amp_old_log_prob`, swapped in on a shallow copy so the
+        batch itself keeps the behaviour log-prob. Call ``backward`` outside
+        this method, i.e. outside the autocast region.
+        """
+        amp_dtype = getattr(self, "_update_amp_dtype", None)
+        if amp_dtype is None:
+            return self.loss_module(batch)
+        # TensorDict refuses bare `in`; membership goes through keys().
+        if AMP_OLD_LOG_PROB_KEY not in batch.keys():  # noqa: SIM118
+            msg = (
+                f"ppo.update_amp_dtype: the batch has no {AMP_OLD_LOG_PROB_KEY!r}; "
+                "it is attached when the rollout enters the replay buffer "
+                "(_attach_amp_old_log_prob)."
+            )
+            raise RuntimeError(msg)
+        loss_batch = batch.clone(False)
+        loss_batch.set(
+            self.loss_module.tensor_keys.sample_log_prob,
+            batch.get(AMP_OLD_LOG_PROB_KEY),
+        )
+        with update_autocast(self.device, amp_dtype):
+            return self.loss_module(loss_batch)
+
+    def update(
+        self, batch: TensorDict, num_network_updates: int
+    ) -> tuple[TensorDict, int]:
+        """One optimizer step on the joint actor-critic PPO objective."""
+        self.optim.zero_grad(set_to_none=True)
+        output_loss = self._backward_ppo_terms(batch)
+
+        self._synchronize_gradients()
+        # Gradient clipping -- always call for a fixed graph
+        grad_norm_tensor = clip_grad_norm_(self._grad_clip_params, self._max_grad_norm)
+
+        self.optim.step()
+        output_loss.set("alpha", torch.ones((), device=self.device))
+        output_loss.set("grad_norm", grad_norm_tensor.detach())
+        return output_loss, num_network_updates + 1
+
+    def _backward_ppo_terms(self, batch: TensorDict) -> TensorDict:
+        """Backpropagate the PPO objective and return detached update metrics."""
+        loss: TensorDict = self._update_loss_forward(batch)
+        extra_actor_loss, extra_actor_metrics = self._lcp_penalty(batch)
+        (
+            loss["loss_critic"]
+            + loss["loss_objective"]
+            + loss["loss_entropy"]
+            + extra_actor_loss
+        ).backward()
+        output_loss = loss.clone().detach_()
+        for key, value in extra_actor_metrics.items():
+            output_loss.set(key, value.detach())
+        return output_loss
+
+    def _update_output_constants(self) -> dict[str, float]:
+        """Constant metrics :meth:`update` sets after the step, in order."""
+        return {"alpha": 1.0}
+
+    def _synchronize_gradients(self) -> None:
+        """Distributed PPO averages gradients here, before clipping."""
+
+    def _normalize_rollout_advantage(self, advantage: Tensor) -> Tensor:
+        return _normalize_advantage_over_rollout(advantage)
+
+    def _should_stop_training(self, metadata: PPOTrainingMetadata) -> bool:
+        """Extra stop condition (distributed PPO pools the signal across ranks)."""
+        del metadata
+        return False
+
+    # ------------------------------------------------------------------
+    # Captured update (ppo.capture_update)
+    # ------------------------------------------------------------------
+
+    # Set in the body of every class that defines ``update``, ``iterate`` or
+    # ``_backward_ppo_terms`` once its captured path runs the same gradient
+    # computation as its eager one; otherwise the update runs eagerly.
+    _capture_update_aware = True
+
+    # ``iterate`` times each eager step under this timeit key; the captured
+    # replay keeps it.
+    _update_timeit_name = "training/update"
+
+    def _captured_update_backward(self, batch: TensorDict) -> TensorDict:
+        """Compute the PPO gradient with unset gradients at entry."""
+        return self._backward_ppo_terms(batch)
+
+    def _captured_update_clip_gradients(self) -> Tensor:
+        return clip_grad_norm_(self._grad_clip_params, self._max_grad_norm)
+
+    def _captured_update_unsupported_reason(self) -> str | None:
+        """Algorithm-specific reason the captured update cannot run, if any."""
+        if float(self.config.ppo.lcp_coeff) > 0.0:
+            return "ppo.lcp_coeff > 0 (the LCP penalty is not covered)"
+        if int(self._update_cfg.critic_extra_epochs) > 0:
+            # These eager optimizer steps run between the iterations' replays
+            # and move the critic's step counters behind the graph, which the
+            # host mirror of device counters (a resumed run) treats as an error.
+            return (
+                f"{self._update_cfg_section}.critic_extra_epochs > 0 "
+                "(critic-only steps are not covered)"
+            )
+        if (
+            torch.distributed.is_available()
+            and torch.distributed.is_initialized()
+            and torch.distributed.get_world_size() > 1
+        ):
+            # The distributed gradient sync checks unused parameters on the
+            # host and all-reduces between backward and clipping.
+            return "distributed training (the gradient all-reduce is not captured)"
+        return None
+
+    def _captured_update(self):
+        """The captured-update engine, or None when ``ppo.capture_update`` is off."""
+        if not bool(getattr(self.config.ppo, "capture_update", False)):
+            return None
+        engine = getattr(self, "_captured_update_engine", None)
+        if engine is None:
+            from imitationlab.algorithms.ppo.captured_update import (  # noqa: PLC0415
+                CapturedUpdate,
+            )
+
+            engine = CapturedUpdate(self)
+            self._captured_update_engine = engine
+        return engine
+
+    def _collector_iter(self) -> Iterator[TensorDict]:
+        """Yield data from the collector while enforcing NaN guards per batch."""
+        yield from self.collector
+
+    def init_metadata(self) -> PPOTrainingMetadata:
+        """Build the stable state shared across the full on-policy train metadata."""
+        cfg = self.config
+
+        num_mini_batches = cfg.collector.frames_per_batch // cfg.loss.mini_batch_size
+        if cfg.collector.frames_per_batch % cfg.loss.mini_batch_size != 0:
+            num_mini_batches += 1
+
+        self.total_network_updates = (
+            (cfg.collector.total_frames // cfg.collector.frames_per_batch)
+            * cfg.loss.epochs
+            * num_mini_batches
+        )
+
+        trainer_cfg = getattr(cfg, "trainer", None)
+        progress_bar_enabled = (
+            True if trainer_cfg is None else bool(trainer_cfg.progress_bar)
+        )
+        log_interval_frames = (
+            1000 if trainer_cfg is None else max(1, int(trainer_cfg.log_interval))
+        )
+
+        self.collector = cast(Collector, self.collector)
+        # Walltime-segmented resume: a checkpoint records the GLOBAL frame
+        # count, load_model stores it here, and the loop continues from that
+        # offset instead of restarting the budget. total_frames stays the full
+        # target for every segment -- a segment ends either by reaching it or
+        # by the scheduler's walltime, never by a shrunken per-segment budget.
+        resume_offset = int(getattr(self, "_resume_frame_offset", 0))
+        if resume_offset <= 0:
+            # Checkpoints from before 2026-08-16 have no cumulative_env_frames
+            # key, so load_model leaves the offset unset; the launcher may then
+            # supply the known global count explicitly. A checkpoint value
+            # always wins over the config one.
+            resume_offset = int(getattr(cfg.collector, "initial_frame_offset", 0) or 0)
+        resume_offset = max(0, resume_offset)
+        frames_per_batch = int(cfg.collector.frames_per_batch)
+        remaining_frames = max(0, int(cfg.collector.total_frames) - resume_offset)
+        remaining_iterations = min(
+            len(self.collector),
+            -(-remaining_frames // frames_per_batch),
+        )
+        if resume_offset:
+            self.log.info(
+                "Resuming the frame budget at %d/%d (%d iterations remain).",
+                resume_offset,
+                int(cfg.collector.total_frames),
+                remaining_iterations,
+            )
+        return PPOTrainingMetadata(
+            collector_iter=iter(self._collector_iter()),
+            total_iterations=remaining_iterations,
+            policy_operator=self.actor_critic.get_policy_operator(),
+            progress_bar=tqdm(
+                total=cfg.collector.total_frames,
+                initial=resume_offset,
+                disable=not progress_bar_enabled or not sys.stdout.isatty(),
+                dynamic_ncols=True,
+            ),
+            progress_bar_enabled=progress_bar_enabled,
+            log_interval_frames=log_interval_frames,
+            next_log_frame=resume_offset + log_interval_frames,
+            next_file_log_frame=resume_offset + log_interval_frames,
+            frames_processed=resume_offset,
+            updates_completed=torch.zeros((), dtype=torch.int64, device=self.device),
+            minibatches_per_epoch=num_mini_batches,
+            epochs_per_rollout=cfg.loss.epochs,
+            anneal_clip_epsilon=cfg.ppo.anneal_clip_epsilon,
+            base_clip_epsilon=cfg.ppo.clip_epsilon,
+        )
+
+    def validate_training(self) -> None:
+        """Validate algorithm-specific prerequisites before the first rollout."""
+        return
+
+    def collect(self, run: PPOTrainingMetadata, iteration_idx: int) -> PPOIterationData:
+        """Collect one rollout and package it into the per-iteration state object."""
+        self.actor_critic.eval()
+        self.adv_module.eval()
+
+        phase_times: dict[str, float] = {}
+        collect_start = time.perf_counter()
+        with (
+            self._profile_iteration_phase(phase_times, "collect"),
+            timeit("collecting"),
+        ):
+            rollout = next(run.collector_iter)
+        collect_time = time.perf_counter() - collect_start
+        if "collect" in phase_times:
+            collect_time = phase_times["collect"]
+
+        rollout_frames = rollout.numel()
+        run.frames_processed += rollout_frames
+        if run.progress_bar_enabled:
+            run.progress_bar.update(rollout_frames)  # type: ignore[attr-defined]
+        return PPOIterationData(
+            iteration_idx=iteration_idx,
+            rollout=rollout,
+            frames=rollout_frames,
+            collect_time=collect_time,
+            phase_times=phase_times,
+        )
+
+    def prepare(
+        self,
+        _iteration: PPOIterationData,
+        _metadata: PPOTrainingMetadata,
+    ) -> None:
+        """Mutate the collected rollout before the shared learning phase begins."""
+        return
+
+    def pre_iteration_compute(self, rollout: TensorDict) -> TensorDict:
+        """Turn one rollout into the replay-buffer view consumed by minibatch updates."""
+        # SONIC keeps the model in rollout/eval mode while it computes values and
+        # returns, then enables running-statistics updates only for PPO
+        # minibatches.  TorchRL evaluates current/next values through ``vmap``;
+        # mutating normalizer buffers from that vmapped forward is invalid too.
+        with torch.no_grad(), self._freeze_value_normalizer_updates():
+            rollout = self.adv_module(rollout)
+            if (
+                self.config.ppo.normalize_advantage
+                and self.config.ppo.normalize_advantage_global
+            ):
+                advantage = rollout.get("advantage")
+                rollout.set(
+                    "advantage",
+                    self._normalize_rollout_advantage(advantage),
+                )
+            if getattr(self.config.compile, "compile", False):
+                rollout = rollout.clone()
+
+        self.data_buffer.extend(
+            self._attach_amp_old_log_prob(self._rollout_for_buffer(rollout))
+        )
+        return rollout
+
+    def _rollout_for_buffer(self, rollout: TensorDict) -> TensorDict:
+        """Shape a rollout for the data buffer.
+
+        Feed-forward: flat rows (the classic shuffled PPO minibatch).
+        Recurrent (``ppo.rnn_hidden_size > 0``): [env, T] sequences, so
+        mini-batches sampled along the env dimension carry real time order
+        for BPTT. A flat rollout is reshaped back — ``reshape(-1)`` of an
+        [env, T] tensordict is env-major, so the round trip is exact.
+        """
+        if int(self.config.ppo.rnn_hidden_size) <= 0:
+            return rollout if rollout.batch_dims == 1 else rollout.reshape(-1)
+        num_envs = int(self.env.batch_size[0])
+        if rollout.batch_dims == 1:
+            total = int(rollout.batch_size[0])
+            if total % num_envs != 0:
+                msg = (
+                    f"Recurrent PPO cannot reshape a flat rollout of {total} "
+                    f"rows into sequences of {num_envs} environments."
+                )
+                raise RuntimeError(msg)
+            return rollout.reshape(num_envs, total // num_envs)
+        seq_rollout = rollout
+        if int(seq_rollout.batch_size[0]) != num_envs:
+            if (
+                seq_rollout.batch_dims >= 2
+                and int(seq_rollout.batch_size[1]) == num_envs
+            ):
+                seq_rollout = seq_rollout.transpose(0, 1)
+            else:
+                msg = (
+                    "Recurrent PPO expected a rollout with the env dimension "
+                    f"first (num_envs={num_envs}), got batch size "
+                    f"{tuple(seq_rollout.batch_size)}."
+                )
+                raise RuntimeError(msg)
+        return seq_rollout
+
+    @contextmanager
+    def _freeze_value_normalizer_updates(self):
+        """Normalize critic inputs without updating statistics during GAE."""
+        normalizers = [
+            module
+            for module in self.value_function.modules()
+            if isinstance(module, RunningMeanStdCatInputs)
+        ]
+        training_states = [module.training for module in normalizers]
+        try:
+            for module in normalizers:
+                module.eval()
+            yield
+        finally:
+            for module, training in zip(normalizers, training_states, strict=True):
+                module.train(training)
+
+    @property
+    def _required_loss_metrics(self) -> list[str]:
+        """Return the always-recorded loss keys for one PPO minibatch update."""
+        return ["loss_critic", "loss_entropy", "loss_objective"]
+
+    @property
+    def _optional_loss_metrics(self) -> list[str]:
+        """Return optional loss keys recorded when the update produced them."""
+        return [
+            "entropy",
+            "explained_variance",
+            "clip_fraction",
+            "value_clip_fraction",
+            "ESS",
+            "kl_approx",
+            "grad_norm",
+        ]
+
+    def _select_reported_loss_metrics(self, loss: TensorDict) -> TensorDict:
+        """Select the subset of update outputs that should be aggregated and logged."""
+        loss_keys = [key for key in self._required_loss_metrics if key in loss]
+        for key in self._optional_loss_metrics:
+            loss_keys.append(key)
+        return loss.select(*loss_keys)
+
+    def iterate(
+        self, iteration: PPOIterationData, metadata: PPOTrainingMetadata
+    ) -> None:
+        """Run update epochs over the current rollout and aggregate minibatch metrics."""
+        losses = TensorDict(
+            batch_size=[metadata.epochs_per_rollout, metadata.minibatches_per_epoch]
+        )
+        learn_start = time.perf_counter()
+
+        self._apply_critic_lr_schedule(metadata)
+        self.data_buffer.empty()
+        self.actor_critic.train()
+        self.adv_module.train()
+
+        with timeit("training"):
+            # Pre-iteration compute GAE, once per rollout
+            with self._profile_iteration_phase(
+                iteration.phase_times, "learn/advantage_and_buffer"
+            ):
+                iteration.rollout = self.pre_iteration_compute(iteration.rollout)
+
+            # Run PPO epochs over the rollout
+            with self._profile_iteration_phase(
+                iteration.phase_times, "learn/policy_updates"
+            ):
+                captured = self._captured_update()
+                ran_captured = captured is not None and captured.run(
+                    iteration, metadata, losses
+                )
+                for epoch_idx in range(
+                    0 if ran_captured else metadata.epochs_per_rollout
+                ):
+                    # Run PPO epochs over the rollout
+                    for batch_idx, batch in enumerate(self.data_buffer):
+                        kl_context = None
+                        if (self.config.optim.scheduler or "").lower() == "adaptive":
+                            kl_context = self._prepare_kl_context(
+                                batch, metadata.policy_operator
+                            )
+
+                        with timeit("training/update"):
+                            loss, metadata.updates_completed = self.update(
+                                batch, metadata.updates_completed
+                            )
+
+                        if self.lr_scheduler and self.lr_scheduler_step == "update":
+                            self.lr_scheduler.step()
+                        if kl_context is not None:
+                            with self._profile_iteration_phase(
+                                iteration.phase_times, "learn/policy_updates/kl_after"
+                            ):
+                                kl_approx = self._compute_kl_after_update(
+                                    kl_context, metadata.policy_operator
+                                )
+                            if kl_approx is not None:
+                                loss.set("kl_approx", kl_approx.detach())
+                                self._record_kl_for_lr_adaptation(
+                                    kl_approx, self.config.optim
+                                )
+
+                        losses[epoch_idx, batch_idx] = (
+                            self._select_reported_loss_metrics(loss)
+                        )
+
+                    if self.lr_scheduler and self.lr_scheduler_step == "epoch":
+                        self.lr_scheduler.step()
+
+                # One adaptive-LR step per iteration under
+                # optim.kl_adapt_step="iteration"; a no-op otherwise.
+                self._flush_kl_lr_adaptation(self.config.optim)
+
+            with self._profile_iteration_phase(
+                iteration.phase_times, "learn/critic_extra_updates"
+            ):
+                critic_extra_metrics = self._run_critic_extra_updates(iteration.rollout)
+            iteration.metrics.update(
+                {f"train/{key}": value for key, value in critic_extra_metrics.items()}
+            )
+
+        iteration.learn_time = time.perf_counter() - learn_start
+        losses_mean = losses.apply(lambda x: x.float().mean(), batch_size=[])
+        for key, value in losses_mean.items():  # type: ignore[attr-defined]
+            iteration.metrics[f"train/{key}"] = value.item()  # type: ignore[attr-defined]
+
+    def _apply_critic_lr_schedule(self, metadata: PPOTrainingMetadata) -> None:
+        """Set the critic group's learning rate for this iteration.
+
+        A no-op under ``critic_lr_schedule="constant"``. Progress is cumulative
+        environment frames over the configured frame budget --
+        ``metadata.frames_processed`` is seeded with the resume offset, so a
+        walltime-chained segment continues the decay where the previous one
+        stopped instead of restarting at ``critic_learning_rate``.
+        """
+        cfg = self._update_cfg
+        schedule = str(cfg.critic_lr_schedule)
+        if schedule == "constant":
+            return
+        start = cfg.critic_learning_rate
+        end = cfg.critic_lr_final
+        if start is None or end is None:
+            return
+        total_frames = float(self.config.collector.total_frames)
+        if total_frames <= 0.0:
+            return
+        progress = float(metadata.frames_processed) / total_frames
+        progress = min(max(progress, 0.0), 1.0)
+        start = float(start)
+        end = float(end)
+        if schedule == "linear":
+            lr = start + (end - start) * progress
+        else:  # cosine
+            lr = end + 0.5 * (start - end) * (1.0 + math.cos(math.pi * progress))
+        bias_scale = float(cfg.first_layer_bias_lr_scale)
+        for group in self.optim.param_groups:
+            if group.get("name") == "critic":
+                group["lr"] = lr
+            elif group.get("name") == "critic_first_bias":
+                group["lr"] = lr * bias_scale
+
+    def _run_critic_extra_updates(self, rollout: TensorDict) -> dict[str, float]:
+        """Critic-only minibatch steps on this rollout's fixed GAE targets.
+
+        See :attr:`PPOConfig.critic_extra_epochs`. ``rollout`` is the
+        post-``pre_iteration_compute`` rollout (``value_target`` and the
+        collected ``state_value`` present). Returns per-iteration means of the
+        critic loss, the value-clip fraction and the gradient norm over the
+        extra steps, plus the step count; ``{}`` when the knob is off.
+        """
+        cfg = self._update_cfg
+        epochs = int(cfg.critic_extra_epochs)
+        if epochs <= 0:
+            return {}
+        num_minibatches = int(cfg.critic_extra_minibatches)
+        flat = rollout if rollout.batch_dims == 1 else rollout.reshape(-1)
+        total = int(flat.batch_size[0])
+        if total <= 0:
+            return {}
+        # The compiled wrapper exposes the original module; ``loss_critic`` is
+        # a plain method call on it (not traced), so minibatch shapes are free.
+        loss_module = getattr(self.loss_module, "_orig_mod", self.loss_module)
+        loss_sum = torch.zeros((), device=self.device)
+        clip_sum = torch.zeros((), device=self.device)
+        grad_sum = torch.zeros((), device=self.device)
+        steps = 0
+        with self._freeze_value_normalizer_updates():
+            for _epoch_idx in range(epochs):
+                perm = torch.randperm(total, device=flat.device)
+                for index in perm.chunk(num_minibatches):
+                    if index.numel() == 0:
+                        continue
+                    batch = flat[index]
+                    self.optim.zero_grad(set_to_none=True)
+                    loss_critic, clip_fraction, _explained = loss_module.loss_critic(
+                        batch
+                    )
+                    if loss_critic.ndim > 0:
+                        loss_critic = loss_critic.mean()
+                    loss_critic.backward()
+                    # Only the critic's parameters carry gradients here; the
+                    # optimizer skips parameters whose ``.grad`` is None, so
+                    # the actor groups (and their Adam moments) stay put.
+                    grad_norm = clip_grad_norm_(
+                        self._grad_clip_params, self._max_grad_norm
+                    )
+                    self.optim.step()
+                    loss_sum = loss_sum + loss_critic.detach()
+                    if clip_fraction is not None:
+                        clip_sum = clip_sum + clip_fraction.detach().float().mean()
+                    grad_sum = grad_sum + grad_norm.detach()
+                    steps += 1
+        self.optim.zero_grad(set_to_none=True)
+        if steps == 0:
+            return {}
+        scale = float(steps)
+        return {
+            "critic_extra_steps": float(steps),
+            "critic_extra_loss_critic": (loss_sum / scale).item(),
+            "critic_extra_value_clip_fraction": (clip_sum / scale).item(),
+            "critic_extra_grad_norm": (grad_sum / scale).item(),
+        }
+
+    def _build_control_metrics(self, metadata: PPOTrainingMetadata) -> dict[str, Any]:
+        """Report optimizer and scheduler-controlled scalars for the current run."""
+        clip_attr = getattr(self.loss_module, "clip_epsilon", None)
+        if metadata.anneal_clip_epsilon and isinstance(clip_attr, torch.Tensor):
+            clip_epsilon = float(clip_attr.detach().item())
+        else:
+            clip_epsilon = float(metadata.base_clip_epsilon)
+        metrics = {
+            "train/lr": self.optim.param_groups[0]["lr"],
+            "train/clip_epsilon": clip_epsilon,
+        }
+        for group in self.optim.param_groups:
+            group_name = group.get("name")
+            if isinstance(group_name, str) and group_name:
+                metrics[f"train/{group_name}_lr"] = group["lr"]
+        return metrics
+
+    def _build_timing_metrics(
+        self, iteration: PPOIterationData, metadata: PPOTrainingMetadata
+    ) -> dict[str, float]:
+        """Return timing metrics for one rollout iteration."""
+        rate = (
+            metadata.progress_bar.format_dict.get("rate")  # type: ignore[attr-defined]
+            if metadata.progress_bar_enabled
+            else None
+        )
+        if rate is not None:
+            return {"time/speed": float(rate)}
+        iter_time = iteration.collect_time + iteration.learn_time
+        speed = float(iteration.frames) / iter_time if iter_time > 0.0 else 0.0
+        return {"time/speed": speed}
+
+    def _progress_summary_fields(self) -> tuple[tuple[str, str], ...]:
+        """Return the metrics printed for non-progress-bar training runs."""
+        return (
+            ("train/step_reward_mean", "r_step"),
+            ("episode/length", "ep_len"),
+            ("episode/return", "r_ep"),
+            ("train/loss_objective", "pi_loss"),
+            ("time/speed", "fps"),
+        )
+
+    def record(
+        self,
+        iteration: PPOIterationData,
+        metadata: PPOTrainingMetadata,
+    ) -> None:
+        """Flush metrics, refresh progress, and handle checkpoint cadence."""
+        rollout = iteration.rollout
+
+        if "train/step_reward_mean" not in iteration.metrics and (
+            "next",
+            "reward",
+        ) in rollout.keys(True):
+            step_rewards = rollout["next", "reward"]
+            iteration.metrics.update(
+                {
+                    "train/step_reward_mean": step_rewards.mean().item(),
+                    "train/step_reward_std": step_rewards.std().item(),
+                    "train/step_reward_max": step_rewards.max().item(),
+                    "train/step_reward_min": step_rewards.min().item(),
+                }
+            )
+        # PPO uses the environment reward as its training objective.
+        if "train/step_reward_mean" in iteration.metrics:
+            iteration.metrics.setdefault(
+                "train/env_reward_mean", iteration.metrics["train/step_reward_mean"]
+            )
+
+        episode_rewards = rollout["next", "episode_reward"][rollout["next", "done"]]
+        if len(episode_rewards) > 0:
+            episode_length = rollout["next", "step_count"][rollout["next", "done"]]
+            episode_lengths = episode_length.cpu().tolist()
+            episode_reward_values = episode_rewards.cpu().tolist()
+            self.episode_lengths.extend(episode_lengths)
+            self.episode_rewards.extend(episode_reward_values)
+            iteration.metrics.update(
+                {
+                    "episode/length": float(np.mean(self.episode_lengths)),
+                    "episode/return": float(np.mean(self.episode_rewards)),
+                    "train/reward": float(np.mean(episode_reward_values)),
+                }
+            )
+
+        self._abort_on_nonfinite(iteration, metadata)
+
+        iteration.metrics.update(self._build_control_metrics(metadata))
+        iteration.metrics.update(self._build_timing_metrics(iteration, metadata))
+        iteration.metrics.update(timeit.todict(prefix="time"))  # type: ignore[arg-type]
+        self.log_training_metrics(
+            iteration.metrics,
+            frames=metadata.frames_processed,
+            iteration=metadata.frames_processed // iteration.frames,
+        )
+        self._log_iteration_file_summary(metadata, iteration)
+        self.collector.update_policy_weights_()
+        self._refresh_progress_display(metadata, iteration)
+
+        if self._should_save_checkpoint(
+            frames_processed=metadata.frames_processed,
+            frames_in_iteration=iteration.frames,
+        ):
+            checkpoint_dir = self.log_dir / self.config.logger.save_path
+            custom_save = getattr(self, "save", None)
+            if callable(custom_save):
+                checkpoint_dir.mkdir(parents=True, exist_ok=True)
+                custom_save(
+                    checkpoint_dir / f"model_step_{metadata.frames_processed}.pt"
+                )
+            else:
+                self.save_model(
+                    path=checkpoint_dir,
+                    step=metadata.frames_processed,
+                )
+
+    # Watchdog keys: the first quantities to turn non-finite when a rollout
+    # produces NaN. Checked every iteration because a NaN policy keeps training
+    # at full speed and every later checkpoint is unusable -- two chains
+    # (2026-08-23 fsq64, 2026-08-24 emastack) each burned about a day before
+    # anyone noticed. Losses are excluded on purpose: an optimizer can recover
+    # a single bad update, but a non-finite reward or policy parameter cannot.
+    _NONFINITE_WATCH_KEYS: tuple[str, ...] = (
+        "train/step_reward_mean",
+        "episode/return",
+    )
+
+    def _abort_on_nonfinite(
+        self, iteration: PPOIterationData, metadata: PPOTrainingMetadata
+    ) -> None:
+        """Raise as soon as training goes non-finite, before writing a checkpoint.
+
+        Set ``agent.abort_on_nonfinite=false`` to downgrade this to a warning.
+        """
+        offenders = [
+            key
+            for key in self._NONFINITE_WATCH_KEYS
+            if key in iteration.metrics
+            and not math.isfinite(float(iteration.metrics[key]))
+        ]
+        if not offenders:
+            bad_params = [
+                name
+                for name, tensor in (
+                    self.policy.named_parameters() if self.policy else ()
+                )
+                if not torch.isfinite(tensor).all()
+            ]
+            if bad_params:
+                offenders = [f"policy:{bad_params[0]}"]
+        if not offenders:
+            return
+        message = (
+            "Training went non-finite at "
+            f"{metadata.frames_processed} cumulative frames: {offenders}. "
+            "Every later checkpoint would be unusable; aborting so the chain "
+            "can resume from the last good checkpoint."
+        )
+        if not bool(getattr(self.config, "abort_on_nonfinite", True)):
+            self.log.error("%s (abort_on_nonfinite=false, continuing)", message)
+            return
+        raise RuntimeError(message)
+
+    @torch.no_grad()
+    def _update_rollout_normalizers(self, rollout: TensorDict) -> None:
+        """Count each collected current observation once, after all PPO/KL work.
+
+        Updating before record() ensures both saved checkpoints and the next
+        collector weight refresh receive the same new buffers. Do not include
+        next/final observations: the rollout already counts each visited state.
+        """
+        if getattr(self.config.ppo, "freeze_normalizers", False):
+            return
+        if not self.config.ppo.update_normalizers_after_rollout:
+            return
+        for network, network_config in (
+            (self.policy, self.config.policy),
+            (self.value_function, self.config.value_function),
+        ):
+            if network is None or network_config is None:
+                continue
+            normalizers = [
+                module
+                for module in network.modules()
+                if isinstance(module, RunningMeanStdCatInputs)
+            ]
+            if not normalizers:
+                continue
+            values = tuple(rollout.get(key) for key in network_config.get_input_keys())
+            value = values[0] if len(values) == 1 else torch.cat(values, dim=-1)
+            for normalizer in normalizers:
+                normalizer._update(value)
+
+    @honours_train_time_budget
+    def train(self) -> None:  # type: ignore
+        """Train the agent with the shared on-policy rollout-to-update workflow."""
+        self.validate_training()
+        metadata = self.init_metadata()
+
+        try:
+            for iteration_idx in range(metadata.total_iterations):
+                # 1) Collect a rollout and create the iteration state.
+                iteration = self.collect(metadata, iteration_idx)
+                # The first batch carries the env cold start; the walltime
+                # budget (trainer.max_train_seconds) starts after it.
+                self._start_train_clock()
+
+                # 2) Let the algorithm reshape rewards or attach extra data.
+                with self._profile_iteration_phase(iteration.phase_times, "prepare"):
+                    self.prepare(iteration, metadata)
+
+                # 3) Run the shared learning phase over the prepared rollout.
+                with self._profile_iteration_phase(iteration.phase_times, "learn"):
+                    self.iterate(iteration, metadata)
+                if "learn" in iteration.phase_times:
+                    iteration.learn_time = iteration.phase_times["learn"]
+
+                self._update_rollout_normalizers(iteration.rollout)
+
+                # Host clock only; a spent budget makes this the last iteration.
+                metadata.stop_after_iteration = (
+                    self._train_time_budget_reached()
+                    or self._calibration_step(metadata.frames_processed)
+                )
+
+                # 4) Log, refresh collector weights, and checkpoint if needed.
+                with self._profile_iteration_phase(iteration.phase_times, "record"):
+                    self.record(iteration, metadata)
+                self._finish_iteration_profile(metadata, iteration)
+                if metadata.stop_after_iteration:
+                    break
+                if self._should_stop_training(metadata):
+                    break
+            if metadata.stop_after_iteration:
+                self._finish_train_time_budget(metadata)
+        except KeyboardInterrupt:
+            # Walltime/SIGTERM (or a real Ctrl+C): persist the current state so
+            # a chained segment resumes from HERE rather than from the last
+            # save_interval boundary. Saved with the global frame step, same
+            # naming as periodic checkpoints.
+            if int(getattr(self, "config", None).save_interval or 0) > 0:
+                self.log.info(
+                    "Interrupted at frame %d; writing a final resume checkpoint.",
+                    int(metadata.frames_processed),
+                )
+                self.save_model(
+                    path=self.log_dir / self.config.logger.save_path,
+                    step=int(metadata.frames_processed),
+                )
+            raise
+        finally:
+            metadata.progress_bar.close()  # type: ignore[attr-defined]
+            self.collector.shutdown()
+
+    def predict(self, obs: Tensor | np.ndarray) -> Tensor:  # type: ignore[override]
+        """Predict action given observation."""
+        obs = torch.as_tensor(obs, device=self.device)
+        input_keys = list(
+            getattr(self, "total_input_keys", self.config.policy.get_input_keys())
+        )
+        input_key = input_keys[0]
+        feature_shape = self.observation_feature_shape(input_key)
+        if tuple(obs.shape) == feature_shape:
+            obs = obs.unsqueeze(0)
+        batch_ndim = max(obs.ndim - len(feature_shape), 0)
+        batch_size = list(obs.shape[:batch_ndim])
+        policy_op = self.actor_critic.get_policy_operator()
+        policy_op.eval()
+        with torch.no_grad(), set_exploration_type(InteractionType.DETERMINISTIC):
+            td = TensorDict(
+                dict.fromkeys(input_keys, obs),
+                batch_size=batch_size,
+                device=self.device,
+            )
+            td = policy_op(td)
+            return td.get("action")

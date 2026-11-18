@@ -1,0 +1,457 @@
+import numpy as np
+import pytest
+import torch
+from tensordict import TensorDict
+from torchrl.data import LazyMemmapStorage
+from torchrl.data.replay_buffers import TensorDictReplayBuffer
+
+
+def _make_dummy_rb_and_traj_info(tmp_path, lengths=(3, 5)):
+    # Build 2 trajectories back-to-back in memmap storage
+    total = sum(lengths)
+    storage = LazyMemmapStorage(
+        total, scratch_dir=str(tmp_path), device="cpu", existsok=True
+    )
+    rb = TensorDictReplayBuffer(storage=storage)
+
+    start = []
+    end = []
+    ordered = []
+    offset = 0
+    num_joints = 2
+    for i, L in enumerate(lengths):
+        qpos = torch.zeros((L, 7 + num_joints), dtype=torch.float32)
+        qvel = torch.zeros((L, 6 + num_joints), dtype=torch.float32)
+        td = TensorDict(
+            {
+                "obs": torch.full((L, 1), float(i)),
+                "done": torch.zeros((L, 1), dtype=torch.bool),
+                "qpos": qpos,
+                "qvel": qvel,
+            },
+            batch_size=[L],
+        )
+        rb.extend(td)
+        start.append(offset)
+        offset += L
+        end.append(offset)
+        ordered.append(("ds", "m", f"t{i}"))
+
+    traj_info = {"start_index": start, "end_index": end, "ordered_traj_list": ordered}
+    return rb, traj_info
+
+
+def _make_step_rb_and_traj_info(tmp_path, lengths=(5, 6), num_joints=2):
+    total = sum(lengths)
+    storage = LazyMemmapStorage(
+        total, scratch_dir=str(tmp_path), device="cpu", existsok=True
+    )
+    rb = TensorDictReplayBuffer(storage=storage)
+
+    start = []
+    end = []
+    ordered = []
+    offset = 0
+    for i, L in enumerate(lengths):
+        steps = torch.arange(L, dtype=torch.float32)
+        obs = (steps + i * 100.0).unsqueeze(1)
+        qpos = torch.zeros((L, 7 + num_joints), dtype=torch.float32)
+        qvel = torch.zeros((L, 6 + num_joints), dtype=torch.float32)
+        td = TensorDict(
+            {
+                "obs": obs,
+                "done": torch.zeros((L, 1), dtype=torch.bool),
+                "qpos": qpos,
+                "qvel": qvel,
+            },
+            batch_size=[L],
+        )
+        rb.extend(td)
+        start.append(offset)
+        offset += L
+        end.append(offset)
+        ordered.append(("ds", "m", f"t{i}"))
+
+    traj_info = {"start_index": start, "end_index": end, "ordered_traj_list": ordered}
+    return rb, traj_info
+
+
+def _make_transition_step_rb_and_traj_info(tmp_path, lengths=(5, 6), num_joints=2):
+    total = sum(lengths)
+    storage = LazyMemmapStorage(
+        total, scratch_dir=str(tmp_path), device="cpu", existsok=True
+    )
+    rb = TensorDictReplayBuffer(storage=storage)
+
+    start = []
+    end = []
+    ordered = []
+    offset = 0
+    for i, L in enumerate(lengths):
+        steps = torch.arange(L, dtype=torch.float32)
+        obs = (steps + i * 100.0).unsqueeze(1)
+        qpos = torch.zeros((L, 7 + num_joints), dtype=torch.float32)
+        qvel = torch.zeros((L, 6 + num_joints), dtype=torch.float32)
+        next_qpos = torch.zeros((L, 7 + num_joints), dtype=torch.float32)
+        next_qvel = torch.zeros((L, 6 + num_joints), dtype=torch.float32)
+        for joint_idx in range(num_joints):
+            qpos[:, 7 + joint_idx] = steps + float(joint_idx) * 0.1 + i * 100.0
+            qvel[:, 6 + joint_idx] = 10.0 + steps + float(joint_idx) + i * 100.0
+            next_qpos[:, 7 + joint_idx] = (
+                steps + 1.0 + float(joint_idx) * 0.1 + i * 100.0
+            )
+            next_qvel[:, 6 + joint_idx] = 20.0 + steps + float(joint_idx) + i * 100.0
+        td = TensorDict(
+            {
+                "obs": obs,
+                "done": torch.zeros((L, 1), dtype=torch.bool),
+                "qpos": qpos,
+                "qvel": qvel,
+                "next_qpos": next_qpos,
+                "next_qvel": next_qvel,
+            },
+            batch_size=[L],
+        )
+        rb.extend(td)
+        start.append(offset)
+        offset += L
+        end.append(offset)
+        ordered.append(("ds", "m", f"t{i}"))
+
+    traj_info = {"start_index": start, "end_index": end, "ordered_traj_list": ordered}
+    return rb, traj_info
+
+
+def test_parallel_trajectory_manager_direct_indexing_and_reset(tmp_path):
+    from imitationlab.data_tools.common.trajectories import (
+        ParallelTrajectoryManager,
+        ResetSchedule,
+    )
+
+    rb, traj_info = _make_dummy_rb_and_traj_info(tmp_path, lengths=(3, 5))
+    mgr = ParallelTrajectoryManager(
+        rb=rb,
+        traj_info=traj_info,
+        num_envs=2,
+        reset_schedule=ResetSchedule.SEQUENTIAL,
+        wrap_steps=False,
+        target_joint_names=["joint1", "joint2"],
+        reference_joint_names=["joint1", "joint2"],
+    )
+
+    # SEQUENTIAL init reset should assign ranks [0,1] with step 0
+    assert mgr.env_traj_rank.tolist() == [0, 1]
+    assert mgr.env_step.tolist() == [0, 0]
+
+    td0 = mgr.sample(advance=True)
+    # obs is filled with float(rank) for this dummy setup
+    assert td0["obs"].squeeze(-1).tolist() == [0.0, 1.0]
+    assert mgr.env_step.tolist() == [1, 1]
+
+    # Reset env 0 -> sequential should pick rank 0 again (cycles) and step resets
+    mgr.reset_envs([0])
+    assert mgr.env_step.tolist()[0] == 0
+    assert mgr.env_traj_rank.tolist()[0] in [0, 1]
+
+
+def test_parallel_trajectory_manager_advance_cursors_without_sampling(tmp_path):
+    from imitationlab.data_tools.common.trajectories import (
+        ParallelTrajectoryManager,
+        ResetSchedule,
+    )
+
+    rb, traj_info = _make_step_rb_and_traj_info(tmp_path, lengths=(3, 5))
+    mgr = ParallelTrajectoryManager(
+        rb=rb,
+        traj_info=traj_info,
+        num_envs=2,
+        reset_schedule=ResetSchedule.SEQUENTIAL,
+        wrap_steps=False,
+        target_joint_names=["joint1", "joint2"],
+        reference_joint_names=["joint1", "joint2"],
+    )
+    mgr.set_env_cursor(
+        env_ids=[0, 1], ranks=torch.tensor([0, 1]), steps=torch.tensor([1, 4])
+    )
+
+    steps, indices = mgr.advance_cursors()
+
+    assert steps.tolist() == [2, 4]
+    assert indices.tolist() == [2, 7]
+    assert mgr.global_indices_for(
+        torch.tensor([1, 0]), torch.tensor([3, 1])
+    ).tolist() == [6, 1]
+    # Returned plans must not alias the live cursors: reset handling is allowed
+    # to mutate the manager while an asynchronous reader consumes the plan.
+    mgr.reset_envs([0], ranks=torch.tensor([1]), steps=torch.tensor([0]))
+    assert steps.tolist() == [2, 4]
+    assert indices.tolist() == [2, 7]
+
+
+def test_parallel_trajectory_manager_maps_planned_cursors_without_mutation(tmp_path):
+    from imitationlab.data_tools.common.trajectories import (
+        ParallelTrajectoryManager,
+        ResetSchedule,
+    )
+
+    rb, traj_info = _make_step_rb_and_traj_info(tmp_path, lengths=(3, 5))
+    mgr = ParallelTrajectoryManager(
+        rb=rb,
+        traj_info=traj_info,
+        num_envs=2,
+        reset_schedule=ResetSchedule.SEQUENTIAL,
+        target_joint_names=["joint1", "joint2"],
+        reference_joint_names=["joint1", "joint2"],
+    )
+    original_ranks = mgr.env_traj_rank.clone()
+    original_steps = mgr.env_step.clone()
+
+    indices = mgr.global_indices_for(torch.tensor([1, 0]), torch.tensor([4, 2]))
+
+    assert indices.tolist() == [7, 2]
+    torch.testing.assert_close(mgr.env_traj_rank, original_ranks)
+    torch.testing.assert_close(mgr.env_step, original_steps)
+    with pytest.raises(ValueError, match="matching 1D"):
+        mgr.global_indices_for(torch.tensor([[0]]), torch.tensor([0]))
+    with pytest.raises(ValueError, match="ranks"):
+        mgr.global_indices_for(torch.tensor([2]), torch.tensor([0]))
+    with pytest.raises(ValueError, match="steps"):
+        mgr.global_indices_for(torch.tensor([0]), torch.tensor([3]))
+
+
+def test_parallel_trajectory_manager_reset_generator_is_dedicated(tmp_path):
+    from imitationlab.data_tools.common.trajectories import (
+        ParallelTrajectoryManager,
+        ResetSchedule,
+    )
+
+    rb, traj_info = _make_dummy_rb_and_traj_info(tmp_path, lengths=(3, 5, 4))
+
+    def _manager(seed: int) -> ParallelTrajectoryManager:
+        generator = torch.Generator(device="cpu")
+        generator.manual_seed(seed)
+        return ParallelTrajectoryManager(
+            rb=rb,
+            traj_info=traj_info,
+            num_envs=8,
+            reset_schedule=ResetSchedule.RANDOM,
+            reset_generator=generator,
+            target_joint_names=["joint1", "joint2"],
+            reference_joint_names=["joint1", "joint2"],
+        )
+
+    torch.manual_seed(1)
+    first = _manager(123)
+    first_initial = first.env_traj_rank.clone()
+    first.reset_envs(torch.arange(8))
+    first_next = first.env_traj_rank.clone()
+
+    torch.manual_seed(9999)
+    second = _manager(123)
+    second_initial = second.env_traj_rank.clone()
+    second.reset_envs(torch.arange(8))
+    second_next = second.env_traj_rank.clone()
+
+    torch.testing.assert_close(first_initial, second_initial)
+    torch.testing.assert_close(first_next, second_next)
+
+
+def test_parallel_trajectory_manager_round_robin(tmp_path):
+    from imitationlab.data_tools.common.trajectories import (
+        ParallelTrajectoryManager,
+        ResetSchedule,
+    )
+
+    rb, traj_info = _make_dummy_rb_and_traj_info(tmp_path, lengths=(3, 5))
+    mgr = ParallelTrajectoryManager(
+        rb=rb,
+        traj_info=traj_info,
+        num_envs=2,
+        reset_schedule=ResetSchedule.ROUND_ROBIN,
+        target_joint_names=["joint1", "joint2"],
+        reference_joint_names=["joint1", "joint2"],
+    )
+    # Initial round-robin reset should distribute envs across trajectories.
+    assert mgr.env_traj_rank.tolist() == [0, 1]
+
+    # Force both to rank 0 then round-robin reset should move them to rank 1
+    mgr.set_env_cursor(env_ids=[0, 1], ranks=torch.tensor([0, 0]))
+    mgr.reset_envs([0, 1])
+    assert mgr.env_traj_rank.tolist() == [1, 1]
+
+
+def test_parallel_trajectory_manager_reset_start_step(tmp_path):
+    from imitationlab.data_tools.common.trajectories import (
+        ParallelTrajectoryManager,
+        ResetSchedule,
+    )
+
+    rb, traj_info = _make_dummy_rb_and_traj_info(tmp_path, lengths=(3, 5))
+    mgr = ParallelTrajectoryManager(
+        rb=rb,
+        traj_info=traj_info,
+        num_envs=2,
+        reset_schedule=ResetSchedule.SEQUENTIAL,
+        reset_start_step=2,
+        target_joint_names=["joint1", "joint2"],
+        reference_joint_names=["joint1", "joint2"],
+    )
+    assert mgr.env_step.tolist() == [2, 2]
+
+    # Explicit reset steps override the default reset_start_step.
+    mgr.reset_envs([0], steps=1)
+    assert mgr.env_step.tolist()[0] == 1
+
+
+def test_parallel_trajectory_manager_sample_slice_modes(tmp_path):
+    from imitationlab.data_tools.common.trajectories import (
+        ParallelTrajectoryManager,
+        ResetSchedule,
+    )
+
+    rb, traj_info = _make_step_rb_and_traj_info(tmp_path, lengths=(5, 6))
+    mgr = ParallelTrajectoryManager(
+        rb=rb,
+        traj_info=traj_info,
+        num_envs=2,
+        reset_schedule=ResetSchedule.RANDOM,
+        target_joint_names=["joint1", "joint2"],
+        reference_joint_names=["joint1", "joint2"],
+    )
+    mgr.set_env_cursor(env_ids=[0, 1], ranks=torch.tensor([0, 1]))
+
+    start_steps = torch.tensor([[1, 3], [0, 2]])
+    td = mgr.sample_slice(
+        batch_size=2,
+        env_ids=[0, 1],
+        start_steps=start_steps,
+        mode="independent",
+    )
+    obs = td["obs"].squeeze(-1)
+    expected = torch.tensor([[1.0, 3.0], [100.0, 102.0]])
+    assert torch.allclose(obs, expected)
+
+    start_steps_contig = torch.tensor([2, 1])
+    td_contig = mgr.sample_slice(
+        batch_size=3,
+        env_ids=[0, 1],
+        start_steps=start_steps_contig,
+        mode="contiguous",
+    )
+    obs_contig = td_contig["obs"].squeeze(-1)
+    expected_contig = torch.tensor([[2.0, 3.0, 4.0], [101.0, 102.0, 103.0]])
+    assert torch.allclose(obs_contig, expected_contig)
+
+
+def test_parallel_trajectory_manager_materializes_aligned_next_fields(tmp_path):
+    from imitationlab.data_tools.common.trajectories import (
+        ParallelTrajectoryManager,
+        ResetSchedule,
+    )
+
+    rb, traj_info = _make_transition_step_rb_and_traj_info(tmp_path, lengths=(5, 6))
+    mgr = ParallelTrajectoryManager(
+        rb=rb,
+        traj_info=traj_info,
+        num_envs=2,
+        reset_schedule=ResetSchedule.RANDOM,
+        target_joint_names=["joint1", "joint2"],
+        reference_joint_names=["joint1", "joint2"],
+    )
+    mgr.set_env_cursor(env_ids=[0, 1], ranks=torch.tensor([0, 1]))
+
+    start_steps = torch.tensor([1, 2])
+    td = mgr.sample_slice(
+        batch_size=2,
+        env_ids=[0, 1],
+        start_steps=start_steps,
+        mode="contiguous",
+    )
+
+    joint_pos = td["joint_pos"]
+    next_joint_pos = td.get(("next", "joint_pos"))
+    next_joint_vel = td.get(("next", "joint_vel"))
+
+    assert next_joint_pos is not None
+    assert next_joint_vel is not None
+    np.testing.assert_allclose(
+        next_joint_pos[..., 0].cpu().numpy(),
+        (joint_pos[..., 0] + 1.0).cpu().numpy(),
+        atol=1e-6,
+    )
+    np.testing.assert_allclose(
+        next_joint_vel[..., 0].cpu().numpy(),
+        np.array([[21.0, 22.0], [122.0, 123.0]], dtype=np.float32),
+        atol=1e-6,
+    )
+
+
+def test_parallel_trajectory_manager_root_pose_matches_reference_qpos(tmp_path):
+    from imitationlab.data_tools.common.trajectories import (
+        ParallelTrajectoryManager,
+        ResetSchedule,
+    )
+
+    storage = LazyMemmapStorage(
+        3, scratch_dir=str(tmp_path), device="cpu", existsok=True
+    )
+    rb = TensorDictReplayBuffer(storage=storage)
+
+    qpos = torch.tensor(
+        [
+            [1.0, 2.0, 0.0, 0.70710677, 0.0, 0.0, 0.70710677, 0.0, 0.0],
+            [2.0, 2.0, 0.0, 0.70710677, 0.0, 0.0, 0.70710677, 0.0, 0.0],
+            [1.0, 3.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0],
+        ],
+        dtype=torch.float32,
+    )
+    qvel = torch.zeros((3, 8), dtype=torch.float32)
+    td = TensorDict(
+        {
+            "obs": torch.zeros((3, 1)),
+            "done": torch.zeros((3, 1), dtype=torch.bool),
+            "qpos": qpos,
+            "qvel": qvel,
+        },
+        batch_size=[3],
+    )
+    rb.extend(td)
+    traj_info = {
+        "start_index": [0],
+        "end_index": [3],
+        "ordered_traj_list": [("ds", "m", "t0")],
+    }
+
+    mgr = ParallelTrajectoryManager(
+        rb=rb,
+        traj_info=traj_info,
+        num_envs=1,
+        reset_schedule=ResetSchedule.RANDOM,
+        target_joint_names=["joint1", "joint2"],
+        reference_joint_names=["joint1", "joint2"],
+    )
+
+    mgr.set_env_cursor(env_ids=[0], ranks=torch.tensor([0]), steps=torch.tensor([0]))
+    td0 = mgr.sample(env_ids=[0], advance=False)
+    assert torch.allclose(td0["root_pos"][0], torch.tensor([1.0, 2.0, 0.0]))
+    assert torch.allclose(
+        td0["root_quat"][0],
+        torch.tensor([0.70710677, 0.0, 0.0, 0.70710677]),
+        atol=1.0e-5,
+    )
+
+    mgr.set_env_cursor(env_ids=[0], ranks=torch.tensor([0]), steps=torch.tensor([1]))
+    td1 = mgr.sample(env_ids=[0], advance=False)
+    assert torch.allclose(td1["root_pos"][0], torch.tensor([2.0, 2.0, 0.0]))
+    assert torch.allclose(
+        td1["root_quat"][0],
+        torch.tensor([0.70710677, 0.0, 0.0, 0.70710677]),
+        atol=1.0e-5,
+    )
+
+    mgr.set_env_cursor(env_ids=[0], ranks=torch.tensor([0]), steps=torch.tensor([2]))
+    td2 = mgr.sample(env_ids=[0], advance=False)
+    assert torch.allclose(td2["root_pos"][0], torch.tensor([1.0, 3.0, 0.0]))
+    assert torch.allclose(
+        td2["root_quat"][0], torch.tensor([0.0, 0.0, 0.0, 1.0]), atol=1.0e-5
+    )

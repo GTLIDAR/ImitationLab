@@ -1,0 +1,18 @@
+{
+  "status": "passed",
+  "cases": 24,
+  "matched_pairs": 12,
+  "checkpoint_measurements": 132,
+  "independent_threshold_checks": 96,
+  "required_policy_seeds": [
+    42,
+    43
+  ],
+  "evaluation_seed": 42,
+  "source_commit": "eaf9aa973ad307b015658dd3e806b0a4a69ad7f2",
+  "source_sha256": "df851c8eab98d88023a202d43e1bf53527874a1d767718c8c94ffb40452b0c7b",
+  "archive_sha256": "15654b39bda3214dee72fca521d5091ecd8dd6852b098c876b6b6c6bee2da6ec",
+  "frozen_selection_sha256": "7499a40c7cf1e7f86c7f7edfced809528184e0e5351fe4b957bdd43e974a731e",
+  "preserved_failed_attempts": 0,
+  "replicated_wins": 0
+}

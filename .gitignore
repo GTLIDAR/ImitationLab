@@ -1,0 +1,84 @@
+# Build artifacts
+/build/
+/dist/
+**/*.so
+**/*.log*
+
+# Python
+.DS_Store
+**/*.egg-info/
+**/__pycache__/
+**/.pytest_cache/
+**/*.pyc
+**/*.pb
+
+# Docker/Singularity
+**/*.sif
+docker/cluster/exports/
+docker/.container.cfg
+
+# IDE
+**/.idea/
+**/.vscode/
+/.claude/
+/.codex/worktrees/
+# Don't ignore the top-level .vscode directory as it is
+# used to configure VS Code settings
+!.vscode
+
+# Outputs
+**/output/*
+**/outputs/*
+**/videos/*
+**/wandb/*
+**/.neptune/*
+docker/artifacts/
+*.tmp
+
+# Doc Outputs
+**/docs/_build/*
+
+# Run artifacts
+/logs/
+/runs/
+/recordings/
+
+# Pre-Trained Checkpoints
+/.pretrained_checkpoints/
+/checkpoints/
+
+# Tests (repo-root scratch dir only -- an unanchored `tests/` also
+# swallowed source/*/tests/, which silently dropped real test files)
+/tests/
+
+# Docker history
+.isaac-lab-docker-history
+
+# data folder
+data/*
+!data/README.md
+!data/unitree
+
+
+# Generated motion label and rollout artifacts
+data/**/*.npz
+data/unitree/*_hl_diffsr/
+# pixi environments
+.pixi/*
+!.pixi/config.toml
+
+scratchpad/
+
+# SSH keys must never sit in the checkout
+id_ed25519*
+id_rsa*
+id_ecdsa*
+id_dsa*
+
+!data/unitree/npz/g1/G1_Take_102.bvh_60hz.npz
+/third_party/mjlab_research/
+**/.venv/
+
+*.pt
+*.pth
+*.onnx

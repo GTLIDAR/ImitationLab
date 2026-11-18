@@ -1,0 +1,114 @@
+[workspace]
+authors = ["Feiyang Wu"]
+channels = ["conda-forge"]
+name = "ImitationLab"
+platforms = ["linux-64"]
+requires-pixi = ">=0.83"
+version = "0.1.0"
+
+[tasks]
+lint = "ruff check ."
+format-check = "ruff format --check ."
+typecheck = "ty check"
+check = { depends-on = ["lint", "format-check", "test-default"] }
+test-algorithms = "pytest -q imitationlab/algorithms/tests"
+test-data-tools = "pytest -q imitationlab/data_tools/tests scripts/data"
+# Env tests that import only the task math; the rest need Isaac Lab (test-isaaclab).
+test-env-cpu = "pytest -q imitationlab/envs/isaaclab/tests/test_causal_planner_observation.py imitationlab/envs/isaaclab/tests/test_counter_rng.py imitationlab/envs/isaaclab/tests/test_g1_graph_step_equivalence.py imitationlab/envs/isaaclab/tests/test_g1_reset_sampler.py imitationlab/envs/isaaclab/tests/test_g1_reset_sampler_masked.py imitationlab/envs/isaaclab/tests/test_g1_step_equivalence.py imitationlab/envs/isaaclab/tests/test_g1_task.py imitationlab/envs/isaaclab/tests/test_motion_manifest.py imitationlab/envs/isaaclab/tests/test_planner_publish_schedule.py imitationlab/envs/isaaclab/tests/test_shared_store.py imitationlab/envs/isaaclab/tests/test_terminal_obs_reader.py imitationlab/envs/isaaclab/tests/test_training_runtime_bootstrap.py imitationlab/envs/isaaclab/tests/test_world_model_task_math.py"
+test-runtime = "pytest -q imitationlab/runners/tests imitationlab/evaluation/tests"
+test-default = { depends-on = ["test-algorithms", "test-data-tools", "test-env-cpu", "test-runtime"] }
+
+[dependencies]
+python = "3.12.*"
+cmake = "*"
+cxx-compiler = "*"
+git = "*"
+gh = "*"
+filelock = "==3.25.2"
+make = "*"
+ninja = "*"
+packaging = "==26.0"
+pre-commit = "*"
+pytest = "*"
+pyyaml = "==6.0.3"
+ruff = "==0.12.12"
+setuptools = "<82"
+toml = "*"
+typing-extensions = ">=4.15,<5"
+wheel = "*"
+
+[pypi-dependencies]
+# NOTE: the pinned Isaac Lab 3.0 stack selects the CUDA 13.0 PyTorch
+# build itself (its root pyproject.toml, [[tool.uv.index]] pytorch-cu130). The
+# index is repeated in [feature.isaaclab.pypi-options.dependency-overrides]
+# because a version-only override drops the index binding and the isaaclab
+# environment would then take torch from PyPI instead of the cu130 index.
+torch = { version = "==2.12.0", index = "https://download.pytorch.org/whl/cu130" }
+torchvision = { version = "==0.27.0", index = "https://download.pytorch.org/whl/cu130" }
+# Keep TorchRL and TensorDict on the versions verified with the simulator.
+tensordict = "==0.13.0"
+torchrl = "==0.13.3"
+wandb = "==0.25.0"
+huggingface-hub = "*"
+# CPU learner tests use Gymnasium environments.
+gymnasium = ">=1.1"
+# The cluster control plane (imitationlab.runners.pipeline.cluster) resolves
+# campaign YAMLs with OmegaConf; the Isaac Lab environment brings it through
+# hydra-core, the default environment needs it declared.
+omegaconf = ">=2.3"
+# Rendering scripts use Matplotlib.
+matplotlib = ">=3.10"
+imitationlab = { path = ".", editable = true }
+ty = ">=0.0.65, <0.0.66"
+
+[feature.isaaclab.pypi-options]
+extra-index-urls = ["https://pypi.nvidia.com"]
+index-strategy = "unsafe-best-match"
+
+[feature.isaaclab.pypi-options.dependency-overrides]
+numpy = ">=2"
+mujoco = "~=3.12.0"
+mujoco-warp = "~=3.12.0"
+newton = { version = "==1.6.1", extras = ["sim"] }
+newton-usd-schemas = ">=0.5.0"
+usd-exchange = "==3.0.0"
+usd-optimize = "~=1.3.0"
+torch = { version = "==2.12.0", index = "https://download.pytorch.org/whl/cu130" }
+torchvision = { version = "==0.27.0", index = "https://download.pytorch.org/whl/cu130" }
+torchaudio = { version = "==2.11.0", index = "https://download.pytorch.org/whl/cu130" }
+packaging = ">=20,<27"
+
+[feature.isaaclab.system-requirements]
+libc = { family = "glibc", version = "2.35" }
+
+[feature.isaaclab.dependencies]
+libxml2 = "<2.14"
+
+[feature.isaaclab.pypi-dependencies]
+isaaclab = { git = "https://github.com/isaac-sim/IsaacLab.git", rev = "06128939c6f3264594483a73e4344e4fefcea6d3", subdirectory = "tools/wheel_builder", extras = [
+    "isaacsim",
+    "all",
+    "video",
+] }
+# transitive pre-release pin of isaacsim-core 6.1.0.0; uv only accepts pre-releases requested explicitly
+tinyobjloader = "==2.0.0rc13"
+opencv-python-headless = "*"
+
+[feature.isaaclab.tasks]
+smoke-g1 = "env TERM=xterm OMNI_KIT_ACCEPT_EULA=YES PYTHONUNBUFFERED=1 HYDRA_FULL_ERROR=1 TORCHDYNAMO_DISABLE=1 imitationlab train --interface explicit --policy ppo --assert-kitless --num_envs 16 --max_iterations 1 env.data.manifest=./data/unitree/manifests/g1_unitree_dance102_manifest.json agent.logger.backend= agent.logger.log_dir=outputs/smoke-g1 agent.save_interval=1"
+test-isaaclab = "env TERM=xterm OMNI_KIT_ACCEPT_EULA=YES pytest -q imitationlab/envs/isaaclab/tests"
+zero-agent = "env TERM=xterm OMNI_KIT_ACCEPT_EULA=YES python scripts/zero_agent.py --task imitation-g1-v1 --num_envs 4 --max_steps 20 --manifest ./data/unitree/manifests/g1_unitree_dance102_manifest.json"
+
+[feature.static.dependencies]
+python = "3.12.*"
+ruff = "==0.12.12"
+
+[feature.static.tasks]
+lint-owned = "ruff check ."
+format-owned = "ruff format --check ."
+compile-owned = "python -m compileall -q imitationlab scripts"
+ci-static = { depends-on = ["lint-owned", "format-owned", "compile-owned"] }
+
+[environments]
+isaaclab = ["isaaclab"]
+static = { features = ["static"], no-default-feature = true }

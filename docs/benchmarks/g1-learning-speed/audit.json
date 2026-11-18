@@ -1,0 +1,27 @@
+{
+  "phases": {
+    "baseline": {
+      "complete": true,
+      "completed_cases": 24,
+      "encoder_records": 4,
+      "missing_cases": [],
+      "errors": []
+    },
+    "diagnostics": {
+      "complete": true,
+      "completed_cases": 10,
+      "encoder_records": 4,
+      "missing_cases": [],
+      "errors": []
+    },
+    "validation": {
+      "complete": true,
+      "completed_cases": 10,
+      "encoder_records": 4,
+      "missing_cases": [],
+      "errors": []
+    }
+  },
+  "selected_cases": 24,
+  "current_profile_resolution_matches_measured": true
+}

@@ -1,0 +1,114 @@
+{
+  "imitation-g1-v1": {
+    "actions_class": "G1ActionsCfg",
+    "anchor_body": "pelvis",
+    "command": {
+      "actor_components": [
+        "joint_qpos_qvel",
+        "root_pos",
+        "root_ori"
+      ],
+      "actor_hold_steps": null,
+      "actor_horizon": null,
+      "actor_kind": "explicit",
+      "actor_latent_dim": null,
+      "actor_source": "reference",
+      "critic_channels": [
+        "reference"
+      ],
+      "critic_components": [
+        "joint_qpos_qvel",
+        "root_pos",
+        "root_ori"
+      ],
+      "encoder_components": null,
+      "encoder_window": null,
+      "generation": "interface",
+      "selection_full_trajectory": false,
+      "selection_random_step_max": 200,
+      "selection_random_step_min": 0,
+      "selection_schedule": "random",
+      "selection_start_frame": 0,
+      "selection_start_mode": "auto"
+    },
+    "curriculum": null,
+    "env_cfg_class": "ImitationG1EnvCfg",
+    "events_class": "G1EventsCfg",
+    "groups": {
+      "critic": [
+        "features"
+      ],
+      "policy": [
+        "features"
+      ],
+      "wm": [
+        "root_state",
+        "joint_state",
+        "last_action",
+        "reference_cursor",
+        "sim_context",
+        "push_flag",
+        "proprio_history"
+      ]
+    },
+    "observations_class": "G1ObservationsCfg",
+    "rewards_class": "G1RewardsCfg",
+    "terminations_class": "G1TerminationsCfg"
+  },
+  "imitation-g1-v1 (encoder)": {
+    "actions_class": "G1ActionsCfg",
+    "anchor_body": "pelvis",
+    "command": {
+      "actor_components": [
+        "joint_qpos_qvel",
+        "root_pos",
+        "root_ori"
+      ],
+      "actor_hold_steps": null,
+      "actor_horizon": null,
+      "actor_kind": "explicit",
+      "actor_latent_dim": null,
+      "actor_source": "reference",
+      "critic_channels": [
+        "reference"
+      ],
+      "critic_components": [
+        "joint_qpos_qvel",
+        "root_pos",
+        "root_ori"
+      ],
+      "encoder_components": null,
+      "encoder_window": null,
+      "generation": "interface",
+      "selection_full_trajectory": false,
+      "selection_random_step_max": 200,
+      "selection_random_step_min": 0,
+      "selection_schedule": "random",
+      "selection_start_frame": 0,
+      "selection_start_mode": "auto"
+    },
+    "curriculum": null,
+    "env_cfg_class": "ImitationG1EnvCfg",
+    "events_class": "G1EventsCfg",
+    "groups": {
+      "critic": [
+        "features"
+      ],
+      "policy": [
+        "features"
+      ],
+      "wm": [
+        "root_state",
+        "joint_state",
+        "last_action",
+        "reference_cursor",
+        "sim_context",
+        "push_flag",
+        "proprio_history"
+      ]
+    },
+    "observations_class": "G1ObservationsCfg",
+    "rewards_class": "G1RewardsCfg",
+    "terminations_class": "G1TerminationsCfg"
+  }
+}
