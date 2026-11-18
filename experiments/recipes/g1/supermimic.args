@@ -1,0 +1,8 @@
+# Settings specific to SuperMimic on packed G1 motions.
+agent.wm.wm_structured=true
+agent.wm.reference_window=true
+agent.wm.contact_reward=0.25
+agent.wm.ref_contact_fix=true
+agent.wm.update_graphs=true
+agent.wm.graph_early=true
+agent.wm.no_sync=true

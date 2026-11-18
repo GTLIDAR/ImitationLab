@@ -1,0 +1,2772 @@
+{
+  "schema_version": 1,
+  "boards": {
+    "lafan1": {
+      "bank_id": "lafan1@0ff4dce7ae91",
+      "bank_sha256": "ae7b212a370e98823592ec0532adb427c948197f5406937f3e79af8d7568167f",
+      "bank_clips": 40,
+      "bank_frames": 441080,
+      "sha256": "0c3fd6e410f07588468bcb5ceedbe82617330fca2d6a12d69e34ae458585c668",
+      "steps": 500,
+      "control_dt": 0.02,
+      "seed": 42,
+      "success": "No task tracking failure during min(10 seconds, clip length).",
+      "failure_rule": "abs(root height error) > 0.25 m or abs(root R[2,2] error) > 0.8",
+      "population": "Fixed in-distribution training-motion board; not held-out generalization.",
+      "evaluation_clips": 40
+    },
+    "bones_seed": {
+      "bank_id": "bones_seed_sonic_full_129785@e714bbff",
+      "bank_sha256": "936799c1fd7621838b8ddbfd6d1230c0d1b4fbb142e3cd61b20843cc197610c5",
+      "bank_clips": 129785,
+      "bank_frames": 47491234,
+      "sha256": "60cf8d4dfe9b16d80d07a8a8dd67c2305006205b3b2d95b755db5974e8e3f603",
+      "steps": 500,
+      "control_dt": 0.02,
+      "seed": 42,
+      "success": "No task tracking failure during min(10 seconds, clip length).",
+      "failure_rule": "abs(root height error) > 0.25 m or abs(root R[2,2] error) > 0.8",
+      "population": "Fixed in-distribution training-motion board; not held-out generalization.",
+      "evaluation_clips": 256
+    }
+  },
+  "sources": [
+    "eea53176a120de7b1595e6401ab54db6dae02c53492ff981b63251505e0c6b1f"
+  ],
+  "gpus": [
+    "NVIDIA H100 80GB HBM3"
+  ],
+  "cases": [
+    {
+      "dataset": "lafan1",
+      "interface": "explicit",
+      "policy": "ppo",
+      "status": "completed",
+      "budget_seconds": 600.0,
+      "milestones": [
+        60.0,
+        120.0,
+        300.0,
+        600.0
+      ],
+      "seed": 42,
+      "source_sha256": "eea53176a120de7b1595e6401ab54db6dae02c53492ff981b63251505e0c6b1f",
+      "software": {
+        "torch": "2.12.0+cu130",
+        "torchrl": "0.13.3",
+        "tensordict": "0.13.0",
+        "isaaclab": "3.0.0",
+        "newton": "1.6.1",
+        "mujoco": "3.12.0",
+        "mujoco-warp": "3.12.0"
+      },
+      "hardware": {
+        "cpu_count": 8,
+        "ram_total": 2163635949568,
+        "ram_available": 2115271884800,
+        "device": "cuda:0",
+        "gpu_name": "NVIDIA H100 80GB HBM3",
+        "vram_total": 85064286208,
+        "vram_free": 84511883264,
+        "compute_capability": [
+          9,
+          0
+        ],
+        "torch_version": "2.12.0+cu130",
+        "cuda_version": "13.0",
+        "notes": []
+      },
+      "profile": "large",
+      "resolved": {
+        "num_envs": 8192,
+        "wm_batch_size": null,
+        "imagine_batch": null,
+        "library_host_mapped": false,
+        "library_env_window": 0
+      },
+      "points": [
+        {
+          "train_seconds": 60.22798036900349,
+          "end_to_end_seconds": 221.6486293550115,
+          "frames": 9437184,
+          "success": 0.0,
+          "mpjpe_l_mm": 156.52334297180175,
+          "mpjpe_g_mm": 205.54366222381591,
+          "survival_seconds": 0.42,
+          "valid_transitions": 800,
+          "checkpoint_sha256": "9659d946e7861241697eff2f46d881e6fd4d94f1fe4ae551d45ba74db8284cbd",
+          "evaluation_seconds": 38.96320151898544
+        },
+        {
+          "train_seconds": 120.05764597002417,
+          "end_to_end_seconds": 281.4782949560322,
+          "frames": 18677760,
+          "success": 0.0,
+          "mpjpe_l_mm": 104.99081262365564,
+          "mpjpe_g_mm": 151.05791036322347,
+          "survival_seconds": 0.36650001525878906,
+          "valid_transitions": 693,
+          "checkpoint_sha256": "556c9fc945d92b7e1ea5d485f1a6a0de26a3b523f4c44cd04b53d68b6edc82cb",
+          "evaluation_seconds": 33.65810072503518
+        },
+        {
+          "train_seconds": 300.71428518998437,
+          "end_to_end_seconds": 462.1349341759924,
+          "frames": 46989312,
+          "success": 0.0,
+          "mpjpe_l_mm": 72.97688443259979,
+          "mpjpe_g_mm": 158.0240580862257,
+          "survival_seconds": 1.7185000610351562,
+          "valid_transitions": 3397,
+          "checkpoint_sha256": "0a47744a78979dd4425cc443dc10c583b1f4b71d68c366ca8069ef8531f6dcd2",
+          "evaluation_seconds": 40.31170815997757
+        },
+        {
+          "train_seconds": 600.1014621469658,
+          "end_to_end_seconds": 761.5221111329738,
+          "frames": 94371840,
+          "success": 0.625,
+          "mpjpe_l_mm": 54.65154581667075,
+          "mpjpe_g_mm": 393.966306528898,
+          "survival_seconds": 8.823499755859375,
+          "valid_transitions": 17632,
+          "checkpoint_sha256": "0b534e00e18857f634f7a6889cf8f5e06fe14ee2a47c65d6d82caecb6c5986f1",
+          "evaluation_seconds": 51.72444802802056
+        }
+      ],
+      "pretrain_seconds": 0.0,
+      "startup_seconds": 161.42064898600802,
+      "encoder_sha256": null,
+      "thresholds": {
+        "0.5": {
+          "seconds": 600.1014621469658,
+          "previous_sample_seconds": 300.71428518998437,
+          "end_to_end_seconds": 761.5221111329738
+        },
+        "0.9": null,
+        "0.95": null,
+        "0.9_and_40mm": null
+      },
+      "checkpoint_validation": {
+        "sha256": "0b534e00e18857f634f7a6889cf8f5e06fe14ee2a47c65d6d82caecb6c5986f1",
+        "optimizer_steps": {
+          "ppo": 19200.0
+        },
+        "finite_tensors": 74
+      },
+      "measurement_phase": "diagnostics",
+      "ppo_input_normalization": true
+    },
+    {
+      "dataset": "lafan1",
+      "interface": "explicit",
+      "policy": "supermimic",
+      "status": "completed",
+      "budget_seconds": 600.0,
+      "milestones": [
+        60.0,
+        120.0,
+        300.0,
+        600.0
+      ],
+      "seed": 42,
+      "source_sha256": "eea53176a120de7b1595e6401ab54db6dae02c53492ff981b63251505e0c6b1f",
+      "software": {
+        "torch": "2.12.0+cu130",
+        "torchrl": "0.13.3",
+        "tensordict": "0.13.0",
+        "isaaclab": "3.0.0",
+        "newton": "1.6.1",
+        "mujoco": "3.12.0",
+        "mujoco-warp": "3.12.0"
+      },
+      "hardware": {
+        "cpu_count": 8,
+        "ram_total": 2163635949568,
+        "ram_available": 2111493840896,
+        "device": "cuda:0",
+        "gpu_name": "NVIDIA H100 80GB HBM3",
+        "vram_total": 85064286208,
+        "vram_free": 84511883264,
+        "compute_capability": [
+          9,
+          0
+        ],
+        "torch_version": "2.12.0+cu130",
+        "cuda_version": "13.0",
+        "notes": []
+      },
+      "profile": "xlarge",
+      "resolved": {
+        "num_envs": 16384,
+        "wm_batch_size": 8192,
+        "imagine_batch": 8192,
+        "library_host_mapped": false,
+        "library_env_window": 0
+      },
+      "points": [
+        {
+          "train_seconds": 221.41182393196505,
+          "end_to_end_seconds": 405.4999105889583,
+          "frames": 1048576,
+          "success": 0.0,
+          "mpjpe_l_mm": 146.76086284659502,
+          "mpjpe_g_mm": 234.04456900006772,
+          "survival_seconds": 0.885,
+          "valid_transitions": 1730,
+          "checkpoint_sha256": "1457ca65a4693cb7bc8a5ba109a2d184d8e59148dbd5db16a521e4a1b5b2bc0f",
+          "evaluation_seconds": 40.06297916499898
+        },
+        {
+          "train_seconds": 300.1538001979934,
+          "end_to_end_seconds": 484.24188685498666,
+          "frames": 9633792,
+          "success": 0.125,
+          "mpjpe_l_mm": 96.53289787737042,
+          "mpjpe_g_mm": 2102.9125141404247,
+          "survival_seconds": 6.813499755859375,
+          "valid_transitions": 13592,
+          "checkpoint_sha256": "8896364127aea12b0be55903f2f5235e2791c150d93eb9136cbc2219a69c22ed",
+          "evaluation_seconds": 52.975785208982415
+        },
+        {
+          "train_seconds": 600.5102686759783,
+          "end_to_end_seconds": 784.5983553329716,
+          "frames": 43220992,
+          "success": 1.0,
+          "mpjpe_l_mm": 15.518040608978271,
+          "mpjpe_g_mm": 53.366865531539915,
+          "survival_seconds": 10.0,
+          "valid_transitions": 20000,
+          "checkpoint_sha256": "bec7a80abecdf1af4651b3463256d5be167a50b005e2cca8c73a611246a586e9",
+          "evaluation_seconds": 52.07910590805113
+        }
+      ],
+      "pretrain_seconds": 0.0,
+      "startup_seconds": 184.08808665699326,
+      "encoder_sha256": null,
+      "thresholds": {
+        "0.5": {
+          "seconds": 600.5102686759783,
+          "previous_sample_seconds": 300.1538001979934,
+          "end_to_end_seconds": 784.5983553329716
+        },
+        "0.9": {
+          "seconds": 600.5102686759783,
+          "previous_sample_seconds": 300.1538001979934,
+          "end_to_end_seconds": 784.5983553329716
+        },
+        "0.95": {
+          "seconds": 600.5102686759783,
+          "previous_sample_seconds": 300.1538001979934,
+          "end_to_end_seconds": 784.5983553329716
+        },
+        "0.9_and_40mm": {
+          "seconds": 600.5102686759783,
+          "previous_sample_seconds": 300.1538001979934,
+          "end_to_end_seconds": 784.5983553329716
+        }
+      },
+      "checkpoint_validation": {
+        "sha256": "bec7a80abecdf1af4651b3463256d5be167a50b005e2cca8c73a611246a586e9",
+        "optimizer_steps": {
+          "wm": 8585.0,
+          "actor": 1717.0,
+          "critic": 34340.0
+        },
+        "finite_tensors": 149
+      },
+      "measurement_phase": "baseline",
+      "ppo_input_normalization": null
+    },
+    {
+      "dataset": "lafan1",
+      "interface": "explicit",
+      "policy": "svg",
+      "status": "completed",
+      "budget_seconds": 600.0,
+      "milestones": [
+        60.0,
+        120.0,
+        300.0,
+        600.0
+      ],
+      "seed": 42,
+      "source_sha256": "eea53176a120de7b1595e6401ab54db6dae02c53492ff981b63251505e0c6b1f",
+      "software": {
+        "torch": "2.12.0+cu130",
+        "torchrl": "0.13.3",
+        "tensordict": "0.13.0",
+        "isaaclab": "3.0.0",
+        "newton": "1.6.1",
+        "mujoco": "3.12.0",
+        "mujoco-warp": "3.12.0"
+      },
+      "hardware": {
+        "cpu_count": 8,
+        "ram_total": 2163635949568,
+        "ram_available": 2111488282624,
+        "device": "cuda:0",
+        "gpu_name": "NVIDIA H100 80GB HBM3",
+        "vram_total": 85064286208,
+        "vram_free": 84511883264,
+        "compute_capability": [
+          9,
+          0
+        ],
+        "torch_version": "2.12.0+cu130",
+        "cuda_version": "13.0",
+        "notes": []
+      },
+      "profile": "xlarge",
+      "resolved": {
+        "num_envs": 16384,
+        "wm_batch_size": 8192,
+        "imagine_batch": 8192,
+        "library_host_mapped": false,
+        "library_env_window": 0
+      },
+      "points": [
+        {
+          "train_seconds": 310.2010761119891,
+          "end_to_end_seconds": 493.9376967039425,
+          "frames": 1048576,
+          "success": 0.0,
+          "mpjpe_l_mm": 146.982581381033,
+          "mpjpe_g_mm": 233.6609115026283,
+          "survival_seconds": 0.8834999847412109,
+          "valid_transitions": 1727,
+          "checkpoint_sha256": "f73dac117df0c3c015d9a0780b1dc0ac2b716053d4ce6fc74c21346c45de14e3",
+          "evaluation_seconds": 39.8699120299425
+        },
+        {
+          "train_seconds": 600.5865191880148,
+          "end_to_end_seconds": 784.3231397799682,
+          "frames": 13910016,
+          "success": 0.824999988079071,
+          "mpjpe_l_mm": 38.779022760262755,
+          "mpjpe_g_mm": 258.41449881331,
+          "survival_seconds": 9.69,
+          "valid_transitions": 19373,
+          "checkpoint_sha256": "793239e52b0e7f2aa5e41b00069135fc16e969c511b4240e7a5406f7353a5eda",
+          "evaluation_seconds": 52.82867300696671
+        }
+      ],
+      "pretrain_seconds": 0.0,
+      "startup_seconds": 183.7366205919534,
+      "encoder_sha256": null,
+      "thresholds": {
+        "0.5": {
+          "seconds": 600.5865191880148,
+          "previous_sample_seconds": 310.2010761119891,
+          "end_to_end_seconds": 784.3231397799682
+        },
+        "0.9": null,
+        "0.95": null,
+        "0.9_and_40mm": null
+      },
+      "checkpoint_validation": {
+        "sha256": "793239e52b0e7f2aa5e41b00069135fc16e969c511b4240e7a5406f7353a5eda",
+        "optimizer_steps": {
+          "wm": 2620.0,
+          "actor": 524.0,
+          "critic": 10480.0
+        },
+        "finite_tensors": 140
+      },
+      "measurement_phase": "baseline",
+      "ppo_input_normalization": null
+    },
+    {
+      "dataset": "lafan1",
+      "interface": "explicit",
+      "policy": "diffsr",
+      "status": "completed",
+      "budget_seconds": 600.0,
+      "milestones": [
+        60.0,
+        120.0,
+        300.0,
+        600.0
+      ],
+      "seed": 42,
+      "source_sha256": "eea53176a120de7b1595e6401ab54db6dae02c53492ff981b63251505e0c6b1f",
+      "software": {
+        "torch": "2.12.0+cu130",
+        "torchrl": "0.13.3",
+        "tensordict": "0.13.0",
+        "isaaclab": "3.0.0",
+        "newton": "1.6.1",
+        "mujoco": "3.12.0",
+        "mujoco-warp": "3.12.0"
+      },
+      "hardware": {
+        "cpu_count": 8,
+        "ram_total": 2163635937280,
+        "ram_available": 2052390268928,
+        "device": "cuda:0",
+        "gpu_name": "NVIDIA H100 80GB HBM3",
+        "vram_total": 85064286208,
+        "vram_free": 84511883264,
+        "compute_capability": [
+          9,
+          0
+        ],
+        "torch_version": "2.12.0+cu130",
+        "cuda_version": "13.0",
+        "notes": []
+      },
+      "profile": "xlarge",
+      "resolved": {
+        "num_envs": 16384,
+        "wm_batch_size": 8192,
+        "imagine_batch": 8192,
+        "library_host_mapped": false,
+        "library_env_window": 0
+      },
+      "points": [
+        {
+          "train_seconds": 210.86619493504986,
+          "end_to_end_seconds": 395.0559454920003,
+          "frames": 1048576,
+          "success": 0.0,
+          "mpjpe_l_mm": 147.43209363405785,
+          "mpjpe_g_mm": 232.92514446630548,
+          "survival_seconds": 0.8865000152587891,
+          "valid_transitions": 1733,
+          "checkpoint_sha256": "8e02c1cd6596a287194d78116b2efb124ff5453b9bd69beb2a976bba5199966f",
+          "evaluation_seconds": 39.26894309394993
+        },
+        {
+          "train_seconds": 300.158080919995,
+          "end_to_end_seconds": 484.34783147694543,
+          "frames": 4472832,
+          "success": 0.0,
+          "mpjpe_l_mm": 152.58545187207912,
+          "mpjpe_g_mm": 235.77176997281893,
+          "survival_seconds": 0.908499984741211,
+          "valid_transitions": 1777,
+          "checkpoint_sha256": "728e6ffa83225eef28f04e1c3f10f9d7dbe3795a28d4276470b9e6b99ef94f2e",
+          "evaluation_seconds": 34.710927976993844
+        },
+        {
+          "train_seconds": 600.733774223947,
+          "end_to_end_seconds": 784.9235247808974,
+          "frames": 16039936,
+          "success": 0.925000011920929,
+          "mpjpe_l_mm": 47.39233213725843,
+          "mpjpe_g_mm": 408.8488397930315,
+          "survival_seconds": 9.881500244140625,
+          "valid_transitions": 19760,
+          "checkpoint_sha256": "583da2c509934217a805899e0afacb9a0e4370f6923c14fa82a09429c077e37e",
+          "evaluation_seconds": 51.62731288897339
+        }
+      ],
+      "pretrain_seconds": 0.0,
+      "startup_seconds": 184.18975055695046,
+      "encoder_sha256": null,
+      "thresholds": {
+        "0.5": {
+          "seconds": 600.733774223947,
+          "previous_sample_seconds": 300.158080919995,
+          "end_to_end_seconds": 784.9235247808974
+        },
+        "0.9": {
+          "seconds": 600.733774223947,
+          "previous_sample_seconds": 300.158080919995,
+          "end_to_end_seconds": 784.9235247808974
+        },
+        "0.95": null,
+        "0.9_and_40mm": null
+      },
+      "checkpoint_validation": {
+        "sha256": "583da2c509934217a805899e0afacb9a0e4370f6923c14fa82a09429c077e37e",
+        "optimizer_steps": {
+          "wm": 3055.0,
+          "actor": 611.0,
+          "critic": 12220.0
+        },
+        "finite_tensors": 375
+      },
+      "measurement_phase": "baseline",
+      "ppo_input_normalization": null
+    },
+    {
+      "dataset": "lafan1",
+      "interface": "fsq",
+      "policy": "ppo",
+      "status": "completed",
+      "budget_seconds": 600.0,
+      "milestones": [
+        60.0,
+        120.0,
+        300.0,
+        600.0
+      ],
+      "seed": 42,
+      "source_sha256": "eea53176a120de7b1595e6401ab54db6dae02c53492ff981b63251505e0c6b1f",
+      "software": {
+        "torch": "2.12.0+cu130",
+        "torchrl": "0.13.3",
+        "tensordict": "0.13.0",
+        "isaaclab": "3.0.0",
+        "newton": "1.6.1",
+        "mujoco": "3.12.0",
+        "mujoco-warp": "3.12.0"
+      },
+      "hardware": {
+        "cpu_count": 8,
+        "ram_total": 2163635949568,
+        "ram_available": 2115357024256,
+        "device": "cuda:0",
+        "gpu_name": "NVIDIA H100 80GB HBM3",
+        "vram_total": 85064286208,
+        "vram_free": 84511883264,
+        "compute_capability": [
+          9,
+          0
+        ],
+        "torch_version": "2.12.0+cu130",
+        "cuda_version": "13.0",
+        "notes": []
+      },
+      "profile": "large",
+      "resolved": {
+        "num_envs": 8192,
+        "wm_batch_size": null,
+        "imagine_batch": null,
+        "library_host_mapped": false,
+        "library_env_window": 0
+      },
+      "points": [
+        {
+          "train_seconds": 60.066489628050476,
+          "end_to_end_seconds": 434.99559745611623,
+          "frames": 6488064,
+          "success": 0.0,
+          "mpjpe_l_mm": 169.63409227224497,
+          "mpjpe_g_mm": 228.38322257995605,
+          "survival_seconds": 0.54,
+          "valid_transitions": 1040,
+          "checkpoint_sha256": "7e125a4a98e2936c9312f26577c229d400005ba08111e3d8b10bfdf3cbc13a7b",
+          "evaluation_seconds": 41.12240338593256
+        },
+        {
+          "train_seconds": 121.58045926201157,
+          "end_to_end_seconds": 496.5095670900773,
+          "frames": 12976128,
+          "success": 0.0,
+          "mpjpe_l_mm": 137.52316758678805,
+          "mpjpe_g_mm": 189.314632844002,
+          "survival_seconds": 0.40750000000000003,
+          "valid_transitions": 775,
+          "checkpoint_sha256": "d8885a77f19b91dc1e3ac8c67fa9005f707c3d0b9a9c391873af02807dc89ecf",
+          "evaluation_seconds": 35.7084533580346
+        },
+        {
+          "train_seconds": 301.5021711370209,
+          "end_to_end_seconds": 676.4312789650867,
+          "frames": 32047104,
+          "success": 0.0,
+          "mpjpe_l_mm": 105.0054543513097,
+          "mpjpe_g_mm": 190.86450406833083,
+          "survival_seconds": 1.2175,
+          "valid_transitions": 2395,
+          "checkpoint_sha256": "2b18c33846aacd281856d8bd67ed7ec95cf2e80e44b117442c3619ae0efac4e7",
+          "evaluation_seconds": 38.262143342988566
+        },
+        {
+          "train_seconds": 600.9393831460038,
+          "end_to_end_seconds": 975.8684909740696,
+          "frames": 64094208,
+          "success": 0.10000000149011612,
+          "mpjpe_l_mm": 74.27951150340743,
+          "mpjpe_g_mm": 225.74687867249705,
+          "survival_seconds": 6.07,
+          "valid_transitions": 12104,
+          "checkpoint_sha256": "fec201263f2feb23c14134e2ab66c89d6edc5464bf205b9ec8dad8588bc46c72",
+          "evaluation_seconds": 55.929321118979715
+        }
+      ],
+      "pretrain_seconds": 214.3208723741118,
+      "startup_seconds": 160.60823545395397,
+      "encoder_sha256": "fcf956784c0131c3e6d088cf67ebedbb018ed6c33e5feea713935f13764079e3",
+      "thresholds": {
+        "0.5": null,
+        "0.9": null,
+        "0.95": null,
+        "0.9_and_40mm": null
+      },
+      "checkpoint_validation": {
+        "sha256": "fec201263f2feb23c14134e2ab66c89d6edc5464bf205b9ec8dad8588bc46c72",
+        "optimizer_steps": {
+          "ppo": 13040.0
+        },
+        "finite_tensors": 74
+      },
+      "measurement_phase": "diagnostics",
+      "ppo_input_normalization": true
+    },
+    {
+      "dataset": "lafan1",
+      "interface": "fsq",
+      "policy": "supermimic",
+      "status": "completed",
+      "budget_seconds": 600.0,
+      "milestones": [
+        60.0,
+        120.0,
+        300.0,
+        600.0
+      ],
+      "seed": 42,
+      "source_sha256": "eea53176a120de7b1595e6401ab54db6dae02c53492ff981b63251505e0c6b1f",
+      "software": {
+        "torch": "2.12.0+cu130",
+        "torchrl": "0.13.3",
+        "tensordict": "0.13.0",
+        "isaaclab": "3.0.0",
+        "newton": "1.6.1",
+        "mujoco": "3.12.0",
+        "mujoco-warp": "3.12.0"
+      },
+      "hardware": {
+        "cpu_count": 8,
+        "ram_total": 2163635949568,
+        "ram_available": 2083327815680,
+        "device": "cuda:0",
+        "gpu_name": "NVIDIA H100 80GB HBM3",
+        "vram_total": 85064286208,
+        "vram_free": 84511883264,
+        "compute_capability": [
+          9,
+          0
+        ],
+        "torch_version": "2.12.0+cu130",
+        "cuda_version": "13.0",
+        "notes": []
+      },
+      "profile": "xlarge",
+      "resolved": {
+        "num_envs": 16384,
+        "wm_batch_size": 8192,
+        "imagine_batch": 8192,
+        "library_host_mapped": false,
+        "library_env_window": 0
+      },
+      "points": [
+        {
+          "train_seconds": 228.42123953497503,
+          "end_to_end_seconds": 619.3025432630675,
+          "frames": 1048576,
+          "success": 0.0,
+          "mpjpe_l_mm": 147.4623864506464,
+          "mpjpe_g_mm": 233.74240244453554,
+          "survival_seconds": 0.885999984741211,
+          "valid_transitions": 1732,
+          "checkpoint_sha256": "fc46d54a8cad8a082d80c23090ab3bb3f21a8f1435caf59619e331c4f03fa903",
+          "evaluation_seconds": 41.86544307600707
+        },
+        {
+          "train_seconds": 300.2836557220435,
+          "end_to_end_seconds": 691.1649594501359,
+          "frames": 7979008,
+          "success": 0.0,
+          "mpjpe_l_mm": 140.04260518882623,
+          "mpjpe_g_mm": 228.45500095912388,
+          "survival_seconds": 1.3675,
+          "valid_transitions": 2695,
+          "checkpoint_sha256": "cc281ec33b64b8141cb56a66ce9d5b6bf228315615abbc2226a976e1e78f3f57",
+          "evaluation_seconds": 38.35958113602828
+        },
+        {
+          "train_seconds": 600.4395908269798,
+          "end_to_end_seconds": 991.3208945550723,
+          "frames": 38879232,
+          "success": 1.0,
+          "mpjpe_l_mm": 22.9669042011261,
+          "mpjpe_g_mm": 64.52033294296265,
+          "survival_seconds": 10.0,
+          "valid_transitions": 20000,
+          "checkpoint_sha256": "60da1cb74553d42fbc8737e51dce7cd78c2af0d471068517e192d9967758d0c5",
+          "evaluation_seconds": 55.08477663202211
+        }
+      ],
+      "pretrain_seconds": 214.3208723741118,
+      "startup_seconds": 176.56043135398068,
+      "encoder_sha256": "fcf956784c0131c3e6d088cf67ebedbb018ed6c33e5feea713935f13764079e3",
+      "thresholds": {
+        "0.5": {
+          "seconds": 600.4395908269798,
+          "previous_sample_seconds": 300.2836557220435,
+          "end_to_end_seconds": 991.3208945550723
+        },
+        "0.9": {
+          "seconds": 600.4395908269798,
+          "previous_sample_seconds": 300.2836557220435,
+          "end_to_end_seconds": 991.3208945550723
+        },
+        "0.95": {
+          "seconds": 600.4395908269798,
+          "previous_sample_seconds": 300.2836557220435,
+          "end_to_end_seconds": 991.3208945550723
+        },
+        "0.9_and_40mm": {
+          "seconds": 600.4395908269798,
+          "previous_sample_seconds": 300.2836557220435,
+          "end_to_end_seconds": 991.3208945550723
+        }
+      },
+      "checkpoint_validation": {
+        "sha256": "60da1cb74553d42fbc8737e51dce7cd78c2af0d471068517e192d9967758d0c5",
+        "optimizer_steps": {
+          "wm": 7700.0,
+          "actor": 1540.0,
+          "critic": 30800.0
+        },
+        "finite_tensors": 149
+      },
+      "measurement_phase": "baseline",
+      "ppo_input_normalization": null
+    },
+    {
+      "dataset": "lafan1",
+      "interface": "fsq",
+      "policy": "svg",
+      "status": "completed",
+      "budget_seconds": 600.0,
+      "milestones": [
+        60.0,
+        120.0,
+        300.0,
+        600.0
+      ],
+      "seed": 42,
+      "source_sha256": "eea53176a120de7b1595e6401ab54db6dae02c53492ff981b63251505e0c6b1f",
+      "software": {
+        "torch": "2.12.0+cu130",
+        "torchrl": "0.13.3",
+        "tensordict": "0.13.0",
+        "isaaclab": "3.0.0",
+        "newton": "1.6.1",
+        "mujoco": "3.12.0",
+        "mujoco-warp": "3.12.0"
+      },
+      "hardware": {
+        "cpu_count": 8,
+        "ram_total": 2163635949568,
+        "ram_available": 2124055117824,
+        "device": "cuda:0",
+        "gpu_name": "NVIDIA H100 80GB HBM3",
+        "vram_total": 85064286208,
+        "vram_free": 84511883264,
+        "compute_capability": [
+          9,
+          0
+        ],
+        "torch_version": "2.12.0+cu130",
+        "cuda_version": "13.0",
+        "notes": []
+      },
+      "profile": "standard",
+      "resolved": {
+        "num_envs": 4096,
+        "wm_batch_size": 2048,
+        "imagine_batch": 2048,
+        "library_host_mapped": false,
+        "library_env_window": 0
+      },
+      "points": [
+        {
+          "train_seconds": 320.94110557599925,
+          "end_to_end_seconds": 711.5419102761662,
+          "frames": 262144,
+          "success": 0.0,
+          "mpjpe_l_mm": 146.9548041202404,
+          "mpjpe_g_mm": 233.9011161239059,
+          "survival_seconds": 0.8840000152587891,
+          "valid_transitions": 1728,
+          "checkpoint_sha256": "04d485df9727b2e90f9f4bb8ef6144717f70f5432fb04f371a06c9c5149c629c",
+          "evaluation_seconds": 42.07001655490603
+        },
+        {
+          "train_seconds": 600.4953551440267,
+          "end_to_end_seconds": 991.0961598441936,
+          "frames": 3293184,
+          "success": 0.7250000238418579,
+          "mpjpe_l_mm": 59.53802463100113,
+          "mpjpe_g_mm": 419.29389339313417,
+          "survival_seconds": 9.242000122070312,
+          "valid_transitions": 18473,
+          "checkpoint_sha256": "9e4dfb20493d84c5f82a93b984e1b37fab8debde044940e92502f474b6110976",
+          "evaluation_seconds": 56.48235737904906
+        }
+      ],
+      "pretrain_seconds": 214.3208723741118,
+      "startup_seconds": 176.27993232605513,
+      "encoder_sha256": "fcf956784c0131c3e6d088cf67ebedbb018ed6c33e5feea713935f13764079e3",
+      "thresholds": {
+        "0.5": {
+          "seconds": 600.4953551440267,
+          "previous_sample_seconds": 320.94110557599925,
+          "end_to_end_seconds": 991.0961598441936
+        },
+        "0.9": null,
+        "0.95": null,
+        "0.9_and_40mm": null
+      },
+      "checkpoint_validation": {
+        "sha256": "9e4dfb20493d84c5f82a93b984e1b37fab8debde044940e92502f474b6110976",
+        "optimizer_steps": {
+          "wm": 2470.0,
+          "actor": 494.0,
+          "critic": 9880.0
+        },
+        "finite_tensors": 140
+      },
+      "measurement_phase": "diagnostics",
+      "ppo_input_normalization": null
+    },
+    {
+      "dataset": "lafan1",
+      "interface": "fsq",
+      "policy": "diffsr",
+      "status": "completed",
+      "budget_seconds": 600.0,
+      "milestones": [
+        60.0,
+        120.0,
+        300.0,
+        600.0
+      ],
+      "seed": 42,
+      "source_sha256": "eea53176a120de7b1595e6401ab54db6dae02c53492ff981b63251505e0c6b1f",
+      "software": {
+        "torch": "2.12.0+cu130",
+        "torchrl": "0.13.3",
+        "tensordict": "0.13.0",
+        "isaaclab": "3.0.0",
+        "newton": "1.6.1",
+        "mujoco": "3.12.0",
+        "mujoco-warp": "3.12.0"
+      },
+      "hardware": {
+        "cpu_count": 8,
+        "ram_total": 2163635949568,
+        "ram_available": 2124055117824,
+        "device": "cuda:0",
+        "gpu_name": "NVIDIA H100 80GB HBM3",
+        "vram_total": 85064286208,
+        "vram_free": 84511883264,
+        "compute_capability": [
+          9,
+          0
+        ],
+        "torch_version": "2.12.0+cu130",
+        "cuda_version": "13.0",
+        "notes": []
+      },
+      "profile": "standard",
+      "resolved": {
+        "num_envs": 4096,
+        "wm_batch_size": 2048,
+        "imagine_batch": 2048,
+        "library_host_mapped": false,
+        "library_env_window": 0
+      },
+      "points": [
+        {
+          "train_seconds": 215.73683620092925,
+          "end_to_end_seconds": 606.5931299610529,
+          "frames": 262144,
+          "success": 0.0,
+          "mpjpe_l_mm": 147.56211558775868,
+          "mpjpe_g_mm": 233.53442535224193,
+          "survival_seconds": 0.885999984741211,
+          "valid_transitions": 1732,
+          "checkpoint_sha256": "0ac281f7dbebb689319984d8e8e4e08003ec158d45fd95ccde67f6d132915188",
+          "evaluation_seconds": 42.16647679102607
+        },
+        {
+          "train_seconds": 300.3597950779367,
+          "end_to_end_seconds": 691.2160888380604,
+          "frames": 1179648,
+          "success": 0.0,
+          "mpjpe_l_mm": 151.4740937595419,
+          "mpjpe_g_mm": 238.10854544009803,
+          "survival_seconds": 0.9475,
+          "valid_transitions": 1855,
+          "checkpoint_sha256": "d0f47be9d56fd9bd5d47e9fca6c5d1ff5cf4ab0be9d7017d4140c3d2661ddae8",
+          "evaluation_seconds": 37.86099514097441
+        },
+        {
+          "train_seconds": 600.7000208959216,
+          "end_to_end_seconds": 991.5563146560453,
+          "frames": 4435968,
+          "success": 0.875,
+          "mpjpe_l_mm": 50.66433477431369,
+          "mpjpe_g_mm": 261.97158030780025,
+          "survival_seconds": 9.656500244140625,
+          "valid_transitions": 19308,
+          "checkpoint_sha256": "a33a8e210bc3f43cb143ce6914037e657492b96d4108c4d949835d2a05cf54fb",
+          "evaluation_seconds": 56.03344491298776
+        }
+      ],
+      "pretrain_seconds": 214.3208723741118,
+      "startup_seconds": 176.53542138601188,
+      "encoder_sha256": "fcf956784c0131c3e6d088cf67ebedbb018ed6c33e5feea713935f13764079e3",
+      "thresholds": {
+        "0.5": {
+          "seconds": 600.7000208959216,
+          "previous_sample_seconds": 300.3597950779367,
+          "end_to_end_seconds": 991.5563146560453
+        },
+        "0.9": null,
+        "0.95": null,
+        "0.9_and_40mm": null
+      },
+      "checkpoint_validation": {
+        "sha256": "a33a8e210bc3f43cb143ce6914037e657492b96d4108c4d949835d2a05cf54fb",
+        "optimizer_steps": {
+          "wm": 3400.0,
+          "actor": 680.0,
+          "critic": 13600.0
+        },
+        "finite_tensors": 375
+      },
+      "measurement_phase": "diagnostics",
+      "ppo_input_normalization": null
+    },
+    {
+      "dataset": "lafan1",
+      "interface": "diffsr",
+      "policy": "ppo",
+      "status": "completed",
+      "budget_seconds": 600.0,
+      "milestones": [
+        60.0,
+        120.0,
+        300.0,
+        600.0
+      ],
+      "seed": 42,
+      "source_sha256": "eea53176a120de7b1595e6401ab54db6dae02c53492ff981b63251505e0c6b1f",
+      "software": {
+        "torch": "2.12.0+cu130",
+        "torchrl": "0.13.3",
+        "tensordict": "0.13.0",
+        "isaaclab": "3.0.0",
+        "newton": "1.6.1",
+        "mujoco": "3.12.0",
+        "mujoco-warp": "3.12.0"
+      },
+      "hardware": {
+        "cpu_count": 8,
+        "ram_total": 2163635949568,
+        "ram_available": 2123789611008,
+        "device": "cuda:0",
+        "gpu_name": "NVIDIA H100 80GB HBM3",
+        "vram_total": 85064286208,
+        "vram_free": 84511883264,
+        "compute_capability": [
+          9,
+          0
+        ],
+        "torch_version": "2.12.0+cu130",
+        "cuda_version": "13.0",
+        "notes": []
+      },
+      "profile": "large",
+      "resolved": {
+        "num_envs": 8192,
+        "wm_batch_size": null,
+        "imagine_batch": null,
+        "library_host_mapped": false,
+        "library_env_window": 0
+      },
+      "points": [
+        {
+          "train_seconds": 60.23824900004547,
+          "end_to_end_seconds": 435.71744610311,
+          "frames": 6488064,
+          "success": 0.0,
+          "mpjpe_l_mm": 171.10880828542807,
+          "mpjpe_g_mm": 230.56810099808212,
+          "survival_seconds": 0.505,
+          "valid_transitions": 970,
+          "checkpoint_sha256": "fcb91dc56477a334da732b1d88ee0dee23e0536e379b24e3ac78f39155d8f8f9",
+          "evaluation_seconds": 40.614215190988034
+        },
+        {
+          "train_seconds": 120.52064838097431,
+          "end_to_end_seconds": 495.9998454840388,
+          "frames": 12779520,
+          "success": 0.0,
+          "mpjpe_l_mm": 133.46954170984165,
+          "mpjpe_g_mm": 178.83617926444717,
+          "survival_seconds": 0.34750000000000003,
+          "valid_transitions": 655,
+          "checkpoint_sha256": "a47d0f4f7e1bb1caddee4ee943ec64a337435771bac57238bab77c41449ca262",
+          "evaluation_seconds": 35.66595126490574
+        },
+        {
+          "train_seconds": 301.3531607990153,
+          "end_to_end_seconds": 676.8323579020798,
+          "frames": 31850496,
+          "success": 0.0,
+          "mpjpe_l_mm": 103.76157933656478,
+          "mpjpe_g_mm": 188.1076666474122,
+          "survival_seconds": 1.3725,
+          "valid_transitions": 2705,
+          "checkpoint_sha256": "be1fb921459cc83b7050c7133cb6182d9857c52e61950969b90bd47896401007",
+          "evaluation_seconds": 39.06081677402835
+        },
+        {
+          "train_seconds": 601.0334055640269,
+          "end_to_end_seconds": 976.5126026670914,
+          "frames": 63897600,
+          "success": 0.17499999701976776,
+          "mpjpe_l_mm": 74.11902031570725,
+          "mpjpe_g_mm": 263.08787490835846,
+          "survival_seconds": 6.032000122070313,
+          "valid_transitions": 12031,
+          "checkpoint_sha256": "f1e3b352865b86760b5a766ba7f391dbc5d712cd3a1ab2d07a38ce8e4dafe6a8",
+          "evaluation_seconds": 55.177889168960974
+        }
+      ],
+      "pretrain_seconds": 213.2700972860912,
+      "startup_seconds": 162.20909981697332,
+      "encoder_sha256": "0d6f79a40dc8fe7f3992b6eb870fea0bbd3a90d01ef4026be6e3a4bcc9b7ea15",
+      "thresholds": {
+        "0.5": null,
+        "0.9": null,
+        "0.95": null,
+        "0.9_and_40mm": null
+      },
+      "checkpoint_validation": {
+        "sha256": "f1e3b352865b86760b5a766ba7f391dbc5d712cd3a1ab2d07a38ce8e4dafe6a8",
+        "optimizer_steps": {
+          "ppo": 13000.0
+        },
+        "finite_tensors": 74
+      },
+      "measurement_phase": "diagnostics",
+      "ppo_input_normalization": true
+    },
+    {
+      "dataset": "lafan1",
+      "interface": "diffsr",
+      "policy": "supermimic",
+      "status": "completed",
+      "budget_seconds": 600.0,
+      "milestones": [
+        60.0,
+        120.0,
+        300.0,
+        600.0
+      ],
+      "seed": 42,
+      "source_sha256": "eea53176a120de7b1595e6401ab54db6dae02c53492ff981b63251505e0c6b1f",
+      "software": {
+        "torch": "2.12.0+cu130",
+        "torchrl": "0.13.3",
+        "tensordict": "0.13.0",
+        "isaaclab": "3.0.0",
+        "newton": "1.6.1",
+        "mujoco": "3.12.0",
+        "mujoco-warp": "3.12.0"
+      },
+      "hardware": {
+        "cpu_count": 8,
+        "ram_total": 2163635929088,
+        "ram_available": 2085473132544,
+        "device": "cuda:0",
+        "gpu_name": "NVIDIA H100 80GB HBM3",
+        "vram_total": 85064286208,
+        "vram_free": 84511883264,
+        "compute_capability": [
+          9,
+          0
+        ],
+        "torch_version": "2.12.0+cu130",
+        "cuda_version": "13.0",
+        "notes": []
+      },
+      "profile": "xlarge",
+      "resolved": {
+        "num_envs": 16384,
+        "wm_batch_size": 8192,
+        "imagine_batch": 8192,
+        "library_host_mapped": false,
+        "library_env_window": 0
+      },
+      "points": [
+        {
+          "train_seconds": 237.8224660139531,
+          "end_to_end_seconds": 639.179562005098,
+          "frames": 1048576,
+          "success": 0.0,
+          "mpjpe_l_mm": 147.3511387995902,
+          "mpjpe_g_mm": 233.40901445157266,
+          "survival_seconds": 0.885,
+          "valid_transitions": 1730,
+          "checkpoint_sha256": "fa057380a42d91446f1f2d284e53cbca1fbbfc937126fa00f181d30eb5b2f5de",
+          "evaluation_seconds": 42.569403673987836
+        },
+        {
+          "train_seconds": 300.1777072669938,
+          "end_to_end_seconds": 701.5348032581387,
+          "frames": 6995968,
+          "success": 0.0,
+          "mpjpe_l_mm": 138.90319275634576,
+          "mpjpe_g_mm": 238.02554197281876,
+          "survival_seconds": 1.3119999694824218,
+          "valid_transitions": 2584,
+          "checkpoint_sha256": "21d2e5cd8aabba873c696b1172fb3c88ff9c4f74b50a8674ebb444ef23c48960",
+          "evaluation_seconds": 38.612611099961214
+        },
+        {
+          "train_seconds": 600.4171924189432,
+          "end_to_end_seconds": 1001.774288410088,
+          "frames": 37797888,
+          "success": 1.0,
+          "mpjpe_l_mm": 21.15932565536499,
+          "mpjpe_g_mm": 55.726097367095946,
+          "survival_seconds": 10.0,
+          "valid_transitions": 20000,
+          "checkpoint_sha256": "ca84420fca93ebb7c5abcbfc23875862c9e53f867d7a765018775c7a14951c62",
+          "evaluation_seconds": 55.932730785920285
+        }
+      ],
+      "pretrain_seconds": 213.2700972860912,
+      "startup_seconds": 188.0869987050537,
+      "encoder_sha256": "0d6f79a40dc8fe7f3992b6eb870fea0bbd3a90d01ef4026be6e3a4bcc9b7ea15",
+      "thresholds": {
+        "0.5": {
+          "seconds": 600.4171924189432,
+          "previous_sample_seconds": 300.1777072669938,
+          "end_to_end_seconds": 1001.774288410088
+        },
+        "0.9": {
+          "seconds": 600.4171924189432,
+          "previous_sample_seconds": 300.1777072669938,
+          "end_to_end_seconds": 1001.774288410088
+        },
+        "0.95": {
+          "seconds": 600.4171924189432,
+          "previous_sample_seconds": 300.1777072669938,
+          "end_to_end_seconds": 1001.774288410088
+        },
+        "0.9_and_40mm": {
+          "seconds": 600.4171924189432,
+          "previous_sample_seconds": 300.1777072669938,
+          "end_to_end_seconds": 1001.774288410088
+        }
+      },
+      "checkpoint_validation": {
+        "sha256": "ca84420fca93ebb7c5abcbfc23875862c9e53f867d7a765018775c7a14951c62",
+        "optimizer_steps": {
+          "wm": 7480.0,
+          "actor": 1496.0,
+          "critic": 29920.0
+        },
+        "finite_tensors": 149
+      },
+      "measurement_phase": "baseline",
+      "ppo_input_normalization": null
+    },
+    {
+      "dataset": "lafan1",
+      "interface": "diffsr",
+      "policy": "svg",
+      "status": "completed",
+      "budget_seconds": 600.0,
+      "milestones": [
+        60.0,
+        120.0,
+        300.0,
+        600.0
+      ],
+      "seed": 42,
+      "source_sha256": "eea53176a120de7b1595e6401ab54db6dae02c53492ff981b63251505e0c6b1f",
+      "software": {
+        "torch": "2.12.0+cu130",
+        "torchrl": "0.13.3",
+        "tensordict": "0.13.0",
+        "isaaclab": "3.0.0",
+        "newton": "1.6.1",
+        "mujoco": "3.12.0",
+        "mujoco-warp": "3.12.0"
+      },
+      "hardware": {
+        "cpu_count": 8,
+        "ram_total": 2163635949568,
+        "ram_available": 2123785482240,
+        "device": "cuda:0",
+        "gpu_name": "NVIDIA H100 80GB HBM3",
+        "vram_total": 85064286208,
+        "vram_free": 84511883264,
+        "compute_capability": [
+          9,
+          0
+        ],
+        "torch_version": "2.12.0+cu130",
+        "cuda_version": "13.0",
+        "notes": []
+      },
+      "profile": "standard",
+      "resolved": {
+        "num_envs": 4096,
+        "wm_batch_size": 2048,
+        "imagine_batch": 2048,
+        "library_host_mapped": false,
+        "library_env_window": 0
+      },
+      "points": [
+        {
+          "train_seconds": 315.8089078749763,
+          "end_to_end_seconds": 704.0409479071386,
+          "frames": 262144,
+          "success": 0.0,
+          "mpjpe_l_mm": 146.92043023034887,
+          "mpjpe_g_mm": 233.7388441022863,
+          "survival_seconds": 0.8834999847412109,
+          "valid_transitions": 1727,
+          "checkpoint_sha256": "816d6881739f3c252aa7aa928d56c0510f8e6aa96d6def2ec98ea578382004c8",
+          "evaluation_seconds": 41.616348057985306
+        },
+        {
+          "train_seconds": 600.457799175987,
+          "end_to_end_seconds": 988.6898392081494,
+          "frames": 3371008,
+          "success": 0.800000011920929,
+          "mpjpe_l_mm": 57.612905301721845,
+          "mpjpe_g_mm": 339.5892802484422,
+          "survival_seconds": 9.4125,
+          "valid_transitions": 18817,
+          "checkpoint_sha256": "8896bb7630db2de528ac23ff3c3e16304eb69085c60a2a3aa7ce5a44fedd59bc",
+          "evaluation_seconds": 56.33578066795599
+        }
+      ],
+      "pretrain_seconds": 213.2700972860912,
+      "startup_seconds": 174.96194274607114,
+      "encoder_sha256": "0d6f79a40dc8fe7f3992b6eb870fea0bbd3a90d01ef4026be6e3a4bcc9b7ea15",
+      "thresholds": {
+        "0.5": {
+          "seconds": 600.457799175987,
+          "previous_sample_seconds": 315.8089078749763,
+          "end_to_end_seconds": 988.6898392081494
+        },
+        "0.9": null,
+        "0.95": null,
+        "0.9_and_40mm": null
+      },
+      "checkpoint_validation": {
+        "sha256": "8896bb7630db2de528ac23ff3c3e16304eb69085c60a2a3aa7ce5a44fedd59bc",
+        "optimizer_steps": {
+          "wm": 2535.0,
+          "actor": 507.0,
+          "critic": 10140.0
+        },
+        "finite_tensors": 140
+      },
+      "measurement_phase": "diagnostics",
+      "ppo_input_normalization": null
+    },
+    {
+      "dataset": "lafan1",
+      "interface": "diffsr",
+      "policy": "diffsr",
+      "status": "completed",
+      "budget_seconds": 600.0,
+      "milestones": [
+        60.0,
+        120.0,
+        300.0,
+        600.0
+      ],
+      "seed": 42,
+      "source_sha256": "eea53176a120de7b1595e6401ab54db6dae02c53492ff981b63251505e0c6b1f",
+      "software": {
+        "torch": "2.12.0+cu130",
+        "torchrl": "0.13.3",
+        "tensordict": "0.13.0",
+        "isaaclab": "3.0.0",
+        "newton": "1.6.1",
+        "mujoco": "3.12.0",
+        "mujoco-warp": "3.12.0"
+      },
+      "hardware": {
+        "cpu_count": 8,
+        "ram_total": 2163635970048,
+        "ram_available": 2087027499008,
+        "device": "cuda:0",
+        "gpu_name": "NVIDIA H100 80GB HBM3",
+        "vram_total": 85064286208,
+        "vram_free": 84511883264,
+        "compute_capability": [
+          9,
+          0
+        ],
+        "torch_version": "2.12.0+cu130",
+        "cuda_version": "13.0",
+        "notes": []
+      },
+      "profile": "standard",
+      "resolved": {
+        "num_envs": 4096,
+        "wm_batch_size": 2048,
+        "imagine_batch": 2048,
+        "library_host_mapped": false,
+        "library_env_window": 0
+      },
+      "points": [
+        {
+          "train_seconds": 214.1813269170234,
+          "end_to_end_seconds": 602.8889813130954,
+          "frames": 262144,
+          "success": 0.0,
+          "mpjpe_l_mm": 147.63208585410055,
+          "mpjpe_g_mm": 233.79165854566853,
+          "survival_seconds": 0.8865000152587891,
+          "valid_transitions": 1733,
+          "checkpoint_sha256": "22138e05a22dc6e245a1643efb2042bbf4ce2f32d1878a777b908243e71d5797",
+          "evaluation_seconds": 41.320485858945176
+        },
+        {
+          "train_seconds": 300.06402835901827,
+          "end_to_end_seconds": 688.7716827550903,
+          "frames": 1204224,
+          "success": 0.0,
+          "mpjpe_l_mm": 156.1840128727684,
+          "mpjpe_g_mm": 236.1379513891066,
+          "survival_seconds": 0.9544999694824219,
+          "valid_transitions": 1869,
+          "checkpoint_sha256": "a2983ff546b7afa7dcdf82c4eceaf0bf5673d302fbbee69f84cb7ce611012b83",
+          "evaluation_seconds": 38.16334030905273
+        },
+        {
+          "train_seconds": 600.5661169430241,
+          "end_to_end_seconds": 989.2737713390961,
+          "frames": 4472832,
+          "success": 0.875,
+          "mpjpe_l_mm": 53.23679585863484,
+          "mpjpe_g_mm": 246.16138568447317,
+          "survival_seconds": 9.688499755859375,
+          "valid_transitions": 19372,
+          "checkpoint_sha256": "51c0e97df37929d8043b4c2399cd65aa4eceb056fc56ccff34042c8d03871f3d",
+          "evaluation_seconds": 56.08493654301856
+        }
+      ],
+      "pretrain_seconds": 213.2700972860912,
+      "startup_seconds": 175.43755710998084,
+      "encoder_sha256": "0d6f79a40dc8fe7f3992b6eb870fea0bbd3a90d01ef4026be6e3a4bcc9b7ea15",
+      "thresholds": {
+        "0.5": {
+          "seconds": 600.5661169430241,
+          "previous_sample_seconds": 300.06402835901827,
+          "end_to_end_seconds": 989.2737713390961
+        },
+        "0.9": null,
+        "0.95": null,
+        "0.9_and_40mm": null
+      },
+      "checkpoint_validation": {
+        "sha256": "51c0e97df37929d8043b4c2399cd65aa4eceb056fc56ccff34042c8d03871f3d",
+        "optimizer_steps": {
+          "wm": 3430.0,
+          "actor": 686.0,
+          "critic": 13720.0
+        },
+        "finite_tensors": 375
+      },
+      "measurement_phase": "diagnostics",
+      "ppo_input_normalization": null
+    },
+    {
+      "dataset": "bones_seed",
+      "interface": "explicit",
+      "policy": "ppo",
+      "status": "completed",
+      "budget_seconds": 600.0,
+      "milestones": [
+        60.0,
+        120.0,
+        300.0,
+        600.0
+      ],
+      "seed": 42,
+      "source_sha256": "eea53176a120de7b1595e6401ab54db6dae02c53492ff981b63251505e0c6b1f",
+      "software": {
+        "torch": "2.12.0+cu130",
+        "torchrl": "0.13.3",
+        "tensordict": "0.13.0",
+        "isaaclab": "3.0.0",
+        "newton": "1.6.1",
+        "mujoco": "3.12.0",
+        "mujoco-warp": "3.12.0"
+      },
+      "hardware": {
+        "cpu_count": 8,
+        "ram_total": 2163635970048,
+        "ram_available": 2086544547840,
+        "device": "cuda:0",
+        "gpu_name": "NVIDIA H100 80GB HBM3",
+        "vram_total": 85064286208,
+        "vram_free": 84511883264,
+        "compute_capability": [
+          9,
+          0
+        ],
+        "torch_version": "2.12.0+cu130",
+        "cuda_version": "13.0",
+        "notes": []
+      },
+      "profile": "large",
+      "resolved": {
+        "num_envs": 8192,
+        "wm_batch_size": null,
+        "imagine_batch": null,
+        "library_host_mapped": false,
+        "library_env_window": 0
+      },
+      "points": [
+        {
+          "train_seconds": 60.374369267956354,
+          "end_to_end_seconds": 280.97278254001867,
+          "frames": 9240576,
+          "success": 0.01953125,
+          "mpjpe_l_mm": 103.16071427114461,
+          "mpjpe_g_mm": 237.70291342386386,
+          "survival_seconds": 0.68625,
+          "valid_transitions": 8528,
+          "checkpoint_sha256": "89e952914ccab917e8046ce6874d694b7dfb83a65e18796923291fc39cdefaa2",
+          "evaluation_seconds": 68.70062322204467
+        },
+        {
+          "train_seconds": 120.07705863600131,
+          "end_to_end_seconds": 340.6754719080636,
+          "frames": 18284544,
+          "success": 0.01953125,
+          "mpjpe_l_mm": 63.975215978513,
+          "mpjpe_g_mm": 195.52079277783926,
+          "survival_seconds": 0.775703125,
+          "valid_transitions": 9673,
+          "checkpoint_sha256": "db279b64ac7235ebe6864ba3b986e3bf90d99066409aa1799cef48244788a579",
+          "evaluation_seconds": 64.49388381303288
+        },
+        {
+          "train_seconds": 300.7311568589648,
+          "end_to_end_seconds": 521.3295701310271,
+          "frames": 46006272,
+          "success": 0.3046875,
+          "mpjpe_l_mm": 60.365449645833785,
+          "mpjpe_g_mm": 269.2979017822463,
+          "survival_seconds": 3.39796875,
+          "valid_transitions": 43245,
+          "checkpoint_sha256": "0c0bf1a9d756067ca49f1fc4ba08ffe25f37b5345af39b7b9536bcfe68388f5b",
+          "evaluation_seconds": 64.79385327501222
+        },
+        {
+          "train_seconds": 600.379892223049,
+          "end_to_end_seconds": 820.9783054951113,
+          "frames": 92209152,
+          "success": 0.85546875,
+          "mpjpe_l_mm": 60.895316681027616,
+          "mpjpe_g_mm": 657.1989615963317,
+          "survival_seconds": 5.60796875,
+          "valid_transitions": 71560,
+          "checkpoint_sha256": "7467e2009dc5a68191b6cea7777b9b6dbad33db9864f3f03fb94922d9bcc2d1d",
+          "evaluation_seconds": 64.69496402295772
+        }
+      ],
+      "pretrain_seconds": 0.0,
+      "startup_seconds": 220.59841327206232,
+      "encoder_sha256": null,
+      "thresholds": {
+        "0.5": {
+          "seconds": 600.379892223049,
+          "previous_sample_seconds": 300.7311568589648,
+          "end_to_end_seconds": 820.9783054951113
+        },
+        "0.9": null,
+        "0.95": null,
+        "0.9_and_40mm": null
+      },
+      "checkpoint_validation": {
+        "sha256": "7467e2009dc5a68191b6cea7777b9b6dbad33db9864f3f03fb94922d9bcc2d1d",
+        "optimizer_steps": {
+          "ppo": 18760.0
+        },
+        "finite_tensors": 74
+      },
+      "measurement_phase": "diagnostics",
+      "ppo_input_normalization": true
+    },
+    {
+      "dataset": "bones_seed",
+      "interface": "explicit",
+      "policy": "supermimic",
+      "status": "completed",
+      "budget_seconds": 600.0,
+      "milestones": [
+        60.0,
+        120.0,
+        300.0,
+        600.0
+      ],
+      "seed": 42,
+      "source_sha256": "eea53176a120de7b1595e6401ab54db6dae02c53492ff981b63251505e0c6b1f",
+      "software": {
+        "torch": "2.12.0+cu130",
+        "torchrl": "0.13.3",
+        "tensordict": "0.13.0",
+        "isaaclab": "3.0.0",
+        "newton": "1.6.1",
+        "mujoco": "3.12.0",
+        "mujoco-warp": "3.12.0"
+      },
+      "hardware": {
+        "cpu_count": 8,
+        "ram_total": 2163635949568,
+        "ram_available": 2109899501568,
+        "device": "cuda:0",
+        "gpu_name": "NVIDIA H100 80GB HBM3",
+        "vram_total": 85064286208,
+        "vram_free": 84511883264,
+        "compute_capability": [
+          9,
+          0
+        ],
+        "torch_version": "2.12.0+cu130",
+        "cuda_version": "13.0",
+        "notes": []
+      },
+      "profile": "xlarge",
+      "resolved": {
+        "num_envs": 16384,
+        "wm_batch_size": 8192,
+        "imagine_batch": 8192,
+        "library_host_mapped": false,
+        "library_env_window": 0
+      },
+      "points": [
+        {
+          "train_seconds": 218.2581719419686,
+          "end_to_end_seconds": 458.8816210710211,
+          "frames": 1048576,
+          "success": 0.01953125,
+          "mpjpe_l_mm": 100.48652949482988,
+          "mpjpe_g_mm": 235.18942936033702,
+          "survival_seconds": 1.0421093750000001,
+          "valid_transitions": 13083,
+          "checkpoint_sha256": "c63cbf116fc9b8fff73483346aa83791e07e12b3c8dfda74b91bcdfc64f1b70f",
+          "evaluation_seconds": 72.55570211203303
+        },
+        {
+          "train_seconds": 300.2825569639681,
+          "end_to_end_seconds": 540.9060060930206,
+          "frames": 9994240,
+          "success": 0.11328125,
+          "mpjpe_l_mm": 91.2532021193051,
+          "mpjpe_g_mm": 397.96768969806214,
+          "survival_seconds": 2.48640625,
+          "valid_transitions": 31571,
+          "checkpoint_sha256": "6325f865a411a6c796f525d6e1ecd465e38740743ddc16e8fc1944a3191cc601",
+          "evaluation_seconds": 70.30337248998694
+        },
+        {
+          "train_seconds": 600.4712990589906,
+          "end_to_end_seconds": 841.094748188043,
+          "frames": 43843584,
+          "success": 0.99609375,
+          "mpjpe_l_mm": 15.71667660612111,
+          "mpjpe_g_mm": 75.47516049404429,
+          "survival_seconds": 5.95578125,
+          "valid_transitions": 76013,
+          "checkpoint_sha256": "eb03ba1f0c7f3c2eeaf0f8227f4f73b9b076570bb0fe48a6f0963a6cfed3d9ab",
+          "evaluation_seconds": 69.50368457706645
+        }
+      ],
+      "pretrain_seconds": 0.0,
+      "startup_seconds": 240.62344912905246,
+      "encoder_sha256": null,
+      "thresholds": {
+        "0.5": {
+          "seconds": 600.4712990589906,
+          "previous_sample_seconds": 300.2825569639681,
+          "end_to_end_seconds": 841.094748188043
+        },
+        "0.9": {
+          "seconds": 600.4712990589906,
+          "previous_sample_seconds": 300.2825569639681,
+          "end_to_end_seconds": 841.094748188043
+        },
+        "0.95": {
+          "seconds": 600.4712990589906,
+          "previous_sample_seconds": 300.2825569639681,
+          "end_to_end_seconds": 841.094748188043
+        },
+        "0.9_and_40mm": {
+          "seconds": 600.4712990589906,
+          "previous_sample_seconds": 300.2825569639681,
+          "end_to_end_seconds": 841.094748188043
+        }
+      },
+      "checkpoint_validation": {
+        "sha256": "eb03ba1f0c7f3c2eeaf0f8227f4f73b9b076570bb0fe48a6f0963a6cfed3d9ab",
+        "optimizer_steps": {
+          "wm": 8710.0,
+          "actor": 1742.0,
+          "critic": 34840.0
+        },
+        "finite_tensors": 149
+      },
+      "measurement_phase": "baseline",
+      "ppo_input_normalization": null
+    },
+    {
+      "dataset": "bones_seed",
+      "interface": "explicit",
+      "policy": "svg",
+      "status": "completed",
+      "budget_seconds": 600.0,
+      "milestones": [
+        60.0,
+        120.0,
+        300.0,
+        600.0
+      ],
+      "seed": 42,
+      "source_sha256": "eea53176a120de7b1595e6401ab54db6dae02c53492ff981b63251505e0c6b1f",
+      "software": {
+        "torch": "2.12.0+cu130",
+        "torchrl": "0.13.3",
+        "tensordict": "0.13.0",
+        "isaaclab": "3.0.0",
+        "newton": "1.6.1",
+        "mujoco": "3.12.0",
+        "mujoco-warp": "3.12.0"
+      },
+      "hardware": {
+        "cpu_count": 8,
+        "ram_total": 2163635949568,
+        "ram_available": 2109901516800,
+        "device": "cuda:0",
+        "gpu_name": "NVIDIA H100 80GB HBM3",
+        "vram_total": 85064286208,
+        "vram_free": 84511883264,
+        "compute_capability": [
+          9,
+          0
+        ],
+        "torch_version": "2.12.0+cu130",
+        "cuda_version": "13.0",
+        "notes": []
+      },
+      "profile": "xlarge",
+      "resolved": {
+        "num_envs": 16384,
+        "wm_batch_size": 8192,
+        "imagine_batch": 8192,
+        "library_host_mapped": false,
+        "library_env_window": 0
+      },
+      "points": [
+        {
+          "train_seconds": 311.09112921892665,
+          "end_to_end_seconds": 548.4064165749587,
+          "frames": 1048576,
+          "success": 0.01953125,
+          "mpjpe_l_mm": 100.41048215178589,
+          "mpjpe_g_mm": 235.41453976016777,
+          "survival_seconds": 1.038046875,
+          "valid_transitions": 13031,
+          "checkpoint_sha256": "3dbac9a9ac1b7bea8393ee9d70aa94457eb93135d1aeb53593a3a5b1127207ef",
+          "evaluation_seconds": 68.69888910604641
+        },
+        {
+          "train_seconds": 600.4827082830016,
+          "end_to_end_seconds": 837.7979956390336,
+          "frames": 13664256,
+          "success": 0.96484375,
+          "mpjpe_l_mm": 36.994357575847985,
+          "mpjpe_g_mm": 334.0154058690928,
+          "survival_seconds": 5.88359375,
+          "valid_transitions": 75088,
+          "checkpoint_sha256": "58c938a5053cdd1b05ab26167cc559aedebb345f7bac1f923bb2bdcc266dbdc5",
+          "evaluation_seconds": 66.09485863090958
+        }
+      ],
+      "pretrain_seconds": 0.0,
+      "startup_seconds": 237.31528735603206,
+      "encoder_sha256": null,
+      "thresholds": {
+        "0.5": {
+          "seconds": 600.4827082830016,
+          "previous_sample_seconds": 311.09112921892665,
+          "end_to_end_seconds": 837.7979956390336
+        },
+        "0.9": {
+          "seconds": 600.4827082830016,
+          "previous_sample_seconds": 311.09112921892665,
+          "end_to_end_seconds": 837.7979956390336
+        },
+        "0.95": {
+          "seconds": 600.4827082830016,
+          "previous_sample_seconds": 311.09112921892665,
+          "end_to_end_seconds": 837.7979956390336
+        },
+        "0.9_and_40mm": {
+          "seconds": 600.4827082830016,
+          "previous_sample_seconds": 311.09112921892665,
+          "end_to_end_seconds": 837.7979956390336
+        }
+      },
+      "checkpoint_validation": {
+        "sha256": "58c938a5053cdd1b05ab26167cc559aedebb345f7bac1f923bb2bdcc266dbdc5",
+        "optimizer_steps": {
+          "wm": 2570.0,
+          "actor": 514.0,
+          "critic": 10280.0
+        },
+        "finite_tensors": 140
+      },
+      "measurement_phase": "baseline",
+      "ppo_input_normalization": null
+    },
+    {
+      "dataset": "bones_seed",
+      "interface": "explicit",
+      "policy": "diffsr",
+      "status": "completed",
+      "budget_seconds": 600.0,
+      "milestones": [
+        60.0,
+        120.0,
+        300.0,
+        600.0
+      ],
+      "seed": 42,
+      "source_sha256": "eea53176a120de7b1595e6401ab54db6dae02c53492ff981b63251505e0c6b1f",
+      "software": {
+        "torch": "2.12.0+cu130",
+        "torchrl": "0.13.3",
+        "tensordict": "0.13.0",
+        "isaaclab": "3.0.0",
+        "newton": "1.6.1",
+        "mujoco": "3.12.0",
+        "mujoco-warp": "3.12.0"
+      },
+      "hardware": {
+        "cpu_count": 8,
+        "ram_total": 2163635949568,
+        "ram_available": 2109498683392,
+        "device": "cuda:0",
+        "gpu_name": "NVIDIA H100 80GB HBM3",
+        "vram_total": 85064286208,
+        "vram_free": 84511883264,
+        "compute_capability": [
+          9,
+          0
+        ],
+        "torch_version": "2.12.0+cu130",
+        "cuda_version": "13.0",
+        "notes": []
+      },
+      "profile": "xlarge",
+      "resolved": {
+        "num_envs": 16384,
+        "wm_batch_size": 8192,
+        "imagine_batch": 8192,
+        "library_host_mapped": false,
+        "library_env_window": 0
+      },
+      "points": [
+        {
+          "train_seconds": 213.91609985299874,
+          "end_to_end_seconds": 447.2084458420286,
+          "frames": 1048576,
+          "success": 0.01953125,
+          "mpjpe_l_mm": 100.75435964951821,
+          "mpjpe_g_mm": 235.1250511239428,
+          "survival_seconds": 1.041875,
+          "valid_transitions": 13080,
+          "checkpoint_sha256": "bc37eec01f7d4685005b5527b208bbef86f711887b74a823ef35ae8c66ba1966",
+          "evaluation_seconds": 68.45092978607863
+        },
+        {
+          "train_seconds": 300.25916760298423,
+          "end_to_end_seconds": 533.5515135920141,
+          "frames": 4276224,
+          "success": 0.01953125,
+          "mpjpe_l_mm": 101.83359827353537,
+          "mpjpe_g_mm": 237.08361548770182,
+          "survival_seconds": 1.0996875,
+          "valid_transitions": 13820,
+          "checkpoint_sha256": "cb99e6aebbe6f00f9a6c2b8108a896c9747697eb585fbf13ff34e5d0f5de3d5d",
+          "evaluation_seconds": 65.14290960400831
+        },
+        {
+          "train_seconds": 600.3834708470386,
+          "end_to_end_seconds": 833.6758168360684,
+          "frames": 15630336,
+          "success": 0.8515625,
+          "mpjpe_l_mm": 47.616213812721114,
+          "mpjpe_g_mm": 375.2072746558368,
+          "survival_seconds": 5.6115625,
+          "valid_transitions": 71602,
+          "checkpoint_sha256": "7feba85820a780ff8fbac54d48445809478b9f85851f056ad152b4a9ec86cfb2",
+          "evaluation_seconds": 65.24579393491149
+        }
+      ],
+      "pretrain_seconds": 0.0,
+      "startup_seconds": 233.29234598902985,
+      "encoder_sha256": null,
+      "thresholds": {
+        "0.5": {
+          "seconds": 600.3834708470386,
+          "previous_sample_seconds": 300.25916760298423,
+          "end_to_end_seconds": 833.6758168360684
+        },
+        "0.9": null,
+        "0.95": null,
+        "0.9_and_40mm": null
+      },
+      "checkpoint_validation": {
+        "sha256": "7feba85820a780ff8fbac54d48445809478b9f85851f056ad152b4a9ec86cfb2",
+        "optimizer_steps": {
+          "wm": 2970.0,
+          "actor": 594.0,
+          "critic": 11880.0
+        },
+        "finite_tensors": 375
+      },
+      "measurement_phase": "baseline",
+      "ppo_input_normalization": null
+    },
+    {
+      "dataset": "bones_seed",
+      "interface": "fsq",
+      "policy": "ppo",
+      "status": "completed",
+      "budget_seconds": 600.0,
+      "milestones": [
+        60.0,
+        120.0,
+        300.0,
+        600.0
+      ],
+      "seed": 42,
+      "source_sha256": "eea53176a120de7b1595e6401ab54db6dae02c53492ff981b63251505e0c6b1f",
+      "software": {
+        "torch": "2.12.0+cu130",
+        "torchrl": "0.13.3",
+        "tensordict": "0.13.0",
+        "isaaclab": "3.0.0",
+        "newton": "1.6.1",
+        "mujoco": "3.12.0",
+        "mujoco-warp": "3.12.0"
+      },
+      "hardware": {
+        "cpu_count": 8,
+        "ram_total": 2163635970048,
+        "ram_available": 2086545461248,
+        "device": "cuda:0",
+        "gpu_name": "NVIDIA H100 80GB HBM3",
+        "vram_total": 85064286208,
+        "vram_free": 84511883264,
+        "compute_capability": [
+          9,
+          0
+        ],
+        "torch_version": "2.12.0+cu130",
+        "cuda_version": "13.0",
+        "notes": []
+      },
+      "profile": "large",
+      "resolved": {
+        "num_envs": 8192,
+        "wm_batch_size": null,
+        "imagine_batch": null,
+        "library_host_mapped": false,
+        "library_env_window": 0
+      },
+      "points": [
+        {
+          "train_seconds": 61.14472039602697,
+          "end_to_end_seconds": 603.0746709550731,
+          "frames": 6488064,
+          "success": 0.01953125,
+          "mpjpe_l_mm": 106.49428306508719,
+          "mpjpe_g_mm": 236.84311066036426,
+          "survival_seconds": 0.74328125,
+          "valid_transitions": 9258,
+          "checkpoint_sha256": "2c0918d446d7ae073a0eab2550622f47179eb3b8ce49f1b00a43d0b152562815",
+          "evaluation_seconds": 73.65319085505325
+        },
+        {
+          "train_seconds": 121.6595518719405,
+          "end_to_end_seconds": 663.5895024309866,
+          "frames": 12779520,
+          "success": 0.01953125,
+          "mpjpe_l_mm": 81.59912276391829,
+          "mpjpe_g_mm": 207.48265636842197,
+          "survival_seconds": 0.817265625,
+          "valid_transitions": 10205,
+          "checkpoint_sha256": "1c1b426149dabb0e7c749e18de0f72709a630c4d6797a188612d6025372187a4",
+          "evaluation_seconds": 69.54965993808582
+        },
+        {
+          "train_seconds": 300.5164727489464,
+          "end_to_end_seconds": 842.4464233079925,
+          "frames": 31457280,
+          "success": 0.19140625,
+          "mpjpe_l_mm": 65.83287598361939,
+          "mpjpe_g_mm": 150.49275666130723,
+          "survival_seconds": 2.77640625,
+          "valid_transitions": 35288,
+          "checkpoint_sha256": "bed728f254cf497a91076a556e330fe208dd9db34eab9e47ba79565d9c872c5a",
+          "evaluation_seconds": 70.84932767599821
+        },
+        {
+          "train_seconds": 601.5471012999769,
+          "end_to_end_seconds": 1143.477051859023,
+          "frames": 63111168,
+          "success": 0.7734375,
+          "mpjpe_l_mm": 83.67575639513007,
+          "mpjpe_g_mm": 667.1925381511093,
+          "survival_seconds": 5.251328125,
+          "valid_transitions": 66988,
+          "checkpoint_sha256": "874467540fa7c73884f0dfd9de52981154a4847441d4cbae49aacd3ebda59879",
+          "evaluation_seconds": 70.0512145680841
+        }
+      ],
+      "pretrain_seconds": 323.310419698013,
+      "startup_seconds": 218.61953086103313,
+      "encoder_sha256": "50faceaae609eabf59f9cd526406fad32fb95e1061576b3a3f58685b47b6ff94",
+      "thresholds": {
+        "0.5": {
+          "seconds": 601.5471012999769,
+          "previous_sample_seconds": 300.5164727489464,
+          "end_to_end_seconds": 1143.477051859023
+        },
+        "0.9": null,
+        "0.95": null,
+        "0.9_and_40mm": null
+      },
+      "checkpoint_validation": {
+        "sha256": "874467540fa7c73884f0dfd9de52981154a4847441d4cbae49aacd3ebda59879",
+        "optimizer_steps": {
+          "ppo": 12840.0
+        },
+        "finite_tensors": 74
+      },
+      "measurement_phase": "diagnostics",
+      "ppo_input_normalization": true
+    },
+    {
+      "dataset": "bones_seed",
+      "interface": "fsq",
+      "policy": "supermimic",
+      "status": "completed",
+      "budget_seconds": 600.0,
+      "milestones": [
+        60.0,
+        120.0,
+        300.0,
+        600.0
+      ],
+      "seed": 42,
+      "source_sha256": "eea53176a120de7b1595e6401ab54db6dae02c53492ff981b63251505e0c6b1f",
+      "software": {
+        "torch": "2.12.0+cu130",
+        "torchrl": "0.13.3",
+        "tensordict": "0.13.0",
+        "isaaclab": "3.0.0",
+        "newton": "1.6.1",
+        "mujoco": "3.12.0",
+        "mujoco-warp": "3.12.0"
+      },
+      "hardware": {
+        "cpu_count": 8,
+        "ram_total": 2163635937280,
+        "ram_available": 2053197475840,
+        "device": "cuda:0",
+        "gpu_name": "NVIDIA H100 80GB HBM3",
+        "vram_total": 85064286208,
+        "vram_free": 84511883264,
+        "compute_capability": [
+          9,
+          0
+        ],
+        "torch_version": "2.12.0+cu130",
+        "cuda_version": "13.0",
+        "notes": []
+      },
+      "profile": "large",
+      "resolved": {
+        "num_envs": 8192,
+        "wm_batch_size": 4096,
+        "imagine_batch": 4096,
+        "library_host_mapped": false,
+        "library_env_window": 0
+      },
+      "points": [
+        {
+          "train_seconds": 225.82903649494983,
+          "end_to_end_seconds": 790.9759189489996,
+          "frames": 524288,
+          "success": 0.01953125,
+          "mpjpe_l_mm": 100.62257153402459,
+          "mpjpe_g_mm": 235.35038388252187,
+          "survival_seconds": 1.041640625,
+          "valid_transitions": 13077,
+          "checkpoint_sha256": "cdab2daf5309ba8ccf6e702c656795354063fceabaebdae2121338c2b16bafbd",
+          "evaluation_seconds": 76.05948344501667
+        },
+        {
+          "train_seconds": 300.1563879469177,
+          "end_to_end_seconds": 865.3032704009674,
+          "frames": 5881856,
+          "success": 0.828125,
+          "mpjpe_l_mm": 74.94828481596019,
+          "mpjpe_g_mm": 447.74628090069564,
+          "survival_seconds": 5.497578125,
+          "valid_transitions": 70145,
+          "checkpoint_sha256": "3f6777e763b342aabb18863e4720ec1ed54a1f484a46a04dbfb1deaf0048e9b8",
+          "evaluation_seconds": 73.10280770494137
+        },
+        {
+          "train_seconds": 600.3617415359477,
+          "end_to_end_seconds": 1165.5086239899974,
+          "frames": 28876800,
+          "success": 0.9921875,
+          "mpjpe_l_mm": 22.904963672603213,
+          "mpjpe_g_mm": 88.6464312290697,
+          "survival_seconds": 5.9471875,
+          "valid_transitions": 75903,
+          "checkpoint_sha256": "e9df117460ca480e86bb5e7f037ace7de256b5100704a4885bd3feb1fffcc82c",
+          "evaluation_seconds": 72.80369369604159
+        }
+      ],
+      "pretrain_seconds": 323.310419698013,
+      "startup_seconds": 241.83646275603678,
+      "encoder_sha256": "50faceaae609eabf59f9cd526406fad32fb95e1061576b3a3f58685b47b6ff94",
+      "thresholds": {
+        "0.5": {
+          "seconds": 300.1563879469177,
+          "previous_sample_seconds": 225.82903649494983,
+          "end_to_end_seconds": 865.3032704009674
+        },
+        "0.9": {
+          "seconds": 600.3617415359477,
+          "previous_sample_seconds": 300.1563879469177,
+          "end_to_end_seconds": 1165.5086239899974
+        },
+        "0.95": {
+          "seconds": 600.3617415359477,
+          "previous_sample_seconds": 300.1563879469177,
+          "end_to_end_seconds": 1165.5086239899974
+        },
+        "0.9_and_40mm": {
+          "seconds": 600.3617415359477,
+          "previous_sample_seconds": 300.1563879469177,
+          "end_to_end_seconds": 1165.5086239899974
+        }
+      },
+      "checkpoint_validation": {
+        "sha256": "e9df117460ca480e86bb5e7f037ace7de256b5100704a4885bd3feb1fffcc82c",
+        "optimizer_steps": {
+          "wm": 11540.0,
+          "actor": 2308.0,
+          "critic": 46160.0
+        },
+        "finite_tensors": 149
+      },
+      "measurement_phase": "baseline",
+      "ppo_input_normalization": null
+    },
+    {
+      "dataset": "bones_seed",
+      "interface": "fsq",
+      "policy": "svg",
+      "status": "completed",
+      "budget_seconds": 600.0,
+      "milestones": [
+        60.0,
+        120.0,
+        300.0,
+        600.0
+      ],
+      "seed": 42,
+      "source_sha256": "eea53176a120de7b1595e6401ab54db6dae02c53492ff981b63251505e0c6b1f",
+      "software": {
+        "torch": "2.12.0+cu130",
+        "torchrl": "0.13.3",
+        "tensordict": "0.13.0",
+        "isaaclab": "3.0.0",
+        "newton": "1.6.1",
+        "mujoco": "3.12.0",
+        "mujoco-warp": "3.12.0"
+      },
+      "hardware": {
+        "cpu_count": 8,
+        "ram_total": 2163635949568,
+        "ram_available": 2112664657920,
+        "device": "cuda:0",
+        "gpu_name": "NVIDIA H100 80GB HBM3",
+        "vram_total": 85064286208,
+        "vram_free": 84511883264,
+        "compute_capability": [
+          9,
+          0
+        ],
+        "torch_version": "2.12.0+cu130",
+        "cuda_version": "13.0",
+        "notes": []
+      },
+      "profile": "standard",
+      "resolved": {
+        "num_envs": 4096,
+        "wm_batch_size": 2048,
+        "imagine_batch": 2048,
+        "library_host_mapped": false,
+        "library_env_window": 0
+      },
+      "points": [
+        {
+          "train_seconds": 327.6818678199779,
+          "end_to_end_seconds": 871.8927024109289,
+          "frames": 262144,
+          "success": 0.01953125,
+          "mpjpe_l_mm": 100.52319624955403,
+          "mpjpe_g_mm": 235.4746942564716,
+          "survival_seconds": 1.039609375,
+          "valid_transitions": 13051,
+          "checkpoint_sha256": "00eec16f9318c5d148dc1a29f435efb96937d8006d4eda4c113794fe866662b8",
+          "evaluation_seconds": 72.61746906500775
+        },
+        {
+          "train_seconds": 600.5805615100544,
+          "end_to_end_seconds": 1144.7913961010054,
+          "frames": 3158016,
+          "success": 0.8515625,
+          "mpjpe_l_mm": 55.309948638882574,
+          "mpjpe_g_mm": 226.8989636025686,
+          "survival_seconds": 5.578046875,
+          "valid_transitions": 71174,
+          "checkpoint_sha256": "618fe7c1bb31ef31884a6578c7b84a85bac5628bbd15d6efc36da8019ca00290",
+          "evaluation_seconds": 70.15551612700801
+        }
+      ],
+      "pretrain_seconds": 323.310419698013,
+      "startup_seconds": 220.900414892938,
+      "encoder_sha256": "50faceaae609eabf59f9cd526406fad32fb95e1061576b3a3f58685b47b6ff94",
+      "thresholds": {
+        "0.5": {
+          "seconds": 600.5805615100544,
+          "previous_sample_seconds": 327.6818678199779,
+          "end_to_end_seconds": 1144.7913961010054
+        },
+        "0.9": null,
+        "0.95": null,
+        "0.9_and_40mm": null
+      },
+      "checkpoint_validation": {
+        "sha256": "618fe7c1bb31ef31884a6578c7b84a85bac5628bbd15d6efc36da8019ca00290",
+        "optimizer_steps": {
+          "wm": 2360.0,
+          "actor": 472.0,
+          "critic": 9440.0
+        },
+        "finite_tensors": 140
+      },
+      "measurement_phase": "validation",
+      "ppo_input_normalization": null
+    },
+    {
+      "dataset": "bones_seed",
+      "interface": "fsq",
+      "policy": "diffsr",
+      "status": "completed",
+      "budget_seconds": 600.0,
+      "milestones": [
+        60.0,
+        120.0,
+        300.0,
+        600.0
+      ],
+      "seed": 42,
+      "source_sha256": "eea53176a120de7b1595e6401ab54db6dae02c53492ff981b63251505e0c6b1f",
+      "software": {
+        "torch": "2.12.0+cu130",
+        "torchrl": "0.13.3",
+        "tensordict": "0.13.0",
+        "isaaclab": "3.0.0",
+        "newton": "1.6.1",
+        "mujoco": "3.12.0",
+        "mujoco-warp": "3.12.0"
+      },
+      "hardware": {
+        "cpu_count": 8,
+        "ram_total": 2163635949568,
+        "ram_available": 2112664657920,
+        "device": "cuda:0",
+        "gpu_name": "NVIDIA H100 80GB HBM3",
+        "vram_total": 85064286208,
+        "vram_free": 84511883264,
+        "compute_capability": [
+          9,
+          0
+        ],
+        "torch_version": "2.12.0+cu130",
+        "cuda_version": "13.0",
+        "notes": []
+      },
+      "profile": "standard",
+      "resolved": {
+        "num_envs": 4096,
+        "wm_batch_size": 2048,
+        "imagine_batch": 2048,
+        "library_host_mapped": false,
+        "library_env_window": 0
+      },
+      "points": [
+        {
+          "train_seconds": 212.02277054695878,
+          "end_to_end_seconds": 755.7721767190378,
+          "frames": 262144,
+          "success": 0.01953125,
+          "mpjpe_l_mm": 100.49267993283951,
+          "mpjpe_g_mm": 235.2897913627007,
+          "survival_seconds": 1.0382031250000001,
+          "valid_transitions": 13033,
+          "checkpoint_sha256": "239f2c6654d7456fd5ce60cf624c52d79b9caf71c8a5c7cf7b674203f60b2296",
+          "evaluation_seconds": 72.1533728770446
+        },
+        {
+          "train_seconds": 300.30941357195843,
+          "end_to_end_seconds": 844.0588197440375,
+          "frames": 1196032,
+          "success": 0.01953125,
+          "mpjpe_l_mm": 102.16426814967453,
+          "mpjpe_g_mm": 235.93080235830746,
+          "survival_seconds": 1.089140625,
+          "valid_transitions": 13685,
+          "checkpoint_sha256": "bbd92b54be99968ea04bb19d1a63e9ccd8f5e260636de55e6daa9bb13447ae63",
+          "evaluation_seconds": 69.64712867501657
+        },
+        {
+          "train_seconds": 600.4275256219553,
+          "end_to_end_seconds": 1144.1769317940343,
+          "frames": 4435968,
+          "success": 0.97265625,
+          "mpjpe_l_mm": 52.25694439236497,
+          "mpjpe_g_mm": 339.88589919493734,
+          "survival_seconds": 5.897421875,
+          "valid_transitions": 75266,
+          "checkpoint_sha256": "5dc7dfbdba7bbd4dc05bc9c43064bba97dd7cb16662ac92cf0f50d1b6977bd8f",
+          "evaluation_seconds": 70.05087671696674
+        }
+      ],
+      "pretrain_seconds": 323.310419698013,
+      "startup_seconds": 220.43898647406604,
+      "encoder_sha256": "50faceaae609eabf59f9cd526406fad32fb95e1061576b3a3f58685b47b6ff94",
+      "thresholds": {
+        "0.5": {
+          "seconds": 600.4275256219553,
+          "previous_sample_seconds": 300.30941357195843,
+          "end_to_end_seconds": 1144.1769317940343
+        },
+        "0.9": {
+          "seconds": 600.4275256219553,
+          "previous_sample_seconds": 300.30941357195843,
+          "end_to_end_seconds": 1144.1769317940343
+        },
+        "0.95": {
+          "seconds": 600.4275256219553,
+          "previous_sample_seconds": 300.30941357195843,
+          "end_to_end_seconds": 1144.1769317940343
+        },
+        "0.9_and_40mm": null
+      },
+      "checkpoint_validation": {
+        "sha256": "5dc7dfbdba7bbd4dc05bc9c43064bba97dd7cb16662ac92cf0f50d1b6977bd8f",
+        "optimizer_steps": {
+          "wm": 3400.0,
+          "actor": 680.0,
+          "critic": 13600.0
+        },
+        "finite_tensors": 375
+      },
+      "measurement_phase": "validation",
+      "ppo_input_normalization": null
+    },
+    {
+      "dataset": "bones_seed",
+      "interface": "diffsr",
+      "policy": "ppo",
+      "status": "completed",
+      "budget_seconds": 600.0,
+      "milestones": [
+        60.0,
+        120.0,
+        300.0,
+        600.0
+      ],
+      "seed": 42,
+      "source_sha256": "eea53176a120de7b1595e6401ab54db6dae02c53492ff981b63251505e0c6b1f",
+      "software": {
+        "torch": "2.12.0+cu130",
+        "torchrl": "0.13.3",
+        "tensordict": "0.13.0",
+        "isaaclab": "3.0.0",
+        "newton": "1.6.1",
+        "mujoco": "3.12.0",
+        "mujoco-warp": "3.12.0"
+      },
+      "hardware": {
+        "cpu_count": 8,
+        "ram_total": 2163635970048,
+        "ram_available": 2085877776384,
+        "device": "cuda:0",
+        "gpu_name": "NVIDIA H100 80GB HBM3",
+        "vram_total": 85064286208,
+        "vram_free": 84511883264,
+        "compute_capability": [
+          9,
+          0
+        ],
+        "torch_version": "2.12.0+cu130",
+        "cuda_version": "13.0",
+        "notes": []
+      },
+      "profile": "large",
+      "resolved": {
+        "num_envs": 8192,
+        "wm_batch_size": null,
+        "imagine_batch": null,
+        "library_host_mapped": false,
+        "library_env_window": 0
+      },
+      "points": [
+        {
+          "train_seconds": 60.89515437593218,
+          "end_to_end_seconds": 604.0133533669868,
+          "frames": 5701632,
+          "success": 0.01953125,
+          "mpjpe_l_mm": 109.8786877715752,
+          "mpjpe_g_mm": 242.72520767979267,
+          "survival_seconds": 0.7221875,
+          "valid_transitions": 8988,
+          "checkpoint_sha256": "ce98ac28e01077a64d60c2e6fc0a5ced326bd2be0f94cafdae94f18c961620ec",
+          "evaluation_seconds": 72.55221197300125
+        },
+        {
+          "train_seconds": 120.31470797397196,
+          "end_to_end_seconds": 663.4329069650266,
+          "frames": 11010048,
+          "success": 0.01953125,
+          "mpjpe_l_mm": 94.26253001207641,
+          "mpjpe_g_mm": 225.4091651121438,
+          "survival_seconds": 0.719453125,
+          "valid_transitions": 8953,
+          "checkpoint_sha256": "4e325741e51a31f78b503710f675b2d726f6e1f0c2b316b4944a06b0a773a0cb",
+          "evaluation_seconds": 69.09696291992441
+        },
+        {
+          "train_seconds": 301.44675846700557,
+          "end_to_end_seconds": 844.5649574580602,
+          "frames": 27131904,
+          "success": 0.0390625,
+          "mpjpe_l_mm": 66.0463109061222,
+          "mpjpe_g_mm": 175.34367069361423,
+          "survival_seconds": 1.649609375,
+          "valid_transitions": 20860,
+          "checkpoint_sha256": "1d1eb3f2ef7404f6d2e7cf5526e5e3c9ba4a156f1a42988e827c4d958918862b",
+          "evaluation_seconds": 70.04769103100989
+        },
+        {
+          "train_seconds": 600.5840615879279,
+          "end_to_end_seconds": 1143.7022605789825,
+          "frames": 53870592,
+          "success": 0.6640625,
+          "mpjpe_l_mm": 81.21838488144363,
+          "mpjpe_g_mm": 456.594472718545,
+          "survival_seconds": 4.7455468750000005,
+          "valid_transitions": 60511,
+          "checkpoint_sha256": "94b1e31159e17737f7d1a3bde89e70ac0f53cad7c4afc90f7c8c7581c03efb06",
+          "evaluation_seconds": 69.9988817810081
+        }
+      ],
+      "pretrain_seconds": 327.00146891199984,
+      "startup_seconds": 216.11673007905483,
+      "encoder_sha256": "fb948e44215ac8d5b6240463fcc4a98d1a0b305eefd6b6ac2d83b2e4efa09ab4",
+      "thresholds": {
+        "0.5": {
+          "seconds": 600.5840615879279,
+          "previous_sample_seconds": 301.44675846700557,
+          "end_to_end_seconds": 1143.7022605789825
+        },
+        "0.9": null,
+        "0.95": null,
+        "0.9_and_40mm": null
+      },
+      "checkpoint_validation": {
+        "sha256": "94b1e31159e17737f7d1a3bde89e70ac0f53cad7c4afc90f7c8c7581c03efb06",
+        "optimizer_steps": {
+          "ppo": 10960.0
+        },
+        "finite_tensors": 74
+      },
+      "measurement_phase": "diagnostics",
+      "ppo_input_normalization": true
+    },
+    {
+      "dataset": "bones_seed",
+      "interface": "diffsr",
+      "policy": "supermimic",
+      "status": "completed",
+      "budget_seconds": 600.0,
+      "milestones": [
+        60.0,
+        120.0,
+        300.0,
+        600.0
+      ],
+      "seed": 42,
+      "source_sha256": "eea53176a120de7b1595e6401ab54db6dae02c53492ff981b63251505e0c6b1f",
+      "software": {
+        "torch": "2.12.0+cu130",
+        "torchrl": "0.13.3",
+        "tensordict": "0.13.0",
+        "isaaclab": "3.0.0",
+        "newton": "1.6.1",
+        "mujoco": "3.12.0",
+        "mujoco-warp": "3.12.0"
+      },
+      "hardware": {
+        "cpu_count": 8,
+        "ram_total": 2163635945472,
+        "ram_available": 2104779804672,
+        "device": "cuda:0",
+        "gpu_name": "NVIDIA H100 80GB HBM3",
+        "vram_total": 85064286208,
+        "vram_free": 84511883264,
+        "compute_capability": [
+          9,
+          0
+        ],
+        "torch_version": "2.12.0+cu130",
+        "cuda_version": "13.0",
+        "notes": []
+      },
+      "profile": "large",
+      "resolved": {
+        "num_envs": 8192,
+        "wm_batch_size": 4096,
+        "imagine_batch": 4096,
+        "library_host_mapped": false,
+        "library_env_window": 0
+      },
+      "points": [
+        {
+          "train_seconds": 227.45073355000932,
+          "end_to_end_seconds": 800.0838944739662,
+          "frames": 524288,
+          "success": 0.01953125,
+          "mpjpe_l_mm": 100.57833921598383,
+          "mpjpe_g_mm": 235.3035952400926,
+          "survival_seconds": 1.041328125,
+          "valid_transitions": 13073,
+          "checkpoint_sha256": "562e8e2ad6cf35cdd90ba15f16a9a6840d15fb8a6dbd3c7a6b5c292ff3e003d1",
+          "evaluation_seconds": 76.00840749894269
+        },
+        {
+          "train_seconds": 300.3422033439856,
+          "end_to_end_seconds": 872.9753642679425,
+          "frames": 3301376,
+          "success": 0.02734375,
+          "mpjpe_l_mm": 99.66411365767904,
+          "mpjpe_g_mm": 228.52717490902359,
+          "survival_seconds": 1.467109375,
+          "valid_transitions": 18523,
+          "checkpoint_sha256": "107b5517c76d48ace50bf79f496e9f60f656396fe2c80f2025263aa22ecbc251",
+          "evaluation_seconds": 72.40640458604321
+        },
+        {
+          "train_seconds": 600.4478767130058,
+          "end_to_end_seconds": 1173.0810376369627,
+          "frames": 15294464,
+          "success": 0.9921875,
+          "mpjpe_l_mm": 26.678514364089263,
+          "mpjpe_g_mm": 116.46789373546093,
+          "survival_seconds": 5.946953125,
+          "valid_transitions": 75900,
+          "checkpoint_sha256": "fd1be6a41345ac5a35d45d5155839d4ea88ba1114faa3ddaae493919941f3f2c",
+          "evaluation_seconds": 70.45019084191881
+        }
+      ],
+      "pretrain_seconds": 327.00146891199984,
+      "startup_seconds": 245.63169201195706,
+      "encoder_sha256": "fb948e44215ac8d5b6240463fcc4a98d1a0b305eefd6b6ac2d83b2e4efa09ab4",
+      "thresholds": {
+        "0.5": {
+          "seconds": 600.4478767130058,
+          "previous_sample_seconds": 300.3422033439856,
+          "end_to_end_seconds": 1173.0810376369627
+        },
+        "0.9": {
+          "seconds": 600.4478767130058,
+          "previous_sample_seconds": 300.3422033439856,
+          "end_to_end_seconds": 1173.0810376369627
+        },
+        "0.95": {
+          "seconds": 600.4478767130058,
+          "previous_sample_seconds": 300.3422033439856,
+          "end_to_end_seconds": 1173.0810376369627
+        },
+        "0.9_and_40mm": {
+          "seconds": 600.4478767130058,
+          "previous_sample_seconds": 300.3422033439856,
+          "end_to_end_seconds": 1173.0810376369627
+        }
+      },
+      "checkpoint_validation": {
+        "sha256": "fd1be6a41345ac5a35d45d5155839d4ea88ba1114faa3ddaae493919941f3f2c",
+        "optimizer_steps": {
+          "wm": 6015.0,
+          "actor": 1203.0,
+          "critic": 24060.0
+        },
+        "finite_tensors": 149
+      },
+      "measurement_phase": "baseline",
+      "ppo_input_normalization": null
+    },
+    {
+      "dataset": "bones_seed",
+      "interface": "diffsr",
+      "policy": "svg",
+      "status": "completed",
+      "budget_seconds": 600.0,
+      "milestones": [
+        60.0,
+        120.0,
+        300.0,
+        600.0
+      ],
+      "seed": 42,
+      "source_sha256": "eea53176a120de7b1595e6401ab54db6dae02c53492ff981b63251505e0c6b1f",
+      "software": {
+        "torch": "2.12.0+cu130",
+        "torchrl": "0.13.3",
+        "tensordict": "0.13.0",
+        "isaaclab": "3.0.0",
+        "newton": "1.6.1",
+        "mujoco": "3.12.0",
+        "mujoco-warp": "3.12.0"
+      },
+      "hardware": {
+        "cpu_count": 8,
+        "ram_total": 2163635949568,
+        "ram_available": 2127497744384,
+        "device": "cuda:0",
+        "gpu_name": "NVIDIA H100 80GB HBM3",
+        "vram_total": 85064286208,
+        "vram_free": 84511883264,
+        "compute_capability": [
+          9,
+          0
+        ],
+        "torch_version": "2.12.0+cu130",
+        "cuda_version": "13.0",
+        "notes": []
+      },
+      "profile": "standard",
+      "resolved": {
+        "num_envs": 4096,
+        "wm_batch_size": 2048,
+        "imagine_batch": 2048,
+        "library_host_mapped": false,
+        "library_env_window": 0
+      },
+      "points": [
+        {
+          "train_seconds": 319.5691532259807,
+          "end_to_end_seconds": 870.8260445930064,
+          "frames": 262144,
+          "success": 0.01953125,
+          "mpjpe_l_mm": 100.4366081406867,
+          "mpjpe_g_mm": 235.43827260651204,
+          "survival_seconds": 1.038828125,
+          "valid_transitions": 13041,
+          "checkpoint_sha256": "a6a357033bf0cee9ce26d7f9f08c50c115248695f750b0da5d1f269f5dd4178f",
+          "evaluation_seconds": 71.65392907999922
+        },
+        {
+          "train_seconds": 600.6417901369277,
+          "end_to_end_seconds": 1151.8986815039534,
+          "frames": 3317760,
+          "success": 0.8515625,
+          "mpjpe_l_mm": 52.75646662029673,
+          "mpjpe_g_mm": 268.8570909068099,
+          "survival_seconds": 5.563671875,
+          "valid_transitions": 70992,
+          "checkpoint_sha256": "f376b975f8941f193a336e62ef261abab5742c93aed16e36d983c2754e87a1ff",
+          "evaluation_seconds": 69.19916998501867
+        }
+      ],
+      "pretrain_seconds": 327.00146891199984,
+      "startup_seconds": 224.25542245502584,
+      "encoder_sha256": "fb948e44215ac8d5b6240463fcc4a98d1a0b305eefd6b6ac2d83b2e4efa09ab4",
+      "thresholds": {
+        "0.5": {
+          "seconds": 600.6417901369277,
+          "previous_sample_seconds": 319.5691532259807,
+          "end_to_end_seconds": 1151.8986815039534
+        },
+        "0.9": null,
+        "0.95": null,
+        "0.9_and_40mm": null
+      },
+      "checkpoint_validation": {
+        "sha256": "f376b975f8941f193a336e62ef261abab5742c93aed16e36d983c2754e87a1ff",
+        "optimizer_steps": {
+          "wm": 2490.0,
+          "actor": 498.0,
+          "critic": 9960.0
+        },
+        "finite_tensors": 140
+      },
+      "measurement_phase": "validation",
+      "ppo_input_normalization": null
+    },
+    {
+      "dataset": "bones_seed",
+      "interface": "diffsr",
+      "policy": "diffsr",
+      "status": "completed",
+      "budget_seconds": 600.0,
+      "milestones": [
+        60.0,
+        120.0,
+        300.0,
+        600.0
+      ],
+      "seed": 42,
+      "source_sha256": "eea53176a120de7b1595e6401ab54db6dae02c53492ff981b63251505e0c6b1f",
+      "software": {
+        "torch": "2.12.0+cu130",
+        "torchrl": "0.13.3",
+        "tensordict": "0.13.0",
+        "isaaclab": "3.0.0",
+        "newton": "1.6.1",
+        "mujoco": "3.12.0",
+        "mujoco-warp": "3.12.0"
+      },
+      "hardware": {
+        "cpu_count": 8,
+        "ram_total": 2163635949568,
+        "ram_available": 2127498260480,
+        "device": "cuda:0",
+        "gpu_name": "NVIDIA H100 80GB HBM3",
+        "vram_total": 85064286208,
+        "vram_free": 84511883264,
+        "compute_capability": [
+          9,
+          0
+        ],
+        "torch_version": "2.12.0+cu130",
+        "cuda_version": "13.0",
+        "notes": []
+      },
+      "profile": "standard",
+      "resolved": {
+        "num_envs": 4096,
+        "wm_batch_size": 2048,
+        "imagine_batch": 2048,
+        "library_host_mapped": false,
+        "library_env_window": 0
+      },
+      "points": [
+        {
+          "train_seconds": 213.77926929097157,
+          "end_to_end_seconds": 765.0037626270205,
+          "frames": 262144,
+          "success": 0.01953125,
+          "mpjpe_l_mm": 100.55779651192627,
+          "mpjpe_g_mm": 235.23531301693757,
+          "survival_seconds": 1.038359375,
+          "valid_transitions": 13035,
+          "checkpoint_sha256": "0099d2999fbe1eacd7d9f31a6724b4b8e45d3b42d20912458367ecfc32455788",
+          "evaluation_seconds": 71.05561578692868
+        },
+        {
+          "train_seconds": 300.41293648595456,
+          "end_to_end_seconds": 851.6374298220035,
+          "frames": 1183744,
+          "success": 0.01953125,
+          "mpjpe_l_mm": 100.46882557502698,
+          "mpjpe_g_mm": 239.52524113485103,
+          "survival_seconds": 1.082890625,
+          "valid_transitions": 13605,
+          "checkpoint_sha256": "eba98e15916d876c13cb830b2585c4363b1234b2ec6b119411659c87c9d4bd5b",
+          "evaluation_seconds": 68.39896520995535
+        },
+        {
+          "train_seconds": 600.2604026569752,
+          "end_to_end_seconds": 1151.484895993024,
+          "frames": 4448256,
+          "success": 0.98046875,
+          "mpjpe_l_mm": 48.959718134060395,
+          "mpjpe_g_mm": 298.1135232740885,
+          "survival_seconds": 5.915390625,
+          "valid_transitions": 75496,
+          "checkpoint_sha256": "48650ba0b860eeb6205c24bb64c240fb79fea64a7cae74cb28e9053412678e8f",
+          "evaluation_seconds": 67.64664343593176
+        }
+      ],
+      "pretrain_seconds": 327.00146891199984,
+      "startup_seconds": 224.22302442404907,
+      "encoder_sha256": "fb948e44215ac8d5b6240463fcc4a98d1a0b305eefd6b6ac2d83b2e4efa09ab4",
+      "thresholds": {
+        "0.5": {
+          "seconds": 600.2604026569752,
+          "previous_sample_seconds": 300.41293648595456,
+          "end_to_end_seconds": 1151.484895993024
+        },
+        "0.9": {
+          "seconds": 600.2604026569752,
+          "previous_sample_seconds": 300.41293648595456,
+          "end_to_end_seconds": 1151.484895993024
+        },
+        "0.95": {
+          "seconds": 600.2604026569752,
+          "previous_sample_seconds": 300.41293648595456,
+          "end_to_end_seconds": 1151.484895993024
+        },
+        "0.9_and_40mm": null
+      },
+      "checkpoint_validation": {
+        "sha256": "48650ba0b860eeb6205c24bb64c240fb79fea64a7cae74cb28e9053412678e8f",
+        "optimizer_steps": {
+          "wm": 3410.0,
+          "actor": 682.0,
+          "critic": 13640.0
+        },
+        "finite_tensors": 375
+      },
+      "measurement_phase": "validation",
+      "ppo_input_normalization": null
+    }
+  ],
+  "selection_rule": "PPO: normalization-only diagnostics, retaining automatic memory-based profiles. Latent SVG/DiffSR: standard on both banks (diagnostics LAFAN1, validation BONES-SEED). All other cases: original baseline. No per-cell maximum selection.",
+  "training_source_commits": {
+    "baseline": "64d70f422515bbd3e437790a44918c528ef20dc0",
+    "diagnostics": "e1923ff",
+    "validation": "1ca5909"
+  },
+  "source_note": "The three training commits differ only in documentation; every measured run has the same recorded training source fingerprint. The launcher now makes the tested normalization/profile overrides default. No core algorithm, architecture or task change was made."
+}

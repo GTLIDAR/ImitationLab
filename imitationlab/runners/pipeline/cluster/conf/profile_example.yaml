@@ -1,0 +1,64 @@
+# Example cluster profile for `python -m imitationlab.runners.pipeline.cluster`.
+#
+# Copy this file to one of the profile directories and fill in your site values:
+#
+#   $IMITATIONLAB_CLUSTER_PROFILE_DIR/profile_<name>.yaml
+#   ~/.config/imitationlab/cluster/profile_<name>.yaml
+#
+# A campaign then selects it with `profile: <name>`, or a command passes
+# `--profile <name>` (or a path to the .yaml file). Keep site profiles out of
+# Git: they name user directories, allocations, and credential files.
+#
+# All paths are host paths on the cluster and must be absolute.
+name: example
+# An ssh alias defined in ~/.ssh/config, not a host name.
+login: mycluster
+# Where the control plane stages plans and workspace archives.
+control_root: /home/user/imitationlab/cluster_control
+# Bound into the container at /data.
+data_dir: /home/user/imitationlab/data
+# The Isaac Lab runtime image every job runs in.
+shared_sif_path: /shared/project/isaaclabsif/isaaclab-runtime-cu130.sif
+isaac_cache_dir: /home/user/imitationlab/cache
+job_tmpdir_root: /tmp
+project_logs_dir: /home/user/imitationlab/isaaclab/logs
+# The container binds only data_dir plus these paths. A dataset elsewhere is
+# not visible inside the job.
+extra_bind_paths:
+  - /shared/project
+# Files on the cluster that hold the tokens. Never put a raw token here.
+hf_token_file: /home/user/.hf_token
+wandb_api_key_file: /home/user/.wandb_api_key
+# Refuse to submit when the output filesystem has less free space than this.
+min_free_gb: 50
+slurm:
+  account: null
+  qos: null
+  partition: gpu
+  gres: gpu:h100:1
+  cpus_per_task: 16
+  mem: 96G
+  time_limit: "15:59:00"
+  # Must be absolute and must exist; Slurm drops the job without a log when
+  # the directory is missing.
+  log_dir: /home/user/imitationlab/slurm_logs
+  job_name_prefix: imit
+  # Comma-separated nodes that every stage keeps off unless it sets its own
+  # `exclude`. Use it for nodes that Slurm reports healthy but cannot run jobs.
+  exclude: null
+env:
+  # Runtime keys read by docker/cluster/run_singularity.sh inside the job.
+  # Every key here reaches the job verbatim.
+  CLUSTER_ISAACLAB_DIR: /home/user/imitationlab/isaaclab
+  CLUSTER_PYTHON_EXECUTABLE: scripts/tracking/train.py
+  CLUSTER_SIM_BACKEND: auto
+  CLUSTER_CU130_RUNTIME_ROOT: /opt/isaaclab-imitation-runtime-spec/.pixi/envs/container-runtime
+  CLUSTER_G1_USD_PATH: repo
+  CLUSTER_USE_OVERLAY: "0"
+  CLUSTER_SKIP_CACHE_COPY: "1"
+  CLUSTER_AUTO_SETUP_G1_DATA: "0"
+  CLUSTER_APPEND_DEFAULT_G1_MANIFEST: "0"
+  CLUSTER_G1_MANIFEST_REFRESH_POLICY: never
+  CLUSTER_EXTRA_PYTHONPATH_REL: IsaacLab/source/isaaclab:IsaacLab/source/isaaclab_tasks:IsaacLab/source/isaaclab_assets:IsaacLab/source/isaaclab_rl:IsaacLab/source/isaaclab_mimic:.
+  REMOVE_CODE_COPY_AFTER_JOB: "false"
+  REMOVE_OVERLAY_AFTER_JOB: "true"

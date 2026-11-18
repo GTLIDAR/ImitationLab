@@ -1,0 +1,26 @@
+# Workspace lint exclusions. Vendored SuperMimic keeps its upstream style.
+
+extend-exclude = [
+    "third_party/supermimic",
+    "third_party/mjlab_research",
+    # Generated run artifacts and caches.
+    "logs",
+    "outputs",
+    "data",
+    "wandb",
+    ".pixi",
+    ".tmp",
+    # Untracked scratch space for debugging sessions.
+    "scratchpad",
+    # Agent worktree roots.
+    ".agents",
+    ".codex",
+]
+
+# Vendor-derived Isaac Lab example scripts keep their upstream formatting, so a
+# diff against upstream shows only the real changes. Lint still covers them.
+[format]
+exclude = [
+    "scripts/zero_agent.py",
+    "scripts/random_agent.py",
+]

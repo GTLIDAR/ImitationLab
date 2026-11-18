@@ -1,0 +1,72 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "imitationlab"
+version = "0.1.0"
+description = "Native policy learning and motion processing for ImitationLab"
+readme = "README.md"
+requires-python = ">=3.12"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Feiyang Wu" }]
+keywords = ["imitation learning", "motion tracking", "humanoid", "isaac lab", "reinforcement learning"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+dependencies = [
+    "diffusers",
+    "gymnasium>=1.1",
+    "numpy",
+    "omegaconf>=2.3",
+    "pydantic>=2",
+    "psutil",
+    "scipy",
+    "pyyaml",
+    "rich",
+    "tensordict>=0.11",
+    "torch>=2.7",
+    "torchrl>=0.11",
+    "tqdm",
+    "wandb",
+    "zarr>3",
+]
+
+[project.optional-dependencies]
+# Imported lazily: dataset download and publication on the Hugging Face Hub.
+hub = ["huggingface_hub"]
+# Imported lazily: ONNX policy bundles (imitationlab export --format onnx).
+export = ["onnx", "onnxruntime"]
+# Imported lazily: benchmark plots and MuJoCo-based world-model validation.
+viz = ["matplotlib>=3.10", "mujoco"]
+
+[project.urls]
+Homepage = "https://github.com/GTLIDAR/ImitationLab"
+Repository = "https://github.com/GTLIDAR/ImitationLab"
+Issues = "https://github.com/GTLIDAR/ImitationLab/issues"
+
+[project.scripts]
+imitationlab = "imitationlab.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["imitationlab*"]
+exclude = ["*.tests", "*.tests.*"]
+namespaces = false
+
+[tool.setuptools.package-data]
+"imitationlab.algorithms" = ["LICENSE", "THIRD_PARTY_NOTICES.md"]
+"imitationlab.data_tools" = ["LICENSE"]
+"imitationlab.runners.pipeline.cluster" = ["conf/*.yaml"]
+"imitationlab.envs.isaaclab" = ["manifests/*.json", "assets/unitree/g1_description/LICENSE", "assets/unitree/g1_description/*.md", "assets/unitree/g1_description/*.urdf", "assets/unitree/g1_description/*.xml", "assets/unitree/g1_description/*.usd", "assets/unitree/g1_description/meshes/*"]
+
+[tool.setuptools.data-files]
+"share/imitationlab/recipes/g1" = ["experiments/recipes/g1/packed.args", "experiments/recipes/g1/world_model.args", "experiments/recipes/g1/supermimic.args", "experiments/recipes/g1/ppo.args"]
+"share/imitationlab/recipes/encoders" = ["experiments/recipes/encoders/g1.args", "experiments/recipes/encoders/fsq.args", "experiments/recipes/encoders/spectral.args", "experiments/recipes/encoders/diffsr.args"]

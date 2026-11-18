@@ -1,0 +1,15 @@
+# Shared simulator defaults for explicit commands and packed G1 motions.
+--num_envs 4096
+env.library_host_mapped=true
+env.library_env_window=64
+%env ISAACLAB_IMITATION_COLLECT_FASTPATH=1
+%env PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
+env.step_mode=graph
+env.data.manifest=null
+env.data.reference_arrays_resident=false
+env.data.reference_arrays_warm_workers=0
+env.data.runtime_cache_device=cpu
+env.data.reference_prefetch_mode=next
+env.data.runtime_cache_body_names=[pelvis,left_hip_roll_link,left_knee_link,left_ankle_roll_link,right_hip_roll_link,right_knee_link,right_ankle_roll_link,torso_link,left_shoulder_roll_link,left_elbow_link,left_wrist_yaw_link,right_shoulder_roll_link,right_elbow_link,right_wrist_yaw_link]
+env.graph_reference_source=library
+env.reset_fail_share=0.3

@@ -1,0 +1,8 @@
+*.bat text eol=crlf
+# SCM syntax highlighting & preventing 3-way merges
+pixi.lock merge=binary linguist-language=YAML linguist-generated=true -diff
+*.usd binary
+*.STL binary
+*.npz binary
+# Preserve the upstream robot descriptions byte for byte.
+imitationlab/envs/isaaclab/assets/unitree/** -whitespace

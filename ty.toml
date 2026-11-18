@@ -1,0 +1,15 @@
+# ty (Astral) configuration for the ImitationLab workspace. The same import
+# roots serve the `ty check` CLI task and the language server. A ty.toml in
+# this directory takes precedence over any [tool.ty] tables in nested
+# pyproject.toml files.
+
+[environment]
+python = ".pixi/envs/isaaclab/bin/python"
+python-version = "3.12"
+# Isaac Lab needs no entry here. Pixi builds it from the git `develop` branch
+# (wheel builder) and installs `isaaclab`, `isaaclab_tasks`, `isaaclab_physx`,
+# and the other Isaac Lab packages as normal top-level packages in the
+# `python` environment above. Do not add `site-packages/isaaclab/source/...`:
+# that directory holds only docs and tests, not importable code.
+# The first-party packages follow.
+extra-paths = ["."]

@@ -1,0 +1,3 @@
+# G1 v1 publishes unscaled observations; normalize both networks in PPO.
+agent.policy.normalize_input=true
+agent.value_function.normalize_input=true
