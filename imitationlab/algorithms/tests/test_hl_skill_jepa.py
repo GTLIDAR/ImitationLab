@@ -259,3 +259,18 @@ def test_past_start_anchor_shifts_the_cursor_and_never_reanchors() -> None:
     assert frames.tolist() == [float(v) for v in range(100, 111)]
     # The source ends at s_t in both anchor modes; only the frame differs.
     assert frames[-1].item() == state[0, 0].item()
+
+
+def test_reanchor_with_a_full_origin_makes_height_relative():
+    from imitationlab.encoders.diffsr.pretrain import _reanchor_heading_frames
+
+    torch.manual_seed(0)
+    frames = torch.randn(3, 5, 38)
+    frames[..., 32:38] = torch.tensor([1.0, 0.0, 0.0, 0.0, 1.0, 0.0])
+    anchor = frames[:, 0]
+    xy = _reanchor_heading_frames(frames, anchor)
+    xyz = _reanchor_heading_frames(frames, anchor, "xyz")
+    assert torch.equal(xy[..., 31], frames[..., 31])
+    torch.testing.assert_close(xyz[..., 31], frames[..., 31] - anchor[:, None, 31])
+    assert torch.equal(xyz[..., :31], xy[..., :31])
+    assert torch.equal(xyz[..., 32:], xy[..., 32:])

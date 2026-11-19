@@ -849,6 +849,10 @@ def _build_trainer_config(
         horizon_steps=args_cli.horizon_steps,
         macro_frame_stride=macro_frame_stride,
         macro_anchor_mode=macro_anchor_mode,
+        macro_origin=str(getattr(env_cfg, "expert_macro_origin", "xy") or "xy"),
+        rollout_anchor=str(
+            getattr(env_cfg, "skill_rollout_anchor", "robot") or "robot"
+        ),
         encoder_window_mode=args_cli.encoder_window_mode,
         source_history_steps=args_cli.source_history_steps,
         source_anchor=args_cli.source_anchor,

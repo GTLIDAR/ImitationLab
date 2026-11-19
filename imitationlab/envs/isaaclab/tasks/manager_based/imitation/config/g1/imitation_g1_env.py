@@ -276,6 +276,15 @@ class ImitationG1EnvCfg(ManagerBasedRLEnvCfg):
     expert_macro_frame_stride: int = 1
     expert_macro_anchor_mode: str = "robot"
     expert_macro_rollout_anchor_mode: str = "inherit"
+    # Origin of the encoder's macro window: "xy" keeps absolute height, "xyz"
+    # makes height relative to the window's anchor. Recorded in the encoder.
+    expert_macro_origin: str = "xy"
+    # Frame the policy builds the live encoder window in: "robot" (the live
+    # robot's yaw frame at its xy; needs a position estimate) or
+    # "previous_reference" (the yaw frame and origin of the reference frame
+    # before the window; reference only). Recorded in the encoder at
+    # pretraining, which is where a policy run reads it from.
+    skill_rollout_anchor: str = "robot"
     expert_macro_anchor_walk_std: float = 0.0
     expert_macro_anchor_walk_max: float = 0.1
     expert_macro_anchor_jitter: float = 0.0

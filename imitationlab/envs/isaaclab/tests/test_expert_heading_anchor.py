@@ -252,3 +252,36 @@ def test_missing_cfg_field_defaults_to_robot():
     plane = object.__new__(ExpertDataPlane)
     plane._env = SimpleNamespace(cfg=SimpleNamespace())  # type: ignore[assignment]
     assert plane._expert_macro_anchor_mode() == "robot"
+
+
+def test_xyz_origin_makes_pretraining_height_relative_to_the_anchor():
+    """``expert_macro_origin=xyz``: the anchor's own height is subtracted too;
+    x, y and the orientation are those of the default ``xy`` origin."""
+    ref_pos = torch.tensor([[[0.9, -0.2, 0.83], [1.1, 0.1, 0.86]]])
+    ref_quat = torch.stack(
+        [_quat_xyzw(0.05, 0.02, 0.9), _quat_xyzw(0.04, 0.03, 1.0)]
+    ).unsqueeze(0)
+    window = {
+        "joint_pos": torch.zeros(1, 2, 3),
+        "_macro_anchor_pos_w": ref_pos,
+        "_macro_anchor_quat_w": ref_quat,
+    }
+    env_ids = torch.zeros(1, dtype=torch.long)
+    terms = {}
+    for origin in ("xy", "xyz"):
+        plane = _window_plane(torch.zeros(1, 3), _quat_xyzw(0, 0, 0).unsqueeze(0))
+        plane._env.cfg.expert_macro_origin = origin  # type: ignore[attr-defined]
+        terms[origin] = plane._build_expert_window_terms(
+            window,  # type: ignore[arg-type]
+            env_ids,
+            context="expert_heading",
+            past_steps=0,
+        )
+    xy = terms["xy"]["expert_anchor_pos_b"].reshape(2, 3)
+    xyz = terms["xyz"]["expert_anchor_pos_b"].reshape(2, 3)
+    assert torch.allclose(xy[:, 2], torch.tensor([0.83, 0.86]), atol=_ATOL)
+    assert torch.allclose(xyz[:, 2], torch.tensor([0.0, 0.03]), atol=_ATOL)
+    assert torch.allclose(xyz[:, :2], xy[:, :2], atol=_ATOL)
+    assert torch.equal(
+        terms["xyz"]["expert_anchor_ori_b"], terms["xy"]["expert_anchor_ori_b"]
+    )

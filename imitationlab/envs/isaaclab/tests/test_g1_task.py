@@ -74,7 +74,7 @@ def test_reference_differentiates_each_clip_without_cross_clip_leakage():
     )
     assert torch.allclose(lib.states[:5, 42], lib.states[:5, 7], atol=1e-5)
     assert torch.allclose(lib.states[:, 12], torch.full((8,), 0.5), atol=1e-5)
-    assert torch.allclose(lib.states[:, 10:12], torch.zeros(8, 2), atol=1e-6)
+    assert torch.allclose(lib.states[:, 10:12], torch.zeros(8, 2), atol=1e-6, rtol=1e-5)
     # End extension clamps the state but records validity independently.
     ref = lib.gather(torch.tensor([1]), torch.tensor([[2, 3, 10]]))
     assert ref.valid.tolist() == [[True, False, False]]
@@ -100,7 +100,9 @@ def test_goal_future_order_reference_heading_and_terminal_velocity():
         torch.tensor([math.cos(theta) * delta_x, -math.sin(theta) * delta_x, 0]),
         atol=1e-7,
     )
-    assert torch.allclose(goal[0, 0, 44], torch.tensor(0.14 * 0.1), atol=1e-6)
+    assert torch.allclose(
+        goal[0, 0, 44], torch.tensor(0.14 * 0.1), atol=1e-6, rtol=1e-5
+    )
 
 
 def test_observation_exact_layout_raw_units_and_relative_orientation():
@@ -118,8 +120,12 @@ def test_observation_exact_layout_raw_units_and_relative_orientation():
     assert prop.shape == (1, 99)
     assert torch.allclose(prop[:, :29], torch.full((1, 29), -0.01), atol=1e-7)
     assert torch.equal(prop[:, 29:58], torch.full((1, 29), 7.0))  # no unused OBS_SCALE
-    assert torch.allclose(prop[0, 58:61], torch.tensor([2.0, -1.0, 3.0]), atol=1e-6)
-    assert torch.allclose(prop[0, 61:64], torch.tensor([0.0, 0.0, -1.0]), atol=1e-6)
+    assert torch.allclose(
+        prop[0, 58:61], torch.tensor([2.0, -1.0, 3.0]), atol=1e-6, rtol=1e-5
+    )
+    assert torch.allclose(
+        prop[0, 61:64], torch.tensor([0.0, 0.0, -1.0]), atol=1e-6, rtol=1e-5
+    )
     assert torch.equal(prop[:, 64:93], action)
     # R_robot^T R_reference: first two columns, interleaved by row.
     assert torch.allclose(
@@ -194,7 +200,7 @@ def test_termination_strict_thresholds_soft_probability_and_clip_end():
     hard = t.mdp.termination(state, rank, frame, hard=True)
     assert hard.tolist() == [False, True, True]
     probability = t.mdp.termination(state[:1], rank[:1], frame[:1])
-    assert torch.allclose(probability, torch.tensor([0.5]), atol=1e-6)
+    assert torch.allclose(probability, torch.tensor([0.5]), atol=1e-6, rtol=1e-5)
     # Clip end is separate from physical termination.
     end = lib.ref_state(rank[:1], torch.tensor([4]))
     assert not t.mdp.termination(end, rank[:1], torch.tensor([4]), hard=True).item()
@@ -222,7 +228,9 @@ def test_context_normalization_and_critic_dimensions():
     xi = torch.cat(
         (torch.tensor([[1.2]]), torch.full((1, 29), 0.01), torch.full((1, 3), 0.05)), -1
     )
-    assert torch.allclose(normalize_context(xi), torch.ones(1, 33), atol=1e-6)
+    assert torch.allclose(
+        normalize_context(xi), torch.ones(1, 33), atol=1e-6, rtol=1e-5
+    )
     rank, frame = torch.tensor([0]), torch.tensor([1])
     state = lib.ref_state(rank, frame)
     value = t.critic_obs(state, xi, rank, frame)
@@ -281,7 +289,7 @@ def test_policy_history_uses_each_reference_frame_and_reset_fill():
         expected = torch.tensor(
             [math.cos(angle), -math.sin(angle), math.sin(angle), math.cos(angle), 0, 0]
         )
-        assert torch.allclose(prop[0, slot, 93:], expected, atol=1e-6)
+        assert torch.allclose(prop[0, slot, 93:], expected, atol=1e-6, rtol=1e-5)
 
 
 def test_reward_and_soft_termination_have_finite_action_path_gradients():
@@ -406,3 +414,106 @@ def test_latent_encodes_next_frame_and_keeps_state_gradients(tmp_path):
         explicit.reward(state, action, action, torch.zeros(2, 33), rank, frame)[0],
     )
     assert latent.goal_binding()["reference_start_offset"] == 1
+
+
+@pytest.mark.parametrize(
+    "origin,frame_dim,qvel_scale",
+    [("xy", 38, 1.0), ("xy", 67, 0.1), ("xyz", 38, 1.0)],
+)
+def test_reference_anchored_window_reads_nothing_from_the_robot(
+    tmp_path, origin, frame_dim, qvel_scale
+):
+    """``rollout_anchor=previous_reference``: the window f+1..f+F in the yaw
+    frame of reference frame f, at its xy (``xy``) or its full position (``xyz``).
+    Expected values are written out per coordinate from the reference rows."""
+    from imitationlab.encoders.diffsr.pretrain import HighLevelSkillDiffSRConfig
+    from imitationlab.encoders.skill_encoder import build_skill_encoder
+    from imitationlab.envs.isaaclab.task_model.g1_task import G1LatentTrackingTask
+
+    cfg = HighLevelSkillDiffSRConfig(
+        horizon_steps=4,
+        z_dim=8,
+        encoder_hidden_dims=(16,),
+        encoder_window_mode="intermediate",
+        macro_anchor_mode="robot_heading",
+        macro_frame_stride=1,
+        source_anchor="current",
+        macro_origin=origin,
+        rollout_anchor="previous_reference",
+        # A velocity scale is only valid on the recipe's objective.
+        **(
+            {}
+            if qvel_scale == 1.0
+            else {
+                "macro_qvel_scale": qvel_scale,
+                "transition_objective": "jepa_ntp",
+                "source_history_steps": 2,
+            }
+        ),
+    )
+    values = cfg.to_dict()
+    encoder = build_skill_encoder(
+        state_dim=frame_dim,
+        window_steps=3,
+        z_dim=8,
+        hidden_dims=(16,),
+        spec=cfg.latent_spec(),
+        activation=cfg.encoder_activation,
+        layer_norm=cfg.encoder_layer_norm,
+    )
+    path = tmp_path / "encoder.pt"
+    torch.save(
+        {"config": values, "skill_encoder_state_dict": encoder.state_dict()}, path
+    )
+    explicit = task(bank((20, 5), moving=True), noise=False)
+    latent = G1LatentTrackingTask(explicit.isaac_env, "cpu", skill_encoder=str(path))
+    rank, frame = torch.tensor([0, 1]), torch.tensor([1, 3])
+    lib = latent.library
+    state = lib.ref_state(rank, frame).clone()
+    frames = latent.skill_frames(state, rank, frame)
+    assert frames.shape == (2, 4, frame_dim)
+
+    # Moving and turning the robot changes nothing.
+    moved = state.clone()
+    moved[:, :3] += torch.tensor([0.7, -0.4, 0.2])
+    moved[:, 3:7] = torch.nn.functional.normalize(
+        moved[:, 3:7] + torch.tensor([0.0, 0.1, -0.2, 0.5]), dim=-1
+    )
+    assert torch.equal(latent.skill_frames(moved, rank, frame), frames)
+
+    current = lib.ref_state(rank, frame)
+    future = lib.ref_state(rank, frame[:, None] + torch.arange(1, 5))
+    w, z = current[:, 3], current[:, 6]
+    yaw = 2 * torch.atan2(z, w)
+    cos, sin = torch.cos(yaw)[:, None], torch.sin(yaw)[:, None]
+    dx = future[..., 0] - current[:, None, 0]
+    dy = future[..., 1] - current[:, None, 1]
+    height = future[..., 2] - (current[:, None, 2] if origin == "xyz" else 0.0)
+    joints = 29 if frame_dim == 38 else 58
+    assert torch.equal(frames[..., :29], future[..., 13:42])
+    if frame_dim == 67:
+        torch.testing.assert_close(frames[..., 29:58], future[..., 42:71] * qvel_scale)
+    torch.testing.assert_close(
+        frames[..., joints], cos * dx + sin * dy, atol=1e-6, rtol=1e-5
+    )
+    torch.testing.assert_close(
+        frames[..., joints + 1], -sin * dx + cos * dy, atol=1e-6, rtol=1e-5
+    )
+    torch.testing.assert_close(frames[..., joints + 2], height, atol=1e-6, rtol=1e-5)
+    binding = latent.goal_binding()
+    assert binding["encoder_rollout_anchor"] == "previous_reference"
+    assert binding["encoder_frame_dim"] == frame_dim
+    assert ("encoder_origin" in binding) == (origin == "xyz")
+
+
+def test_first_release_encoders_keep_their_goal_binding(tmp_path):
+    from imitationlab.encoders.diffsr.pretrain import HighLevelSkillDiffSRConfig
+
+    values = HighLevelSkillDiffSRConfig(
+        horizon_steps=4, z_dim=8, encoder_hidden_dims=(16,)
+    ).to_dict()
+    # A record written before these fields existed loads with the first
+    # release's behaviour.
+    values.pop("macro_origin"), values.pop("rollout_anchor")
+    restored = HighLevelSkillDiffSRConfig.from_dict(values)
+    assert (restored.macro_origin, restored.rollout_anchor) == ("xy", "robot")
