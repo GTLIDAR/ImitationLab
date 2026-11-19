@@ -247,6 +247,8 @@ def _rot6d_to_matrix(rot6d: Tensor) -> Tensor:
 
 
 _FULL_BODY_FRAME_DIM = 67
+_EXPLICIT_QPOS_FRAME_DIM = 44  # qpos(29) + root lin/ang vel(6) + anchor pose(9)
+_EXPLICIT_FRAME_DIM = 73  # qpos(29) + qvel(29) + root lin/ang vel(6) + anchor pose(9)
 # full_body frame: joint qpos (29) | joint qvel (29) | anchor pos (3) | rot6d (6).
 _FULL_BODY_QVEL_SLICE = slice(29, 58)
 
@@ -261,12 +263,19 @@ def _scale_macro_qvel(frames: Tensor, scale: float) -> Tensor:
     if float(scale) == 1.0:
         return frames
     width = int(frames.shape[-1])
-    if width % _FULL_BODY_FRAME_DIM != 0:
-        msg = f"macro_qvel_scale needs 67-wide full_body frames, got width {width}."
+    # Both frames with joint velocities hold them right after the joint
+    # positions: full_body (67) and the explicit goal's content (73).
+    dim = next(
+        (d for d in (_FULL_BODY_FRAME_DIM, _EXPLICIT_FRAME_DIM) if width % d == 0),
+        None,
+    )
+    if dim is None:
+        msg = (
+            "macro_qvel_scale needs 67-wide full_body or 73-wide explicit "
+            f"frames, got width {width}."
+        )
         raise ValueError(msg)
-    shaped = frames.reshape(
-        *frames.shape[:-1], width // _FULL_BODY_FRAME_DIM, _FULL_BODY_FRAME_DIM
-    ).clone()
+    shaped = frames.reshape(*frames.shape[:-1], width // dim, dim).clone()
     shaped[..., _FULL_BODY_QVEL_SLICE] = shaped[..., _FULL_BODY_QVEL_SLICE] * float(
         scale
     )
@@ -383,6 +392,10 @@ _HEADING_FRAME_LAYOUTS = {
     _ROOT_QPOS_FRAME_DIM: (29, 0),
     _FULL_BODY_FRAME_DIM: (58, 0),
     _ROOT_QPOS_EE_FRAME_DIM: (29, 12),
+    # The explicit goal's content: the root's linear and angular velocity in
+    # each frame's own body frame (6) join the invariant prefix.
+    _EXPLICIT_QPOS_FRAME_DIM: (35, 0),
+    _EXPLICIT_FRAME_DIM: (64, 0),
 }
 
 
@@ -872,6 +885,9 @@ class HighLevelSkillDiffSRConfig:
     # Origin of the macro window, recorded from ``env.expert_macro_origin``:
     # "xy" keeps absolute height, "xyz" makes height relative to the anchor.
     macro_origin: str = "xy"
+    # Yaw of the window's anchor, recorded from ``env.expert_macro_heading``:
+    # "twist" or "forward" (the explicit goal's projected body x-axis).
+    macro_heading: str = "twist"
     # Frame the policy builds the live window in, recorded from
     # ``env.skill_rollout_anchor``: "robot" is the live robot's yaw frame at
     # its xy (needs a position estimate); "previous_reference" is the yaw frame
@@ -1024,6 +1040,12 @@ class HighLevelSkillDiffSRConfig:
         )
         if self.macro_origin not in ("xy", "xyz"):
             msg = f"macro_origin must be 'xy' or 'xyz', got {self.macro_origin!r}."
+            raise ValueError(msg)
+        if self.macro_heading not in ("twist", "forward"):
+            msg = (
+                "macro_heading must be 'twist' or 'forward', got "
+                f"{self.macro_heading!r}."
+            )
             raise ValueError(msg)
         if self.rollout_anchor not in ("robot", "previous_reference"):
             msg = (

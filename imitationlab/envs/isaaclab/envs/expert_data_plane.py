@@ -101,6 +101,24 @@ _FULL_BODY_MACRO_TERMS = (
     "expert_anchor_pos_b",
     "expert_anchor_ori_b",
 )
+#: The explicit goal's frame content (``G1ReferenceLibrary.goal``): the root's
+#: linear and angular velocity in each frame's own body frame, between the
+#: joint block and the anchor pose. With ``expert_motion`` this is 73/frame,
+#: with ``expert_motion_qpos`` 44/frame. Served from the reference library's
+#: own rows, so velocities are its central differences.
+_ROOT_VELOCITY_TERMS = ("expert_root_lin_vel_b", "expert_root_ang_vel_b")
+_EXPLICIT_MACRO_TERMS = (
+    "expert_motion",
+    *_ROOT_VELOCITY_TERMS,
+    "expert_anchor_pos_b",
+    "expert_anchor_ori_b",
+)
+_EXPLICIT_QPOS_MACRO_TERMS = (
+    "expert_motion_qpos",
+    *_ROOT_VELOCITY_TERMS,
+    "expert_anchor_pos_b",
+    "expert_anchor_ori_b",
+)
 #: ``root_qpos`` plus the command end-effector positions (``expert_ee_pos_b``,
 #: the ``_command_ee_body_names`` bodies, 3 each): 38 + 12 = 50/frame for the
 #: G1's four end effectors. The compact cache then also carries the world pose
@@ -2891,12 +2909,17 @@ class ExpertDataPlane:
     def _compact_macro_cache_device(self) -> torch.device | None:
         configured = getattr(self._env.cfg.data, "macro_cache_device", None)
         if configured is None or not str(configured).strip():
+            if self._macro_from_library():
+                # These windows exist only as views of the library's rows.
+                return torch.device(self._env.device)
             return None
         if self._compact_macro_cache_needs_joint_vel() is None:
             supported = (
                 _ROOT_QPOS_MACRO_TERMS,
                 _FULL_BODY_MACRO_TERMS,
                 _ROOT_QPOS_EE_MACRO_TERMS,
+                _EXPLICIT_MACRO_TERMS,
+                _EXPLICIT_QPOS_MACRO_TERMS,
             )
             raise ValueError(
                 "env.data.macro_cache_device supports the root_qpos, full_body "
@@ -2933,11 +2956,62 @@ class ExpertDataPlane:
         the wider selection asks for it.
         """
         terms = self._expert_macro_feature_term_order()
-        if terms in (_ROOT_QPOS_MACRO_TERMS, _ROOT_QPOS_EE_MACRO_TERMS):
+        if terms in (
+            _ROOT_QPOS_MACRO_TERMS,
+            _ROOT_QPOS_EE_MACRO_TERMS,
+            _EXPLICIT_QPOS_MACRO_TERMS,
+        ):
             return False
-        if terms == _FULL_BODY_MACRO_TERMS:
+        if terms in (_FULL_BODY_MACRO_TERMS, _EXPLICIT_MACRO_TERMS):
             return True
         return None
+
+    def _expert_macro_heading(self) -> str:
+        """How the macro window's yaw is taken from its anchor: "twist" (the
+        rotation's twist about z) or "forward" (the body x-axis projected onto
+        the ground, as the explicit goal takes it)."""
+        heading = str(getattr(self._env.cfg, "expert_macro_heading", "twist")).strip()
+        if heading not in ("twist", "forward"):
+            raise ValueError(
+                f"expert_macro_heading must be 'twist' or 'forward', got {heading!r}."
+            )
+        return heading
+
+    def _macro_from_library(self) -> bool:
+        """Whether the macro window follows the explicit goal's conventions,
+        which are defined on the reference library's rows."""
+        return self._expert_macro_heading() == "forward" or any(
+            name in _ROOT_VELOCITY_TERMS
+            for name in self._expert_macro_feature_term_order()
+        )
+
+    def _compact_macro_cache_from_library(
+        self, cache_device: torch.device
+    ) -> dict[str, torch.Tensor]:
+        """The macro fields as views of the reference library's rows.
+
+        The explicit goal is computed from these rows, so a window built from
+        them has its joint and root velocities (central differences within a
+        clip) and its root pose. The root is the anchor.
+        """
+        if self._expert_anchor_body_name != "pelvis":
+            raise ValueError("The reference library's rows anchor at the pelvis.")
+        library = getattr(self._env, "g1_library", None)
+        if library is None:
+            from imitationlab.envs.isaaclab.task_model.g1_math import (
+                G1ReferenceLibrary,
+            )
+
+            library = G1ReferenceLibrary(self._env, cache_device)
+        rows = library.states
+        return {
+            "joint_pos": rows[:, 13:42],
+            "joint_vel": rows[:, 42:71],
+            "anchor_pos_w": rows[:, :3],
+            "anchor_quat_w": rows[:, 3:7][:, _WXYZ_TO_XYZW].contiguous(),
+            "root_lin_vel_w": rows[:, 7:10],
+            "root_ang_vel_w": rows[:, 10:13],
+        }
 
     def _compact_macro_cache_from_arrays(
         self, store: ReferenceArrayStore, cache_device: torch.device
@@ -3082,6 +3156,11 @@ class ExpertDataPlane:
         if self._compact_macro_cache is not None:
             return self._compact_macro_cache
         needs_joint_vel = bool(self._compact_macro_cache_needs_joint_vel())
+        if self._macro_from_library():
+            self._compact_macro_cache = self._compact_macro_cache_from_library(
+                cache_device
+            )
+            return self._compact_macro_cache
         if self._reference_array_store is not None:
             self._compact_macro_cache = self._compact_macro_cache_from_arrays(
                 self._reference_array_store, cache_device
@@ -3305,6 +3384,9 @@ class ExpertDataPlane:
         }
         if "joint_vel" in cache:
             window["joint_vel"] = cache["joint_vel"][indices]
+        if "root_lin_vel_w" in cache:
+            window["_macro_root_lin_vel_w"] = cache["root_lin_vel_w"][indices]
+            window["_macro_root_ang_vel_w"] = cache["root_ang_vel_w"][indices]
         if "ee_pos_w" in cache:
             window["_macro_ee_pos_w"] = cache["ee_pos_w"][indices]
             window["_macro_ee_quat_w"] = cache["ee_quat_w"][indices]
@@ -3553,6 +3635,15 @@ class ExpertDataPlane:
             if self._expert_macro_origin() == "xyz":
                 # Height relative to the anchor as well, as the explicit goal has it.
                 center_anchor_pos = origin_pos
+            if self._expert_macro_heading() == "forward":
+                # Yaw of the body x-axis projected onto the ground (XYZW):
+                # atan2(R[1, 0], R[0, 0]), the explicit goal's heading.
+                x, y, z, w = origin_quat.unbind(-1)
+                yaw = torch.atan2(2 * (x * y + w * z), 1 - 2 * (y * y + z * z))
+                zero = torch.zeros_like(yaw)
+                center_anchor_quat = torch.stack(
+                    (zero, zero, torch.sin(yaw / 2), torch.cos(yaw / 2)), dim=-1
+                )
             anchor_pos_b, anchor_ori_b = compiled.body_pose_in_anchor_frame(
                 center_anchor_pos,
                 center_anchor_quat,
@@ -3649,6 +3740,18 @@ class ExpertDataPlane:
             terms["expert_motion"] = torch.cat([joint_pos, joint_vel], dim=-1).reshape(
                 batch_size, -1
             )
+        root_lin_vel_w = expert_window.get("_macro_root_lin_vel_w", None)
+        if root_lin_vel_w is not None:
+            # Each frame's root velocity in that frame's own body frame, which
+            # no change of heading frame alters.
+            frame_quat = anchor_quat.reshape(-1, 4)
+            for name, value in (
+                ("expert_root_lin_vel_b", root_lin_vel_w),
+                ("expert_root_ang_vel_b", expert_window["_macro_root_ang_vel_w"]),
+            ):
+                terms[name] = math_utils.quat_apply_inverse(
+                    frame_quat, value.reshape(-1, 3)
+                ).reshape(batch_size, -1)
         if body_terms_enabled:
             body_pos_flat = body_pos_b.reshape(batch_size, -1)
             terms["expert_ee_pos_b"] = body_pos_flat

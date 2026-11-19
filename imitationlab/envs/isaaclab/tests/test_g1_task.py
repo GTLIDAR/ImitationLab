@@ -517,3 +517,61 @@ def test_first_release_encoders_keep_their_goal_binding(tmp_path):
     values.pop("macro_origin"), values.pop("rollout_anchor")
     restored = HighLevelSkillDiffSRConfig.from_dict(values)
     assert (restored.macro_origin, restored.rollout_anchor) == ("xy", "robot")
+
+
+@pytest.mark.parametrize("frame_dim", [38, 44, 73])
+def test_explicit_matched_window_is_the_explicit_goal_regrouped(tmp_path, frame_dim):
+    """``macro_heading=forward``: the live window is the explicit goal's own
+    numbers in the encoder's order (joints, root velocities, anchor pose)."""
+    from imitationlab.encoders.diffsr.pretrain import HighLevelSkillDiffSRConfig
+    from imitationlab.encoders.skill_encoder import build_skill_encoder
+    from imitationlab.envs.isaaclab.task_model.g1_task import G1LatentTrackingTask
+
+    cfg = HighLevelSkillDiffSRConfig(
+        horizon_steps=4,
+        z_dim=8,
+        encoder_hidden_dims=(16,),
+        encoder_window_mode="intermediate",
+        macro_anchor_mode="robot_heading",
+        macro_frame_stride=1,
+        source_anchor="current",
+        macro_origin="xyz",
+        macro_heading="forward",
+        rollout_anchor="previous_reference",
+        **(
+            {}
+            if frame_dim != 73
+            else {
+                "macro_qvel_scale": 0.1,
+                "transition_objective": "jepa_ntp",
+                "source_history_steps": 2,
+            }
+        ),
+    )
+    encoder = build_skill_encoder(
+        state_dim=frame_dim,
+        window_steps=3,
+        z_dim=8,
+        hidden_dims=(16,),
+        spec=cfg.latent_spec(),
+        activation=cfg.encoder_activation,
+        layer_norm=cfg.encoder_layer_norm,
+    )
+    path = tmp_path / "encoder.pt"
+    torch.save(
+        {"config": cfg.to_dict(), "skill_encoder_state_dict": encoder.state_dict()},
+        path,
+    )
+    explicit = task(bank((20, 5), moving=True), noise=False)
+    latent = G1LatentTrackingTask(explicit.isaac_env, "cpu", skill_encoder=str(path))
+    rank, frame = torch.tensor([0, 1]), torch.tensor([1, 3])
+    state = latent.library.ref_state(rank, frame).clone()
+    frames = latent.skill_frames(state, rank, frame)
+    goal = latent.library.goal(rank, frame, 4).reshape(2, 4, 73)
+    joints = 58 if frame_dim == 73 else 29
+    assert torch.equal(frames[..., :joints], goal[..., 15 : 15 + joints])
+    if frame_dim != 38:
+        assert torch.equal(frames[..., joints : joints + 6], goal[..., 9:15])
+    assert torch.equal(frames[..., -9:], goal[..., :9])
+    assert frames.shape[-1] == frame_dim
+    assert latent.goal_binding()["encoder_heading"] == "forward"

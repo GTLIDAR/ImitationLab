@@ -279,6 +279,10 @@ class ImitationG1EnvCfg(ManagerBasedRLEnvCfg):
     # Origin of the encoder's macro window: "xy" keeps absolute height, "xyz"
     # makes height relative to the window's anchor. Recorded in the encoder.
     expert_macro_origin: str = "xy"
+    # Yaw of the window's anchor: "twist" (the rotation's twist about z) or
+    # "forward" (the body x-axis projected onto the ground, as the explicit
+    # goal takes it). Recorded in the encoder.
+    expert_macro_heading: str = "twist"
     # Frame the policy builds the live encoder window in: "robot" (the live
     # robot's yaw frame at its xy; needs a position estimate) or
     # "previous_reference" (the yaw frame and origin of the reference frame
