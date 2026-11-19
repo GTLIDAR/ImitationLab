@@ -475,7 +475,7 @@ def test_reanchor_rejects_unknown_width() -> None:
 
     from imitationlab.encoders.diffsr.pretrain import _reanchor_heading_frames
 
-    frames = torch.randn(2, 3, 44)
+    frames = torch.randn(2, 3, 45)  # 44 is the explicit goal without joint velocity
     with pytest.raises(ValueError, match="38-wide root_qpos, 67-wide"):
         _reanchor_heading_frames(frames, frames[:, 0])
 

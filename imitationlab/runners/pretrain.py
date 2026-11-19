@@ -850,6 +850,7 @@ def _build_trainer_config(
         macro_frame_stride=macro_frame_stride,
         macro_anchor_mode=macro_anchor_mode,
         macro_origin=str(getattr(env_cfg, "expert_macro_origin", "xy") or "xy"),
+        macro_heading=str(getattr(env_cfg, "expert_macro_heading", "twist") or "twist"),
         rollout_anchor=str(
             getattr(env_cfg, "skill_rollout_anchor", "robot") or "robot"
         ),

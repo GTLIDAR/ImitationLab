@@ -72,7 +72,15 @@ _M32 = 0xFFFFFFFF
 # and rot6d (6) in a heading frame (the env's root_qpos macro frame). The
 # full_body frame adds the joint velocities (29) after the joint positions.
 SKILL_FRAME_DIM = 38
-SKILL_FRAME_DIMS = (38, 67)
+SKILL_FRAME_DIMS = (38, 67, 44, 73)
+# Columns of one explicit goal frame (``G1ReferenceLibrary.goal``: position 3,
+# rot6d 6, root linear and angular velocity 6, joint positions 29, scaled joint
+# velocities 29) in the encoder's order: joints, root velocities, anchor pose.
+_EXPLICIT_GOAL_COLUMNS = {
+    38: (*range(15, 44), *range(0, 9)),
+    44: (*range(15, 44), *range(9, 15), *range(0, 9)),
+    73: (*range(15, 73), *range(9, 15), *range(0, 9)),
+}
 # The sin/cos command phase the hl_skill source appends at a one-step
 # hold (latent_steps 1, period 1): always phase 0.
 SKILL_PHASE = (0.0, 1.0)
@@ -160,6 +168,26 @@ class FrozenSkillEncoder:
         self.rollout_anchor = str(cfg.rollout_anchor)
         self.origin = str(cfg.macro_origin)
         self.qvel_scale = float(cfg.macro_qvel_scale)
+        self.heading = str(cfg.macro_heading)
+        explicit = (self.rollout_anchor, self.origin) == ("previous_reference", "xyz")
+        if self.heading == "forward" and not (
+            explicit and self.frame_dim in _EXPLICIT_GOAL_COLUMNS
+        ):
+            msg = (
+                f"skill encoder {path}: the forward heading is the explicit goal's "
+                "and needs its anchor, origin and frame content."
+            )
+            raise ValueError(msg)
+        if self.heading != "forward" and self.frame_dim in (44, 73):
+            msg = (
+                f"skill encoder {path}: root velocities need the explicit goal's frame."
+            )
+            raise ValueError(msg)
+        if self.frame_dim == 73 and self.qvel_scale != 0.1:
+            msg = (
+                f"skill encoder {path}: the explicit goal scales joint velocity by 0.1."
+            )
+            raise ValueError(msg)
         if self.rollout_anchor == "robot" and self.origin != "xy":
             msg = f"skill encoder {path}: the robot anchor keeps absolute height."
             raise ValueError(msg)
@@ -870,6 +898,10 @@ class G1LatentTrackingTask(G1TrackingTask):
         plane = getattr(self.isaac_env, "expert_data_plane", None)
         self.skill_anchor = str(getattr(plane, "_expert_anchor_body_name", "pelvis"))
         self._skill_anchor_slot = self.body_names.index(self.skill_anchor)
+        if self.skill.heading == "forward":
+            self._explicit_columns = torch.tensor(
+                _EXPLICIT_GOAL_COLUMNS[self.skill.frame_dim], device=self.device
+            )
         legacy = (self.skill.rollout_anchor, self.skill.origin, self.skill.frame_dim)
         if self.skill_anchor != "pelvis" and legacy != ("robot", "xy", SKILL_FRAME_DIM):
             raise ValueError("Only the pelvis anchor builds this encoder's window.")
@@ -886,6 +918,11 @@ class G1LatentTrackingTask(G1TrackingTask):
         slot of was read) is skipped. The frames are bit for bit the same."""
         if self.skill_anchor != "pelvis":
             return self._skill_frames_fk(state, rank, frame + 1)
+        if self.skill.heading == "forward":
+            # The explicit goal's own numbers, regrouped into the encoder's order.
+            goal = self.library.goal(rank, frame, self.skill.frames)
+            goal = goal.reshape(*goal.shape[:-1], self.skill.frames, GOAL_FRAME_DIM)
+            return goal[..., self._explicit_columns]
         offsets = torch.arange(1, self.skill.frames + 1, device=frame.device)
         rows = self.library.ref_state(rank, frame.unsqueeze(-1) + offsets)
         ref_p, ref_quat, _, _, ref_q, ref_qd = unpack(rows)
@@ -963,6 +1000,7 @@ class G1LatentTrackingTask(G1TrackingTask):
         added = {
             "encoder_rollout_anchor": (skill.rollout_anchor, "robot"),
             "encoder_origin": (skill.origin, "xy"),
+            "encoder_heading": (skill.heading, "twist"),
             "encoder_qvel_scale": (skill.qvel_scale, 1.0),
         }
         return {k: v for k, (v, first) in added.items() if v != first} | {

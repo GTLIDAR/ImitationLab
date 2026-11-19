@@ -285,3 +285,69 @@ def test_xyz_origin_makes_pretraining_height_relative_to_the_anchor():
     assert torch.equal(
         terms["xyz"]["expert_anchor_ori_b"], terms["xy"]["expert_anchor_ori_b"]
     )
+
+
+@pytest.mark.parametrize("width", [38, 44, 73])
+def test_explicit_matched_window_equals_the_explicit_goal(width):
+    """Pretraining frames under the explicit goal's conventions (forward
+    heading, full origin, root velocities from the reference library's rows)
+    are ``G1ReferenceLibrary.goal``'s numbers when the anchor is the frame
+    before the window, which is how a latent policy builds its live window."""
+    from imitationlab.envs.isaaclab.envs.expert_data_plane import (
+        _EXPLICIT_MACRO_TERMS,
+        _EXPLICIT_QPOS_MACRO_TERMS,
+        _ROOT_QPOS_MACRO_TERMS,
+    )
+    from imitationlab.envs.isaaclab.task_model.g1_math import G1ReferenceLibrary
+    from imitationlab.envs.isaaclab.task_model.g1_task import _EXPLICIT_GOAL_COLUMNS
+
+    torch.manual_seed(0)
+    steps = 12
+    time = torch.arange(steps, dtype=torch.float32)[:, None]
+    qpos = torch.zeros(steps, 36)
+    qpos[:, :3] = torch.cat((0.02 * time, 0.01 * time**1.3, 0.75 + 0.01 * time), 1)
+    quats = torch.stack(
+        [
+            _quat_xyzw(0.1 + 0.01 * k, -0.2 + 0.02 * k, 0.3 + 0.05 * k)
+            for k in range(steps)
+        ]
+    )
+    qpos[:, 3:7] = quats[:, [3, 0, 1, 2]]  # the bank stores WXYZ
+    qpos[:, 7:] = 0.1 * torch.sin(0.3 * time + torch.arange(29))
+    library = G1ReferenceLibrary.from_qpos(qpos, [steps])
+
+    plane = _window_plane(torch.zeros(1, 3), _quat_xyzw(0, 0, 0).unsqueeze(0))
+    plane._env.cfg.expert_macro_origin = "xyz"  # type: ignore[attr-defined]
+    plane._env.cfg.expert_macro_heading = "forward"  # type: ignore[attr-defined]
+    plane._env.g1_library = library  # type: ignore[attr-defined]
+    plane._expert_anchor_body_name = "pelvis"
+    cache = plane._compact_macro_cache_from_library(torch.device("cpu"))
+    frame, count = 3, 5
+    rows = torch.arange(frame, frame + count + 1)[None]
+    window = {
+        "joint_pos": cache["joint_pos"][rows],
+        "joint_vel": cache["joint_vel"][rows],
+        "_macro_anchor_pos_w": cache["anchor_pos_w"][rows],
+        "_macro_anchor_quat_w": cache["anchor_quat_w"][rows],
+        "_macro_root_lin_vel_w": cache["root_lin_vel_w"][rows],
+        "_macro_root_ang_vel_w": cache["root_ang_vel_w"][rows],
+    }
+    terms = plane._build_expert_window_terms(
+        window,  # type: ignore[arg-type]
+        torch.zeros(1, dtype=torch.long),
+        context="expert_heading",
+        past_steps=0,
+    )
+    order = {
+        38: _ROOT_QPOS_MACRO_TERMS,
+        44: _EXPLICIT_QPOS_MACRO_TERMS,
+        73: _EXPLICIT_MACRO_TERMS,
+    }[width]
+    frames = torch.cat([terms[name].reshape(count + 1, -1) for name in order], dim=-1)
+    if width == 73:
+        frames[:, 29:58] *= 0.1  # ``macro_qvel_scale`` at pretraining
+    assert frames.shape == (count + 1, width)
+
+    goal = library.goal(torch.tensor([0]), torch.tensor([frame]), count)
+    expected = goal.reshape(count, 73)[:, list(_EXPLICIT_GOAL_COLUMNS[width])]
+    torch.testing.assert_close(frames[1:], expected, atol=2e-5, rtol=1e-4)
