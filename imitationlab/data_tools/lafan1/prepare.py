@@ -33,7 +33,6 @@ import json
 import math
 import os
 import shlex
-import subprocess
 import sys
 import tempfile
 from pathlib import Path
@@ -43,6 +42,7 @@ from filelock import FileLock
 
 from imitationlab.data_tools.common.cli_args import hide_legacy_aliases
 from imitationlab.data_tools.common.manifest_io import sanitize_motion_name, write_json
+from imitationlab.data_tools.common.isaac_process import run_isaac
 
 
 G1_CSV_JOINT_OFFSET = 7
@@ -118,7 +118,7 @@ def _run_batch_conversion(
     print(f"[INFO] Batch converting {len(jobs)} motion(s) in one Isaac Sim session.")
     print(f"[CMD]  {' '.join(shlex.quote(x) for x in cmd)}")
     try:
-        subprocess.run(cmd, check=True)
+        run_isaac(cmd)
     finally:
         temp_jobs_path.unlink(missing_ok=True)
 

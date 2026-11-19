@@ -65,6 +65,10 @@ anchoring, auditing, and manifest generation can run as separate
 `--stages`. Normalization and anchoring use CPU worker processes. Isaac
 converts length-sorted batches on the selected local GPU.
 
+Isaac writes temporary USD files under `$TMPDIR` (default `/tmp`) during
+conversion. If `/tmp` is a small RAM-backed or quota-limited filesystem,
+point `TMPDIR` at a directory on disk before running the pipeline.
+
 Rerun with the same selection, rates, and work root to skip completed
 stages or clips. Use a separate work root when testing with `--limit` or
 changing source or rate settings. The training manifest is

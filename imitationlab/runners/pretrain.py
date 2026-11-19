@@ -1109,6 +1109,8 @@ def _run_training(
             log_callback=_log,
             checkpoint_path=checkpoint_path,
             reconstruction_eval=bool(args_cli.reconstruction_eval),
+            # Saved once below, after the final evaluation.
+            save_final=False,
         )
         final_metrics = trainer.evaluate(
             prefix="train",
