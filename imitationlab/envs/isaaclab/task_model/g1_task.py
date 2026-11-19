@@ -69,9 +69,10 @@ INCREMENT_FLOOR = (
 )
 _M32 = 0xFFFFFFFF
 # One skill-encoder input frame: joint positions (29), anchor-body position (3)
-# and rot6d (6) in the live anchor's heading frame (the env's root_qpos macro
-# frame).
+# and rot6d (6) in a heading frame (the env's root_qpos macro frame). The
+# full_body frame adds the joint velocities (29) after the joint positions.
 SKILL_FRAME_DIM = 38
+SKILL_FRAME_DIMS = (38, 67)
 # The sin/cos command phase the hl_skill source appends at a one-step
 # hold (latent_steps 1, period 1): always phase 0.
 SKILL_PHASE = (0.0, 1.0)
@@ -146,14 +147,24 @@ class FrozenSkillEncoder:
             msg = f"skill encoder {path}: encoder_window_mode={cfg.encoder_window_mode!r} is not supported."
             raise ValueError(msg)
         state_dict = ckpt["skill_encoder_state_dict"]
-        if int(state_dict["net.0.weight"].shape[1]) != SKILL_FRAME_DIM * (window + 1):
+        inputs = int(state_dict["net.0.weight"].shape[1])
+        if inputs not in {dim * (window + 1) for dim in SKILL_FRAME_DIMS}:
             msg = (
-                f"skill encoder {path} reads {int(state_dict['net.0.weight'].shape[1])} inputs; the z goal "
-                f"builds {window + 1} root_qpos macro frames of {SKILL_FRAME_DIM}."
+                f"skill encoder {path} reads {inputs} inputs; the z goal "
+                f"builds {window + 1} macro frames of {SKILL_FRAME_DIMS}."
             )
             raise ValueError(msg)
+        self.frame_dim = inputs // (window + 1)
+        # Where the live window is anchored, and whether height is relative to
+        # that anchor: both were fixed when the encoder was pretrained.
+        self.rollout_anchor = str(cfg.rollout_anchor)
+        self.origin = str(cfg.macro_origin)
+        self.qvel_scale = float(cfg.macro_qvel_scale)
+        if self.rollout_anchor == "robot" and self.origin != "xy":
+            msg = f"skill encoder {path}: the robot anchor keeps absolute height."
+            raise ValueError(msg)
         self.encoder = build_skill_encoder(
-            state_dim=SKILL_FRAME_DIM,
+            state_dim=self.frame_dim,
             window_steps=window,
             z_dim=int(cfg.z_dim),
             hidden_dims=tuple(cfg.encoder_hidden_dims),
@@ -177,7 +188,7 @@ class FrozenSkillEncoder:
 
     def __call__(self, frames: Tensor) -> Tensor:
         lead = frames.shape[:-2]
-        flat = frames.reshape(-1, self.frames, SKILL_FRAME_DIM)
+        flat = frames.reshape(-1, self.frames, self.frame_dim)
         z = self.encoder(flat[:, 0], flat[:, 1:]).float()
         phase = z.new_tensor(SKILL_PHASE).expand(z.shape[0], len(SKILL_PHASE))
         return torch.cat((z, phase), dim=-1).reshape(*lead, self.command_dim)
@@ -859,6 +870,9 @@ class G1LatentTrackingTask(G1TrackingTask):
         plane = getattr(self.isaac_env, "expert_data_plane", None)
         self.skill_anchor = str(getattr(plane, "_expert_anchor_body_name", "pelvis"))
         self._skill_anchor_slot = self.body_names.index(self.skill_anchor)
+        legacy = (self.skill.rollout_anchor, self.skill.origin, self.skill.frame_dim)
+        if self.skill_anchor != "pelvis" and legacy != ("robot", "xy", SKILL_FRAME_DIM):
+            raise ValueError("Only the pelvis anchor builds this encoder's window.")
         self.policy_obs_dim = self.history * PROPRIO_DIM + self.skill.command_dim
         self.critic_obs_dim = (
             G1TrackingTask.critic_obs_dim - 10 * GOAL_FRAME_DIM + self.skill.command_dim
@@ -874,18 +888,31 @@ class G1LatentTrackingTask(G1TrackingTask):
             return self._skill_frames_fk(state, rank, frame + 1)
         offsets = torch.arange(1, self.skill.frames + 1, device=frame.device)
         rows = self.library.ref_state(rank, frame.unsqueeze(-1) + offsets)
-        ref_p, ref_quat, _, _, ref_q, _ = unpack(rows)
-        p, quat, *_ = unpack(state)
+        ref_p, ref_quat, _, _, ref_q, ref_qd = unpack(rows)
+        if self.skill.rollout_anchor == "previous_reference":
+            # The reference frame the robot is on, f: the yaw frame and origin
+            # the explicit goal uses. Nothing is read from the robot.
+            p, quat, *_ = unpack(self.library.ref_state(rank, frame))
+        else:
+            p, quat, *_ = unpack(state)
         o = torch.zeros_like(quat[..., 0])
         twist = torch.stack((quat[..., 0], o, o, quat[..., 3]), dim=-1)
         H = quat_wxyz_to_matrix(
             twist / twist.norm(dim=-1, keepdim=True).clamp_min(1e-9)
         )
         H = H.unsqueeze(-3)
-        origin = torch.cat((p[..., :2], torch.zeros_like(p[..., 2:3])), dim=-1)
+        height = (
+            p[..., 2:3] if self.skill.origin == "xyz" else torch.zeros_like(p[..., 2:3])
+        )
+        origin = torch.cat((p[..., :2], height), dim=-1)
         rel_pos = _rot_t(H, ref_p - origin.unsqueeze(-2))
         rel_rot = matrix_to_rot6d(H.transpose(-1, -2) @ quat_wxyz_to_matrix(ref_quat))
-        return torch.cat((ref_q, rel_pos, rel_rot), dim=-1)
+        joints = (
+            ref_q
+            if self.skill.frame_dim == SKILL_FRAME_DIM
+            else torch.cat((ref_q, ref_qd * self.skill.qvel_scale), dim=-1)
+        )
+        return torch.cat((joints, rel_pos, rel_rot), dim=-1)
 
     def _skill_frames_fk(self, state: Tensor, rank: Tensor, frame: Tensor) -> Tensor:
         """The skill encoder's input frames (..., F, 38) for reference frames
@@ -930,12 +957,20 @@ class G1LatentTrackingTask(G1TrackingTask):
             return self.skill(frames)
 
     def goal_binding(self):
-        return {
+        skill = self.skill
+        # Keys added after the first release appear only when they differ from
+        # it, so earlier checkpoints keep their binding.
+        added = {
+            "encoder_rollout_anchor": (skill.rollout_anchor, "robot"),
+            "encoder_origin": (skill.origin, "xy"),
+            "encoder_qvel_scale": (skill.qvel_scale, 1.0),
+        }
+        return {k: v for k, (v, first) in added.items() if v != first} | {
             "task": "g1-v3-latent",
             "goal_mode": "z",
             "skill_encoder_sha256": self.skill.weights_sha256,
             "encoder_frames": self.skill.frames,
-            "encoder_frame_dim": 38,
+            "encoder_frame_dim": self.skill.frame_dim,
             "encoder_frame_stride": 1,
             "encoder_anchor_body": self.skill_anchor,
             "encoder_anchor_mode": "robot_heading",

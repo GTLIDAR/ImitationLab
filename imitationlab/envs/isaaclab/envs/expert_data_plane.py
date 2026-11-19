@@ -3550,6 +3550,9 @@ class ExpertDataPlane:
                 origin_pos,
                 origin_quat,
             )
+            if self._expert_macro_origin() == "xyz":
+                # Height relative to the anchor as well, as the explicit goal has it.
+                center_anchor_pos = origin_pos
             anchor_pos_b, anchor_ori_b = compiled.body_pose_in_anchor_frame(
                 center_anchor_pos,
                 center_anchor_quat,
@@ -3742,6 +3745,15 @@ class ExpertDataPlane:
                 f"'robot_heading', got {mode!r}."
             )
         return mode
+
+    def _expert_macro_origin(self) -> str:
+        """Origin of the heading-frame macro window: "xy" or "xyz"."""
+        origin = str(getattr(self._env.cfg, "expert_macro_origin", "xy")).strip()
+        if origin not in ("xy", "xyz"):
+            raise ValueError(
+                f"expert_macro_origin must be 'xy' or 'xyz', got {origin!r}."
+            )
+        return origin
 
     def _expert_macro_rollout_anchor_mode(self) -> str:
         """Read the online override without changing offline frame provenance."""

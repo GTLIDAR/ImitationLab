@@ -386,8 +386,13 @@ _HEADING_FRAME_LAYOUTS = {
 }
 
 
-def _reanchor_heading_frames(frames: Tensor, anchor: Tensor) -> Tensor:
+def _reanchor_heading_frames(
+    frames: Tensor, anchor: Tensor, origin: str = "xy"
+) -> Tensor:
     """Re-express ``root_qpos`` frames in ``anchor``'s heading frame.
+
+    ``origin`` is the window's origin convention (``macro_origin``): ``"xy"``
+    keeps absolute height, ``"xyz"`` also subtracts the anchor's height.
 
     Both are already expressed in some common heading frame (the sampled
     window's own slot-0 heading anchor). The next-chunk target must instead be
@@ -423,8 +428,10 @@ def _reanchor_heading_frames(frames: Tensor, anchor: Tensor) -> Tensor:
         ],
         dim=-2,
     )
-    origin = anchor[..., inv : inv + 3].clone()
-    origin[..., 2] = 0.0  # xy-only origin: absolute height survives
+    origin_pos = anchor[..., inv : inv + 3].clone()
+    if origin == "xy":
+        origin_pos[..., 2] = 0.0  # xy-only origin: absolute height survives
+    origin = origin_pos
     while yaw_t.dim() < frames.dim() + 1:
         yaw_t = yaw_t.unsqueeze(-3)
         origin = origin.unsqueeze(-2)
@@ -862,6 +869,14 @@ class HighLevelSkillDiffSRConfig:
     :class:`FrozenHighLevelSkillCommandSampler` does.
     """
     macro_anchor_mode: str = "robot"
+    # Origin of the macro window, recorded from ``env.expert_macro_origin``:
+    # "xy" keeps absolute height, "xyz" makes height relative to the anchor.
+    macro_origin: str = "xy"
+    # Frame the policy builds the live window in, recorded from
+    # ``env.skill_rollout_anchor``: "robot" is the live robot's yaw frame at
+    # its xy (needs a position estimate); "previous_reference" is the yaw frame
+    # and origin of the reference frame before the window (reference only).
+    rollout_anchor: str = "robot"
     """Frame convention of the macro window at pretrain time.
 
     Provenance, like ``macro_frame_stride``: the environment owns the
@@ -1007,6 +1022,15 @@ class HighLevelSkillDiffSRConfig:
         self.macro_frame_stride = _require_positive_int(
             "macro_frame_stride", self.macro_frame_stride
         )
+        if self.macro_origin not in ("xy", "xyz"):
+            msg = f"macro_origin must be 'xy' or 'xyz', got {self.macro_origin!r}."
+            raise ValueError(msg)
+        if self.rollout_anchor not in ("robot", "previous_reference"):
+            msg = (
+                "rollout_anchor must be 'robot' or 'previous_reference', got "
+                f"{self.rollout_anchor!r}."
+            )
+            raise ValueError(msg)
         if self.macro_anchor_mode not in (
             "robot",
             "expert_heading",
@@ -1543,6 +1567,9 @@ class FrozenHighLevelSkillCommandSampler:
     renewed command so PPO minibatches can recompute skill commands with gradient
     flow into the skill encoder.
     """
+
+    def _reanchor(self, frames: Tensor, anchor: Tensor) -> Tensor:
+        return _reanchor_heading_frames(frames, anchor, self.config.macro_origin)
 
     def __init__(
         self,
@@ -2412,10 +2439,8 @@ class FrozenHighLevelSkillCommandSampler:
         horizon = int(self.config.horizon_steps)
         chunk1_window = window[:, :horizon]
         chunk2_anchor = window[:, horizon - 1]
-        chunk2_state = _reanchor_heading_frames(chunk2_anchor, chunk2_anchor)
-        chunk2_window = _reanchor_heading_frames(
-            window[:, horizon : 2 * horizon], chunk2_anchor
-        )
+        chunk2_state = self._reanchor(chunk2_anchor, chunk2_anchor)
+        chunk2_window = self._reanchor(window[:, horizon : 2 * horizon], chunk2_anchor)
         z1 = self.skill_encoder(
             state, _encoder_input_window(self.config, chunk1_window)
         )
@@ -2945,6 +2970,9 @@ class HighLevelSkillDiffSRTrainState:
 
 class HighLevelSkillDiffSRTrainer:
     """Offline trainer for high-level skill encoders and controlled objectives."""
+
+    def _reanchor(self, frames: Tensor, anchor: Tensor) -> Tensor:
+        return _reanchor_heading_frames(frames, anchor, self.config.macro_origin)
 
     def __init__(self, config: HighLevelSkillDiffSRConfig, env: object) -> None:
         self.config = config
@@ -3986,8 +4014,8 @@ class HighLevelSkillDiffSRTrainer:
                 return state, window[:, :horizon]
             anchor = window[:, index * horizon - 1]
             return (
-                _reanchor_heading_frames(anchor, anchor),
-                _reanchor_heading_frames(
+                self._reanchor(anchor, anchor),
+                self._reanchor(
                     window[:, index * horizon : (index + 1) * horizon], anchor
                 ),
             )
@@ -4061,9 +4089,7 @@ class HighLevelSkillDiffSRTrainer:
             # standard endpoint objective on that chunk.
             boundary = window[:, (context + 1) * horizon - 1]
             if context > 0:
-                endpoint = _reanchor_heading_frames(
-                    boundary, window[:, context * horizon - 1]
-                )
+                endpoint = self._reanchor(boundary, window[:, context * horizon - 1])
             else:
                 endpoint = boundary
             endpoint = self._head_frames(endpoint)
@@ -4172,9 +4198,7 @@ class HighLevelSkillDiffSRTrainer:
             exec_endpoint = (
                 boundary
                 if context == 0
-                else _reanchor_heading_frames(
-                    boundary, window[:, context * horizon - 1]
-                )
+                else self._reanchor(boundary, window[:, context * horizon - 1])
             )
             recon_target = self._reconstruction_target(
                 exec_state, exec_window, exec_endpoint
@@ -4435,7 +4459,7 @@ class HighLevelSkillDiffSRTrainer:
                             deterministic=True,
                         )
                         if self.config.jepa_ntp_chunk_anchor == "next":
-                            target = _reanchor_heading_frames(
+                            target = self._reanchor(
                                 window[:, horizon : 2 * horizon], window[:, horizon - 1]
                             ).reshape(batch_size, -1)
                         else:
@@ -4517,10 +4541,8 @@ class HighLevelSkillDiffSRTrainer:
 
         def _target_token() -> Tensor:
             anchor = window[:, horizon - 1]
-            target_state = _reanchor_heading_frames(anchor, anchor)
-            target_window = _reanchor_heading_frames(
-                window[:, horizon : 2 * horizon], anchor
-            )
+            target_state = self._reanchor(anchor, anchor)
+            target_window = self._reanchor(window[:, horizon : 2 * horizon], anchor)
             encoder = (
                 self.jepa_target_encoder
                 if str(self.config.jepa_target_encoder_mode) == "ema"
@@ -4542,7 +4564,7 @@ class HighLevelSkillDiffSRTrainer:
         if head == "diff_chunk":
             if str(self.config.jepa_ntp_chunk_anchor) == "next":
                 anchor = window[:, horizon - 1]
-                ntp_target = _reanchor_heading_frames(
+                ntp_target = self._reanchor(
                     window[:, horizon : 2 * horizon], anchor
                 ).reshape(z1.shape[0], -1)
             else:
@@ -5115,7 +5137,7 @@ class HighLevelSkillDiffSRTrainer:
             )
             if str(self.config.jepa_ntp_chunk_anchor) == "next":
                 anchor = window[:, horizon - 1]
-                ntp_target = _reanchor_heading_frames(
+                ntp_target = self._reanchor(
                     window[:, horizon : 2 * horizon], anchor
                 ).reshape(batch_size, -1)
             else:
