@@ -38,7 +38,6 @@ import math
 import os
 import shlex
 import shutil
-import subprocess
 import sys
 import tarfile
 import time
@@ -54,6 +53,7 @@ from imitationlab.data_tools.common.anchor_npz import anchor_one
 from imitationlab.data_tools.common.cli_args import hide_legacy_aliases
 from imitationlab.data_tools.common.manifest_io import sanitize_motion_name, write_json
 from imitationlab.data_tools.bones_seed.csv import normalize_bones_csv
+from imitationlab.data_tools.common.isaac_process import run_isaac
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 ALL_STAGES = ("extract", "normalize", "convert", "anchor", "audit", "manifest")
@@ -372,7 +372,7 @@ def stage_convert(
                 f"max_frames={bmax} cells={len(bucket) * bmax:,}"
             )
             print(f"[CMD] {' '.join(shlex.quote(c) for c in cmd)}")
-            subprocess.run(cmd, check=True)
+            run_isaac(cmd)
             missing = [f for f in bucket if not _npz_path(staged_dir, f).is_file()]
             if missing:
                 raise RuntimeError(

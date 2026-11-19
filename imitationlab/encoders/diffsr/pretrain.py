@@ -4761,7 +4761,15 @@ class HighLevelSkillDiffSRTrainer:
         log_callback: Callable[[dict[str, float | int]], None] | None = None,
         checkpoint_path: str | Path | None = None,
         reconstruction_eval: bool = False,
+        save_final: bool = True,
     ) -> HighLevelSkillDiffSRTrainState:
+        """Train for ``num_updates``.
+
+        ``best.pt`` beside ``checkpoint_path`` gets the encoder weights at each
+        evaluation improvement. The full state is written to ``checkpoint_path``
+        at the end unless ``save_final`` is false, for callers that save it
+        themselves after a final evaluation.
+        """
         start_time = time.perf_counter()
         state = HighLevelSkillDiffSRTrainState()
         best_eval = float("inf")
@@ -4795,7 +4803,22 @@ class HighLevelSkillDiffSRTrainer:
                     and eval_loss < best_eval
                 ):
                     best_eval = float(eval_loss)
-                    self.save_checkpoint(best_path)
+                    # Only the frozen-encoder weights: the full training
+                    # state is ~4 GB (mostly optimizer moments) and saving it
+                    # at every improvement dominated I/O on shared storage.
+                    # Nothing resumes from best.pt; latest.pt keeps the full
+                    # state and encoder.pt the tracker's weights.
+                    from imitationlab.encoders._checkpoint_io import (  # noqa: PLC0415
+                        save_staged,
+                    )
+
+                    save_staged(
+                        {
+                            **self.encoder_checkpoint_state_dict(),
+                            "eval_loss": best_eval,
+                        },
+                        best_path,
+                    )
                 elapsed = time.perf_counter() - start_time
                 row: dict[str, float | int] = {
                     "update": int(self.update),
@@ -4809,7 +4832,7 @@ class HighLevelSkillDiffSRTrainer:
                 }
                 state.elapsed_seconds = float(elapsed)
                 state.update = int(self.update)
-        if checkpoint_path is not None:
+        if checkpoint_path is not None and save_final:
             self.save_checkpoint(checkpoint_path)
         return state
 

@@ -257,3 +257,21 @@ def test_live_offset_head_round_trips_through_the_sampler_checkpoint(
         strict=True,
     ):
         assert torch.equal(a, b)
+
+
+@pytest.mark.parametrize("save_final", [True, False])
+def test_best_checkpoint_holds_only_the_encoder(tmp_path: Path, save_final) -> None:
+    torch.manual_seed(3)
+    trainer = HighLevelSkillDiffSRTrainer(
+        _config(num_updates=3, log_interval=1, **DIFF_CHUNK), _FakeEnv()
+    )
+    latest = tmp_path / "checkpoints" / "latest.pt"
+    trainer.train(checkpoint_path=latest, save_final=save_final)
+    best = torch.load(latest.with_name("best.pt"), weights_only=False)
+    assert set(best) == {"skill_encoder_state_dict", "config", "update", "eval_loss"}
+    assert math.isfinite(best["eval_loss"])
+    assert latest.is_file() is save_final
+    if save_final:
+        full = torch.load(latest, weights_only=False)
+        assert "optimizer_state_dict" in full
+        assert latest.stat().st_size > latest.with_name("best.pt").stat().st_size
