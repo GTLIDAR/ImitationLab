@@ -2970,6 +2970,8 @@ class ExpertDataPlane:
         """How the macro window's yaw is taken from its anchor: "twist" (the
         rotation's twist about z) or "forward" (the body x-axis projected onto
         the ground, as the explicit goal takes it)."""
+        if self._expert_macro_anchor_mode() == "reference_heading":
+            return "forward"
         heading = str(getattr(self._env.cfg, "expert_macro_heading", "twist")).strip()
         if heading not in ("twist", "forward"):
             raise ValueError(
@@ -3831,26 +3833,25 @@ class ExpertDataPlane:
         differs from its pretraining input by exactly the live tracking
         error. "expert_heading" anchors both contexts at the expert's slot-0
         heading (yaw-only) frame with an xy-only origin, making pretrain and
-        rollout inputs identical by construction. "robot_heading" is SONIC
-        v1.1's convention: the live encoder input is anchored at the LIVE
-        robot's heading (yaw-only) frame with an xy-only origin, which is what
-        `motion_anchor_ori_heading_mf_nonflat` computes upstream; pretraining
-        has no robot, so it keeps the expert's own slot-0 heading frame -- the
-        perfect-tracking limit of the same frame. The width is unchanged in
-        every mode, so the mode is recorded in the skill checkpoint and the
-        low level refuses an encoder pretrained under a different mode.
+        rollout inputs identical by construction. "robot_pos_heading" anchors
+        the live encoder input at the LIVE robot's heading (yaw-only) frame
+        with the robot's xy as origin; pretraining has no robot, so it keeps
+        the expert's own slot-0 heading frame. "reference_heading" builds
+        pretraining windows under the explicit goal's conventions (forward
+        yaw, full origin, the reference library's rows); the policy builds its
+        live window from the explicit goal itself. See
+        ``imitationlab.encoders.anchor_modes``. The mode is recorded in the
+        skill checkpoint.
         """
+        from imitationlab.encoders.anchor_modes import canonical_anchor_mode
+
         configured = getattr(self._env.cfg, "expert_macro_anchor_mode", "robot")
-        mode = str(configured).strip()
-        if mode not in ("robot", "expert_heading", "robot_heading"):
-            raise ValueError(
-                "expert_macro_anchor_mode must be 'robot', 'expert_heading' or "
-                f"'robot_heading', got {mode!r}."
-            )
-        return mode
+        return canonical_anchor_mode(configured)
 
     def _expert_macro_origin(self) -> str:
         """Origin of the heading-frame macro window: "xy" or "xyz"."""
+        if self._expert_macro_anchor_mode() == "reference_heading":
+            return "xyz"
         origin = str(getattr(self._env.cfg, "expert_macro_origin", "xy")).strip()
         if origin not in ("xy", "xyz"):
             raise ValueError(
@@ -3950,12 +3951,14 @@ class ExpertDataPlane:
             # construction. Only the macro state changes; the expert_window
             # observation terms keep their per-context semantics.
             context = "expert_heading"
-        elif anchor_mode == "robot_heading":
-            # SONIC v1.1: the live encoder input is expressed in the LIVE
-            # robot's heading frame, so the reference the encoder sees carries
-            # the current tracking error. Pretraining has no robot, so it keeps
-            # the expert's own slot-0 heading frame -- the same frame in the
-            # perfect-tracking limit, which is the closest offline analogue.
+        elif anchor_mode == "reference_heading":
+            # Reference only, in both contexts.
+            context = "expert_heading"
+        elif anchor_mode == "robot_pos_heading":
+            # The live encoder input is expressed in the LIVE robot's heading
+            # frame at the robot's xy, so the reference the encoder sees
+            # carries the current tracking error. Pretraining has no robot, so
+            # it keeps the expert's own slot-0 heading frame.
             context = "expert_heading" if context == "expert" else "robot_heading"
         selected = set(self._expert_macro_feature_term_order())
         terms = self._build_expert_window_terms(

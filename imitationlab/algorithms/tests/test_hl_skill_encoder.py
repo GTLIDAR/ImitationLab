@@ -347,3 +347,32 @@ def test_transition_offsets_reject_invalid_checkpoint_sets(offsets):
     )
     with pytest.raises(ValueError, match="transition_offsets"):
         config.validate()
+
+
+def test_anchor_mode_names_and_the_first_release_alias() -> None:
+    import pytest
+
+    from imitationlab.encoders.anchor_modes import canonical_anchor_mode
+
+    # Encoders of the first release recorded ``robot_heading``.
+    assert canonical_anchor_mode("robot_heading") == "robot_pos_heading"
+    assert _config(macro_anchor_mode="robot_heading").macro_anchor_mode == (
+        "robot_pos_heading"
+    )
+    restored = type(_config()).from_dict(
+        _config(macro_anchor_mode="robot_heading").to_dict()
+        | {"macro_anchor_mode": "robot_heading"}
+    )
+    assert restored.macro_anchor_mode == "robot_pos_heading"
+    assert (restored.rollout_anchor, restored.macro_origin) == ("robot", "xy")
+    with pytest.raises(ValueError, match="expert_macro_anchor_mode"):
+        canonical_anchor_mode("robot_yaw")
+
+
+def test_reference_heading_fixes_the_explicit_goal_conventions() -> None:
+    config = _config(macro_anchor_mode="reference_heading")
+    assert (config.rollout_anchor, config.macro_origin, config.macro_heading) == (
+        "previous_reference",
+        "xyz",
+        "forward",
+    )

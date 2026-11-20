@@ -122,7 +122,6 @@ class FrozenSkillEncoder:
     """
 
     _REQUIRED = {
-        "macro_anchor_mode": "robot_heading",
         "macro_frame_stride": 1,
         "source_anchor": "current",
     }
@@ -147,6 +146,13 @@ class FrozenSkillEncoder:
             if getattr(cfg, key) != want:
                 msg = f"skill encoder {path}: {key}={getattr(cfg, key)!r}, the z goal needs {want!r}."
                 raise ValueError(msg)
+        if cfg.macro_anchor_mode not in ("robot_pos_heading", "reference_heading"):
+            msg = (
+                f"skill encoder {path}: macro_anchor_mode={cfg.macro_anchor_mode!r}, "
+                "the z goal needs 'robot_pos_heading' or 'reference_heading'."
+            )
+            raise ValueError(msg)
+        self.anchor_mode = str(cfg.macro_anchor_mode)
         horizon = int(cfg.horizon_steps)
         window = {"full": horizon, "intermediate": horizon - 1}.get(
             str(cfg.encoder_window_mode)
@@ -955,7 +961,7 @@ class G1LatentTrackingTask(G1TrackingTask):
         """The skill encoder's input frames (..., F, 38) for reference frames
         ``frame`` .. ``frame + F - 1``, as the env builds its macro window under
         ``expert_macro_state_terms=[expert_motion_qpos, expert_anchor_pos_b,
-        expert_anchor_ori_b]`` and ``expert_macro_anchor_mode=robot_heading``:
+        expert_anchor_ori_b]`` and ``expert_macro_anchor_mode=robot_pos_heading``:
         reference joint positions, and the reference anchor-body pose in the
         live robot anchor's heading frame (twist about z, xy-only origin),
         rot6d."""
@@ -1011,7 +1017,11 @@ class G1LatentTrackingTask(G1TrackingTask):
             "encoder_frame_dim": self.skill.frame_dim,
             "encoder_frame_stride": 1,
             "encoder_anchor_body": self.skill_anchor,
-            "encoder_anchor_mode": "robot_heading",
+            # The first release's name for ``robot_pos_heading``, kept so its
+            # checkpoints' bindings still match.
+            "encoder_anchor_mode": {"robot_pos_heading": "robot_heading"}.get(
+                skill.anchor_mode, skill.anchor_mode
+            ),
             "reference_start_offset": 1,
             "command_dim": self.skill.command_dim,
         }

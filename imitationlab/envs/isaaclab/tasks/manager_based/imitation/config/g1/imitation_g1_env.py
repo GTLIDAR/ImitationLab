@@ -278,6 +278,9 @@ class ImitationG1EnvCfg(ManagerBasedRLEnvCfg):
     expert_macro_rollout_anchor_mode: str = "inherit"
     # Origin of the encoder's macro window: "xy" keeps absolute height, "xyz"
     # makes height relative to the window's anchor. Recorded in the encoder.
+    # (``expert_macro_anchor_mode=reference_heading`` fixes this, the heading
+    # and the rollout anchor below; they are separate settings only for the
+    # other measured variants.)
     expert_macro_origin: str = "xy"
     # Yaw of the window's anchor: "twist" (the rotation's twist about z) or
     # "forward" (the body x-axis projected onto the ground, as the explicit

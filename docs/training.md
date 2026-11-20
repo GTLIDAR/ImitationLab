@@ -8,9 +8,16 @@
 | `fsq` | A frozen spectral skill encoder's 64 normalized scalar lattice values and two phase values with the supplied recipe |
 | `spectral` | A frozen spectral skill encoder's 64 continuous values and two phase values with the supplied recipe |
 
-`--interface diffsr` is the earlier name of `spectral` and still works. Both encoders use ten 38-value root-and-joint frames at 50 Hz in the robot's
-heading frame. The tracker encodes reference frames starting at the next
-control step. Keep the encoder weights with the tracker checkpoint.
+`--interface diffsr` is the earlier name of `spectral` and still works. Both encoders use ten 38-value root-and-joint frames at 50 Hz. With the
+supplied recipe (`env.expert_macro_anchor_mode=reference_heading`) these are the
+explicit goal's root position, root orientation and joint positions: frames
+start at the next control step and are expressed in the yaw frame and position
+of the reference frame the robot is on. Nothing in them is read from the robot,
+so a deployed latent policy needs an IMU but no position estimate, as the
+explicit interface does. `robot_pos_heading` instead expresses the frames in the
+live robot's yaw frame at the robot's x/y, which adds position feedback and
+needs odometry; encoders from the first release recorded this mode as
+`robot_heading` and still load. Keep the encoder weights with the tracker checkpoint.
 
 | `--policy` | Update |
 | --- | --- |
