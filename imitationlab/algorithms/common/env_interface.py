@@ -68,7 +68,7 @@ class ImitationEnvInterface(Protocol):
         ...
 
     def expert_macro_anchor_mode(self) -> str:
-        """Macro-window frame ("robot", "expert_heading" or "robot_heading").
+        """Macro-window frame (one of ``encoders.anchor_modes.ANCHOR_MODES``).
 
         Same detection problem as the stride: the macro state has the same
         width in every mode, so a skill encoder paired with the wrong frame

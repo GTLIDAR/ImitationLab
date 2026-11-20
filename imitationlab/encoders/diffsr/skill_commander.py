@@ -2314,6 +2314,9 @@ class FrozenSkillCommanderSampler(FrozenHighLevelSkillCommandSampler):
             if supports(_interface, "expert_macro_anchor_mode")
             else "robot"
         )
+        from imitationlab.encoders.anchor_modes import canonical_anchor_mode
+
+        _env_anchor_mode = canonical_anchor_mode(_env_anchor_mode)
         if _env_anchor_mode != str(self.config.macro_anchor_mode):
             msg = (
                 "Skill encoder macro-window anchor mode does not match the "

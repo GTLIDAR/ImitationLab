@@ -1,5 +1,5 @@
 physics=newton_mjwarp
-env.expert_macro_anchor_mode=robot_heading
+env.expert_macro_anchor_mode=reference_heading
 env.expert_macro_frame_stride=1
 --task imitation-g1-v1
 --headless

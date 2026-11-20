@@ -704,7 +704,7 @@ parser.add_argument(
     help=(
         "Move every training jepa draw (encoder window, phi source, next-chunk "
         "target) by one random planar offset, so the encoder also learns windows "
-        "anchored at a live robot that is off the reference (robot_heading rollout)."
+        "anchored at a live robot that is off the reference (robot_pos_heading rollout)."
     ),
 )
 parser.add_argument("--macro_offset_xy_median", type=float, default=0.05)

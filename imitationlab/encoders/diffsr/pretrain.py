@@ -901,9 +901,10 @@ class HighLevelSkillDiffSRConfig:
     historical split (expert-anchored pretrain, robot-anchored rollout);
     "expert_heading" expresses both in the expert's slot-0 heading frame, so
     pretrain and rollout encoder inputs match by construction;
-    "robot_heading" is SONIC v1.1's convention -- rollout anchors at the LIVE
-    robot's heading (yaw-only) frame, pretrain keeps the expert slot-0 heading
-    frame because offline data has no robot. The width is
+    "robot_pos_heading" anchors the rollout at the LIVE robot's heading
+    (yaw-only) frame and xy, pretrain keeps the expert slot-0 heading frame
+    because offline data has no robot; "reference_heading" is the explicit
+    goal's frame (``imitationlab.encoders.anchor_modes``). The width is
     identical in every mode, so a low level that loads this encoder under a
     different mode is silently off-distribution unless it compares this
     field -- which :class:`FrozenHighLevelSkillCommandSampler` does. A
@@ -1053,10 +1054,20 @@ class HighLevelSkillDiffSRConfig:
                 f"{self.rollout_anchor!r}."
             )
             raise ValueError(msg)
+        from imitationlab.encoders.anchor_modes import (
+            REFERENCE_HEADING,
+            canonical_anchor_mode,
+        )
+
+        self.macro_anchor_mode = canonical_anchor_mode(self.macro_anchor_mode)
+        if self.macro_anchor_mode == "reference_heading":
+            for key, value in REFERENCE_HEADING.items():
+                setattr(self, key, value)
         if self.macro_anchor_mode not in (
             "robot",
             "expert_heading",
-            "robot_heading",
+            "robot_pos_heading",
+            "reference_heading",
         ):
             msg = (
                 "macro_anchor_mode must be 'robot', 'expert_heading' or "
@@ -2051,6 +2062,9 @@ class FrozenHighLevelSkillCommandSampler:
             env_mode = "robot"
         else:
             env_mode = str(interface.expert_macro_anchor_mode())
+        from imitationlab.encoders.anchor_modes import canonical_anchor_mode
+
+        env_mode = canonical_anchor_mode(env_mode)
         checkpoint_mode = str(self.config.macro_anchor_mode)
         if env_mode != checkpoint_mode:
             msg = (
