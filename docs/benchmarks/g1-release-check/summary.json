@@ -1,0 +1,7328 @@
+{
+ "runs": [
+  {
+   "tier": "rtx4080",
+   "dataset": "lafan1",
+   "learner": "supermimic",
+   "interface": "explicit",
+   "status": "completed",
+   "gpu": "NVIDIA GeForce RTX 4080",
+   "profile": "standard",
+   "num_envs": 4096,
+   "frames": 71860224,
+   "train_minutes": 30.01,
+   "startup_seconds": 26.4,
+   "encoder_updates": null,
+   "source_sha256": "b59eea6d67b17a41f8e15ee847c90033fb06e7ce40b6d626f01c131f3d4d03a5",
+   "board256": {
+    "success": 1.0,
+    "mpjpe_l_mm": 14.253950320434571,
+    "mpjpe_g_mm": 56.77564414176941,
+    "first_90pct_40mm_min": 5.0
+   },
+   "curve": [
+    [
+     1.08,
+     0.0,
+     146.71
+    ],
+    [
+     2.0,
+     0.15000000596046448,
+     104.56
+    ],
+    [
+     5.01,
+     1.0,
+     18.04
+    ],
+    [
+     10.0,
+     1.0,
+     14.33
+    ],
+    [
+     15.0,
+     1.0,
+     13.78
+    ],
+    [
+     20.0,
+     1.0,
+     14.24
+    ],
+    [
+     30.01,
+     1.0,
+     14.25
+    ]
+   ],
+   "revision": "fb4b33d",
+   "rerun": false
+  },
+  {
+   "tier": "rtx4080",
+   "dataset": "lafan1",
+   "learner": "supermimic",
+   "interface": "fsq",
+   "status": "completed",
+   "gpu": "NVIDIA GeForce RTX 4080",
+   "profile": "small",
+   "num_envs": 1024,
+   "frames": 34395136,
+   "train_minutes": 30.0,
+   "startup_seconds": 20.0,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 1.0,
+    "mpjpe_l_mm": 17.68857169494629,
+    "mpjpe_g_mm": 71.47953928985596,
+    "first_90pct_40mm_min": 5.0
+   },
+   "curve": [
+    [
+     1.03,
+     0.0,
+     147.38
+    ],
+    [
+     2.0,
+     0.875,
+     45.3
+    ],
+    [
+     5.0,
+     0.8999999761581421,
+     25.17
+    ],
+    [
+     10.0,
+     1.0,
+     20.55
+    ],
+    [
+     15.0,
+     1.0,
+     18.98
+    ],
+    [
+     20.0,
+     1.0,
+     18.28
+    ],
+    [
+     30.0,
+     1.0,
+     17.65
+    ],
+    [
+     30.0,
+     1.0,
+     17.69
+    ]
+   ],
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "rtx4080",
+   "dataset": "lafan1",
+   "learner": "supermimic",
+   "interface": "spectral",
+   "status": "completed",
+   "gpu": "NVIDIA GeForce RTX 4080",
+   "profile": "small",
+   "num_envs": 1024,
+   "frames": 35080192,
+   "train_minutes": 30.0,
+   "startup_seconds": 20.0,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 1.0,
+    "mpjpe_l_mm": 17.270384144973754,
+    "mpjpe_g_mm": 64.93315074768067,
+    "first_90pct_40mm_min": 2.0
+   },
+   "curve": [
+    [
+     1.0,
+     0.0,
+     145.2
+    ],
+    [
+     2.0,
+     0.925000011920929,
+     32.56
+    ],
+    [
+     5.0,
+     0.8999999761581421,
+     23.09
+    ],
+    [
+     10.0,
+     1.0,
+     18.71
+    ],
+    [
+     15.0,
+     1.0,
+     18.07
+    ],
+    [
+     20.0,
+     1.0,
+     18.45
+    ],
+    [
+     30.0,
+     1.0,
+     17.27
+    ]
+   ],
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "rtx4080",
+   "dataset": "lafan1",
+   "learner": "ppo",
+   "interface": "explicit",
+   "status": "completed",
+   "gpu": "NVIDIA GeForce RTX 4080",
+   "profile": "small",
+   "num_envs": 1024,
+   "frames": 104497152,
+   "train_minutes": 30.01,
+   "startup_seconds": 17.7,
+   "encoder_updates": null,
+   "source_sha256": "aebdefbd8015789bd383d7897372136a2d6d0c55fb721bfc3c6d6fb7ecd7fc24",
+   "board256": {
+    "success": 0.625,
+    "mpjpe_l_mm": 66.92445864276439,
+    "mpjpe_g_mm": 552.708041752697,
+    "first_90pct_40mm_min": null
+   },
+   "curve": [
+    [
+     1.0,
+     0.0,
+     100.17
+    ],
+    [
+     2.0,
+     0.0,
+     91.05
+    ],
+    [
+     5.01,
+     0.0,
+     54.23
+    ],
+    [
+     10.0,
+     0.0,
+     75.67
+    ],
+    [
+     15.0,
+     0.02500000037252903,
+     70.88
+    ],
+    [
+     20.01,
+     0.05000000074505806,
+     79.68
+    ],
+    [
+     30.01,
+     0.625,
+     66.92
+    ]
+   ],
+   "revision": "fb4b33d",
+   "rerun": false
+  },
+  {
+   "tier": "rtx4080",
+   "dataset": "lafan1",
+   "learner": "ppo",
+   "interface": "fsq",
+   "status": "completed",
+   "gpu": "NVIDIA GeForce RTX 4080",
+   "profile": "small",
+   "num_envs": 1024,
+   "frames": 60284928,
+   "train_minutes": 30.0,
+   "startup_seconds": 16.3,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.550000011920929,
+    "mpjpe_l_mm": 75.72318430370106,
+    "mpjpe_g_mm": 473.034913210742,
+    "first_90pct_40mm_min": null
+   },
+   "curve": [
+    [
+     1.0,
+     0.0,
+     98.65
+    ],
+    [
+     2.01,
+     0.0,
+     73.3
+    ],
+    [
+     5.0,
+     0.0,
+     55.11
+    ],
+    [
+     10.01,
+     0.0,
+     90.79
+    ],
+    [
+     15.01,
+     0.0,
+     98.3
+    ],
+    [
+     20.01,
+     0.0,
+     84.14
+    ],
+    [
+     30.0,
+     0.550000011920929,
+     75.72
+    ]
+   ],
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "rtx4080",
+   "dataset": "lafan1",
+   "learner": "ppo",
+   "interface": "spectral",
+   "status": "completed",
+   "gpu": "NVIDIA GeForce RTX 4080",
+   "profile": "small",
+   "num_envs": 1024,
+   "frames": 60727296,
+   "train_minutes": 30.01,
+   "startup_seconds": 16.2,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.6000000238418579,
+    "mpjpe_l_mm": 85.84165525872338,
+    "mpjpe_g_mm": 519.7124803943265,
+    "first_90pct_40mm_min": null
+   },
+   "curve": [
+    [
+     1.01,
+     0.0,
+     111.24
+    ],
+    [
+     2.0,
+     0.0,
+     104.79
+    ],
+    [
+     5.0,
+     0.0,
+     70.43
+    ],
+    [
+     10.01,
+     0.0,
+     85.3
+    ],
+    [
+     15.01,
+     0.0,
+     94.44
+    ],
+    [
+     20.0,
+     0.0,
+     83.61
+    ],
+    [
+     30.01,
+     0.6000000238418579,
+     85.84
+    ]
+   ],
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "rtx4080",
+   "dataset": "lafan1",
+   "learner": "svg",
+   "interface": "explicit",
+   "status": "completed",
+   "gpu": "NVIDIA GeForce RTX 4080",
+   "profile": "standard",
+   "num_envs": 4096,
+   "frames": 36745216,
+   "train_minutes": 30.0,
+   "startup_seconds": 17.6,
+   "encoder_updates": null,
+   "source_sha256": "b59eea6d67b17a41f8e15ee847c90033fb06e7ce40b6d626f01c131f3d4d03a5",
+   "board256": {
+    "success": 1.0,
+    "mpjpe_l_mm": 14.884971099853516,
+    "mpjpe_g_mm": 67.2040111240387,
+    "first_90pct_40mm_min": 5.0
+   },
+   "curve": [
+    [
+     1.73,
+     0.0,
+     146.9
+    ],
+    [
+     2.0,
+     0.0,
+     147.16
+    ],
+    [
+     5.0,
+     0.8999999761581421,
+     30.35
+    ],
+    [
+     10.0,
+     0.949999988079071,
+     19.76
+    ],
+    [
+     15.0,
+     0.9750000238418579,
+     15.75
+    ],
+    [
+     20.0,
+     1.0,
+     15.07
+    ],
+    [
+     30.0,
+     1.0,
+     14.88
+    ]
+   ],
+   "revision": "fb4b33d",
+   "rerun": false
+  },
+  {
+   "tier": "rtx4080",
+   "dataset": "lafan1",
+   "learner": "svg",
+   "interface": "fsq",
+   "status": "completed",
+   "gpu": "NVIDIA GeForce RTX 4080",
+   "profile": "small",
+   "num_envs": 1024,
+   "frames": 10214400,
+   "train_minutes": 30.0,
+   "startup_seconds": 19.9,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.925000011920929,
+    "mpjpe_l_mm": 22.548775048669384,
+    "mpjpe_g_mm": 90.21824088568022,
+    "first_90pct_40mm_min": 10.0
+   },
+   "curve": [
+    [
+     1.02,
+     0.0,
+     147.1
+    ],
+    [
+     2.0,
+     0.0,
+     148.56
+    ],
+    [
+     5.0,
+     0.875,
+     30.5
+    ],
+    [
+     10.0,
+     0.8999999761581421,
+     25.98
+    ],
+    [
+     15.0,
+     0.875,
+     21.73
+    ],
+    [
+     20.0,
+     0.925000011920929,
+     23.07
+    ],
+    [
+     30.0,
+     0.925000011920929,
+     22.55
+    ]
+   ],
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "rtx4080",
+   "dataset": "lafan1",
+   "learner": "svg",
+   "interface": "spectral",
+   "status": "completed",
+   "gpu": "NVIDIA GeForce RTX 4080",
+   "profile": "small",
+   "num_envs": 1024,
+   "frames": 9725952,
+   "train_minutes": 30.0,
+   "startup_seconds": 19.9,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.8999999761581421,
+    "mpjpe_l_mm": 21.649554118013707,
+    "mpjpe_g_mm": 85.8036011109264,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     1.74,
+     0.0,
+     146.98
+    ],
+    [
+     2.0,
+     0.0,
+     148.96
+    ],
+    [
+     5.0,
+     0.875,
+     35.53
+    ],
+    [
+     10.0,
+     0.875,
+     24.24
+    ],
+    [
+     15.0,
+     0.8999999761581421,
+     23.87
+    ],
+    [
+     20.0,
+     0.875,
+     22.11
+    ],
+    [
+     30.0,
+     0.8999999761581421,
+     21.65
+    ]
+   ],
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "rtx4080",
+   "dataset": "lafan1",
+   "learner": "diffsr",
+   "interface": "explicit",
+   "status": "completed",
+   "gpu": "NVIDIA GeForce RTX 4080",
+   "profile": "standard",
+   "num_envs": 4096,
+   "frames": 26681344,
+   "train_minutes": 30.0,
+   "startup_seconds": 24.1,
+   "encoder_updates": null,
+   "source_sha256": "aebdefbd8015789bd383d7897372136a2d6d0c55fb721bfc3c6d6fb7ecd7fc24",
+   "board256": {
+    "success": 1.0,
+    "mpjpe_l_mm": 16.047122399139404,
+    "mpjpe_g_mm": 61.413749519348144,
+    "first_90pct_40mm_min": 10.0
+   },
+   "curve": [
+    [
+     1.54,
+     0.0,
+     147.46
+    ],
+    [
+     2.0,
+     0.0,
+     148.07
+    ],
+    [
+     5.0,
+     0.75,
+     67.7
+    ],
+    [
+     10.0,
+     0.925000011920929,
+     23.13
+    ],
+    [
+     15.0,
+     0.9750000238418579,
+     19.6
+    ],
+    [
+     20.0,
+     1.0,
+     17.19
+    ],
+    [
+     30.0,
+     1.0,
+     16.05
+    ]
+   ],
+   "revision": "fb4b33d",
+   "rerun": false
+  },
+  {
+   "tier": "rtx4080",
+   "dataset": "lafan1",
+   "learner": "diffsr",
+   "interface": "fsq",
+   "status": "completed",
+   "gpu": "NVIDIA GeForce RTX 4080",
+   "profile": "small",
+   "num_envs": 1024,
+   "frames": 10380288,
+   "train_minutes": 30.0,
+   "startup_seconds": 20.0,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 1.0,
+    "mpjpe_l_mm": 20.66918773498535,
+    "mpjpe_g_mm": 91.88154071807861,
+    "first_90pct_40mm_min": 5.0
+   },
+   "curve": [
+    [
+     1.0,
+     0.0,
+     149.48
+    ],
+    [
+     2.0,
+     0.0,
+     139.56
+    ],
+    [
+     5.0,
+     0.8999999761581421,
+     37.59
+    ],
+    [
+     10.0,
+     0.925000011920929,
+     26.3
+    ],
+    [
+     15.0,
+     0.925000011920929,
+     23.04
+    ],
+    [
+     20.0,
+     0.925000011920929,
+     21.52
+    ],
+    [
+     30.0,
+     1.0,
+     20.67
+    ]
+   ],
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "rtx4080",
+   "dataset": "lafan1",
+   "learner": "diffsr",
+   "interface": "spectral",
+   "status": "completed",
+   "gpu": "NVIDIA GeForce RTX 4080",
+   "profile": "small",
+   "num_envs": 1024,
+   "frames": 10212352,
+   "train_minutes": 30.0,
+   "startup_seconds": 19.9,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.9750000238418579,
+    "mpjpe_l_mm": 19.673093307293872,
+    "mpjpe_g_mm": 84.66391629078976,
+    "first_90pct_40mm_min": 5.0
+   },
+   "curve": [
+    [
+     1.0,
+     0.0,
+     146.85
+    ],
+    [
+     2.0,
+     0.0,
+     144.67
+    ],
+    [
+     5.0,
+     0.925000011920929,
+     36.94
+    ],
+    [
+     10.0,
+     0.8999999761581421,
+     30.62
+    ],
+    [
+     15.0,
+     0.8999999761581421,
+     22.7
+    ],
+    [
+     20.0,
+     0.925000011920929,
+     21.67
+    ],
+    [
+     30.0,
+     0.9750000238418579,
+     19.67
+    ]
+   ],
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "rtxpro6000",
+   "dataset": "lafan1",
+   "learner": "supermimic",
+   "interface": "explicit",
+   "status": "completed",
+   "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition MIG 2g.48gb",
+   "profile": "large",
+   "num_envs": 8192,
+   "frames": 79167488,
+   "train_minutes": 30.01,
+   "startup_seconds": 192.1,
+   "encoder_updates": null,
+   "source_sha256": "b59eea6d67b17a41f8e15ee847c90033fb06e7ce40b6d626f01c131f3d4d03a5",
+   "board256": {
+    "success": 1.0,
+    "mpjpe_l_mm": 13.201284517669677,
+    "mpjpe_g_mm": 53.52866953849792,
+    "first_90pct_40mm_min": 10.0
+   },
+   "curve": [
+    [
+     3.6,
+     0.0,
+     146.76
+    ],
+    [
+     5.01,
+     0.05000000074505806,
+     93.92
+    ],
+    [
+     10.01,
+     1.0,
+     16.6
+    ],
+    [
+     15.01,
+     1.0,
+     13.83
+    ],
+    [
+     20.01,
+     1.0,
+     13.34
+    ],
+    [
+     30.0,
+     1.0,
+     13.2
+    ],
+    [
+     30.01,
+     1.0,
+     13.2
+    ]
+   ],
+   "revision": "fb4b33d",
+   "rerun": false
+  },
+  {
+   "tier": "rtxpro6000",
+   "dataset": "lafan1",
+   "learner": "supermimic",
+   "interface": "fsq",
+   "status": "completed",
+   "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition MIG 2g.48gb",
+   "profile": "large",
+   "num_envs": 8192,
+   "frames": 74080256,
+   "train_minutes": 30.01,
+   "startup_seconds": 185.2,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 1.0,
+    "mpjpe_l_mm": 16.98559309196472,
+    "mpjpe_g_mm": 59.93029234924317,
+    "first_90pct_40mm_min": 10.0
+   },
+   "curve": [
+    [
+     3.71,
+     0.0,
+     147.1
+    ],
+    [
+     5.01,
+     0.0,
+     143.12
+    ],
+    [
+     10.01,
+     0.949999988079071,
+     22.72
+    ],
+    [
+     15.01,
+     1.0,
+     19.05
+    ],
+    [
+     20.0,
+     1.0,
+     17.91
+    ],
+    [
+     30.01,
+     1.0,
+     16.99
+    ]
+   ],
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "rtxpro6000",
+   "dataset": "lafan1",
+   "learner": "supermimic",
+   "interface": "spectral",
+   "status": "completed",
+   "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition MIG 2g.48gb",
+   "profile": "large",
+   "num_envs": 8192,
+   "frames": 73875456,
+   "train_minutes": 30.01,
+   "startup_seconds": 198.6,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 1.0,
+    "mpjpe_l_mm": 16.443234869384767,
+    "mpjpe_g_mm": 55.96614850387573,
+    "first_90pct_40mm_min": 10.0
+   },
+   "curve": [
+    [
+     3.97,
+     0.0,
+     146.95
+    ],
+    [
+     5.01,
+     0.0,
+     143.95
+    ],
+    [
+     10.0,
+     0.949999988079071,
+     21.4
+    ],
+    [
+     15.01,
+     1.0,
+     17.77
+    ],
+    [
+     20.0,
+     1.0,
+     16.58
+    ],
+    [
+     30.01,
+     1.0,
+     16.44
+    ]
+   ],
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "rtxpro6000",
+   "dataset": "lafan1",
+   "learner": "ppo",
+   "interface": "explicit",
+   "status": "completed",
+   "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition MIG 2g.48gb",
+   "profile": "standard",
+   "num_envs": 4096,
+   "frames": 172818432,
+   "train_minutes": 30.02,
+   "startup_seconds": 156.3,
+   "encoder_updates": null,
+   "source_sha256": "b59eea6d67b17a41f8e15ee847c90033fb06e7ce40b6d626f01c131f3d4d03a5",
+   "board256": {
+    "success": 0.875,
+    "mpjpe_l_mm": 56.94951602545094,
+    "mpjpe_g_mm": 435.7246600274259,
+    "first_90pct_40mm_min": null
+   },
+   "curve": [
+    [
+     1.01,
+     0.0,
+     116.08
+    ],
+    [
+     2.01,
+     0.0,
+     86.3
+    ],
+    [
+     5.01,
+     0.0,
+     46.88
+    ],
+    [
+     10.01,
+     0.0,
+     65.47
+    ],
+    [
+     15.01,
+     0.2750000059604645,
+     50.19
+    ],
+    [
+     20.02,
+     0.6499999761581421,
+     56.52
+    ],
+    [
+     30.02,
+     0.875,
+     56.95
+    ]
+   ],
+   "revision": "fb4b33d",
+   "rerun": false
+  },
+  {
+   "tier": "rtxpro6000",
+   "dataset": "lafan1",
+   "learner": "ppo",
+   "interface": "fsq",
+   "status": "completed",
+   "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition MIG 2g.48gb",
+   "profile": "large",
+   "num_envs": 8192,
+   "frames": 152764416,
+   "train_minutes": 30.0,
+   "startup_seconds": 167.1,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.875,
+    "mpjpe_l_mm": 53.36416247270389,
+    "mpjpe_g_mm": 398.3256474226184,
+    "first_90pct_40mm_min": null
+   },
+   "curve": [
+    [
+     1.01,
+     0.0,
+     163.15
+    ],
+    [
+     2.03,
+     0.0,
+     153.25
+    ],
+    [
+     5.03,
+     0.0,
+     105.31
+    ],
+    [
+     10.01,
+     0.0,
+     81.57
+    ],
+    [
+     15.01,
+     0.6000000238418579,
+     63.49
+    ],
+    [
+     20.02,
+     0.8500000238418579,
+     61.27
+    ],
+    [
+     30.0,
+     0.875,
+     53.36
+    ]
+   ],
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "rtxpro6000",
+   "dataset": "lafan1",
+   "learner": "ppo",
+   "interface": "spectral",
+   "status": "completed",
+   "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition MIG 2g.48gb",
+   "profile": "large",
+   "num_envs": 8192,
+   "frames": 169082880,
+   "train_minutes": 30.02,
+   "startup_seconds": 150.4,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.875,
+    "mpjpe_l_mm": 51.43668492234505,
+    "mpjpe_g_mm": 385.3694989429441,
+    "first_90pct_40mm_min": null
+   },
+   "curve": [
+    [
+     1.03,
+     0.0,
+     163.08
+    ],
+    [
+     2.01,
+     0.0,
+     127.92
+    ],
+    [
+     5.01,
+     0.0,
+     103.55
+    ],
+    [
+     10.03,
+     0.0,
+     65.1
+    ],
+    [
+     15.02,
+     0.8500000238418579,
+     61.59
+    ],
+    [
+     20.03,
+     0.8999999761581421,
+     61.31
+    ],
+    [
+     30.02,
+     0.875,
+     51.44
+    ]
+   ],
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "rtxpro6000",
+   "dataset": "lafan1",
+   "learner": "svg",
+   "interface": "explicit",
+   "status": "completed",
+   "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition MIG 2g.48gb",
+   "profile": "large",
+   "num_envs": 8192,
+   "frames": 33382400,
+   "train_minutes": 30.01,
+   "startup_seconds": 181.3,
+   "encoder_updates": null,
+   "source_sha256": "b59eea6d67b17a41f8e15ee847c90033fb06e7ce40b6d626f01c131f3d4d03a5",
+   "board256": {
+    "success": 1.0,
+    "mpjpe_l_mm": 14.559484241104126,
+    "mpjpe_g_mm": 63.957346029663086,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     4.85,
+     0.0,
+     147.15
+    ],
+    [
+     5.0,
+     0.0,
+     147.23
+    ],
+    [
+     10.01,
+     0.8500000238418579,
+     35.48
+    ],
+    [
+     15.0,
+     0.8999999761581421,
+     18.37
+    ],
+    [
+     20.0,
+     0.9750000238418579,
+     15.89
+    ],
+    [
+     30.01,
+     1.0,
+     14.56
+    ]
+   ],
+   "revision": "fb4b33d",
+   "rerun": false
+  },
+  {
+   "tier": "rtxpro6000",
+   "dataset": "lafan1",
+   "learner": "svg",
+   "interface": "fsq",
+   "status": "completed",
+   "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition MIG 2g.48gb",
+   "profile": "large",
+   "num_envs": 8192,
+   "frames": 30990336,
+   "train_minutes": 30.0,
+   "startup_seconds": 165.4,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.9750000238418579,
+    "mpjpe_l_mm": 18.464225209304583,
+    "mpjpe_g_mm": 66.30868885207136,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     4.9,
+     0.0,
+     146.95
+    ],
+    [
+     5.0,
+     0.0,
+     146.85
+    ],
+    [
+     10.01,
+     0.7250000238418579,
+     55.11
+    ],
+    [
+     15.01,
+     0.8999999761581421,
+     24.85
+    ],
+    [
+     20.0,
+     0.9750000238418579,
+     19.98
+    ],
+    [
+     30.0,
+     0.9750000238418579,
+     18.46
+    ]
+   ],
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "rtxpro6000",
+   "dataset": "lafan1",
+   "learner": "svg",
+   "interface": "spectral",
+   "status": "completed",
+   "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition MIG 2g.48gb",
+   "profile": "large",
+   "num_envs": 8192,
+   "frames": 25018368,
+   "train_minutes": 30.0,
+   "startup_seconds": 194.4,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 1.0,
+    "mpjpe_l_mm": 17.311107401275635,
+    "mpjpe_g_mm": 65.43951728515626,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     5.48,
+     0.0,
+     146.91
+    ],
+    [
+     10.01,
+     0.0,
+     117.02
+    ],
+    [
+     15.0,
+     0.925000011920929,
+     31.41
+    ],
+    [
+     20.01,
+     0.925000011920929,
+     19.96
+    ],
+    [
+     30.0,
+     1.0,
+     17.31
+    ]
+   ],
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "rtxpro6000",
+   "dataset": "lafan1",
+   "learner": "diffsr",
+   "interface": "explicit",
+   "status": "completed",
+   "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition MIG 2g.48gb",
+   "profile": "large",
+   "num_envs": 8192,
+   "frames": 25174016,
+   "train_minutes": 30.01,
+   "startup_seconds": 176.5,
+   "encoder_updates": null,
+   "source_sha256": "b59eea6d67b17a41f8e15ee847c90033fb06e7ce40b6d626f01c131f3d4d03a5",
+   "board256": {
+    "success": 0.9750000238418579,
+    "mpjpe_l_mm": 18.255300448329017,
+    "mpjpe_g_mm": 78.44740657197546,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     3.61,
+     0.0,
+     147.62
+    ],
+    [
+     5.0,
+     0.0,
+     151.25
+    ],
+    [
+     10.0,
+     0.3499999940395355,
+     81.91
+    ],
+    [
+     15.01,
+     0.925000011920929,
+     31.68
+    ],
+    [
+     20.0,
+     0.925000011920929,
+     21.69
+    ],
+    [
+     30.01,
+     0.9750000238418579,
+     18.26
+    ]
+   ],
+   "revision": "fb4b33d",
+   "rerun": false
+  },
+  {
+   "tier": "rtxpro6000",
+   "dataset": "lafan1",
+   "learner": "diffsr",
+   "interface": "fsq",
+   "status": "completed",
+   "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition MIG 2g.48gb",
+   "profile": "large",
+   "num_envs": 8192,
+   "frames": 24559616,
+   "train_minutes": 30.01,
+   "startup_seconds": 182.4,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.949999988079071,
+    "mpjpe_l_mm": 22.106753839499884,
+    "mpjpe_g_mm": 89.90228113097255,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     3.52,
+     0.0,
+     147.62
+    ],
+    [
+     5.01,
+     0.0,
+     150.03
+    ],
+    [
+     10.0,
+     0.0,
+     110.1
+    ],
+    [
+     15.01,
+     0.925000011920929,
+     36.43
+    ],
+    [
+     20.0,
+     0.925000011920929,
+     28.32
+    ],
+    [
+     30.01,
+     0.949999988079071,
+     22.11
+    ]
+   ],
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "rtxpro6000",
+   "dataset": "lafan1",
+   "learner": "diffsr",
+   "interface": "spectral",
+   "status": "completed",
+   "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition MIG 2g.48gb",
+   "profile": "large",
+   "num_envs": 8192,
+   "frames": 24657920,
+   "train_minutes": 30.01,
+   "startup_seconds": 183.0,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 1.0,
+    "mpjpe_l_mm": 21.38929383163452,
+    "mpjpe_g_mm": 86.4810324874878,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     3.48,
+     0.0,
+     147.5
+    ],
+    [
+     5.01,
+     0.0,
+     146.55
+    ],
+    [
+     10.0,
+     0.0,
+     118.26
+    ],
+    [
+     15.01,
+     0.8999999761581421,
+     36.04
+    ],
+    [
+     20.01,
+     0.925000011920929,
+     26.04
+    ],
+    [
+     30.01,
+     1.0,
+     21.39
+    ]
+   ],
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "h100",
+   "dataset": "lafan1",
+   "learner": "supermimic",
+   "interface": "explicit",
+   "status": "completed",
+   "gpu": "NVIDIA H100 80GB HBM3",
+   "profile": "xlarge",
+   "num_envs": 16384,
+   "frames": 180109312,
+   "train_minutes": 30.01,
+   "startup_seconds": 185.4,
+   "encoder_updates": null,
+   "source_sha256": "b59eea6d67b17a41f8e15ee847c90033fb06e7ce40b6d626f01c131f3d4d03a5",
+   "board256": {
+    "success": 1.0,
+    "mpjpe_l_mm": 13.109593921279908,
+    "mpjpe_g_mm": 52.05642307815552,
+    "first_90pct_40mm_min": 10.0
+   },
+   "curve": [
+    [
+     3.65,
+     0.0,
+     147.06
+    ],
+    [
+     5.0,
+     0.30000001192092896,
+     83.19
+    ],
+    [
+     10.01,
+     1.0,
+     15.29
+    ],
+    [
+     15.01,
+     1.0,
+     14.55
+    ],
+    [
+     20.0,
+     1.0,
+     13.38
+    ],
+    [
+     30.01,
+     1.0,
+     13.11
+    ]
+   ],
+   "revision": "fb4b33d",
+   "rerun": false
+  },
+  {
+   "tier": "h100",
+   "dataset": "lafan1",
+   "learner": "supermimic",
+   "interface": "fsq",
+   "status": "completed",
+   "gpu": "NVIDIA H100 80GB HBM3",
+   "profile": "xlarge",
+   "num_envs": 16384,
+   "frames": 133955584,
+   "train_minutes": 30.01,
+   "startup_seconds": 184.8,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 1.0,
+    "mpjpe_l_mm": 16.256453924560546,
+    "mpjpe_g_mm": 53.44508433380127,
+    "first_90pct_40mm_min": 10.0
+   },
+   "curve": [
+    [
+     3.75,
+     0.0,
+     147.53
+    ],
+    [
+     5.01,
+     0.0,
+     142.36
+    ],
+    [
+     10.0,
+     1.0,
+     22.41
+    ],
+    [
+     15.01,
+     1.0,
+     18.16
+    ],
+    [
+     20.0,
+     1.0,
+     17.82
+    ],
+    [
+     30.01,
+     1.0,
+     16.26
+    ]
+   ],
+   "revision": "5a626b4",
+   "rerun": true
+  },
+  {
+   "tier": "h100",
+   "dataset": "lafan1",
+   "learner": "supermimic",
+   "interface": "spectral",
+   "status": "completed",
+   "gpu": "NVIDIA H100 80GB HBM3",
+   "profile": "xlarge",
+   "num_envs": 16384,
+   "frames": 171491328,
+   "train_minutes": 30.01,
+   "startup_seconds": 185.6,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 1.0,
+    "mpjpe_l_mm": 16.25982673149109,
+    "mpjpe_g_mm": 47.7235988368988,
+    "first_90pct_40mm_min": 10.0
+   },
+   "curve": [
+    [
+     3.73,
+     0.0,
+     147.41
+    ],
+    [
+     5.0,
+     0.0,
+     147.09
+    ],
+    [
+     10.01,
+     1.0,
+     19.52
+    ],
+    [
+     15.01,
+     1.0,
+     18.32
+    ],
+    [
+     20.0,
+     1.0,
+     17.2
+    ],
+    [
+     30.01,
+     1.0,
+     16.26
+    ]
+   ],
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "h100",
+   "dataset": "lafan1",
+   "learner": "ppo",
+   "interface": "explicit",
+   "status": "completed",
+   "gpu": "NVIDIA H100 80GB HBM3",
+   "profile": "large",
+   "num_envs": 8192,
+   "frames": 282525696,
+   "train_minutes": 30.01,
+   "startup_seconds": 166.5,
+   "encoder_updates": null,
+   "source_sha256": "b59eea6d67b17a41f8e15ee847c90033fb06e7ce40b6d626f01c131f3d4d03a5",
+   "board256": {
+    "success": 0.925000011920929,
+    "mpjpe_l_mm": 48.200451029618264,
+    "mpjpe_g_mm": 323.76881015247983,
+    "first_90pct_40mm_min": null
+   },
+   "curve": [
+    [
+     1.0,
+     0.0,
+     160.26
+    ],
+    [
+     2.02,
+     0.0,
+     89.99
+    ],
+    [
+     5.02,
+     0.0,
+     68.82
+    ],
+    [
+     10.02,
+     0.625,
+     60.75
+    ],
+    [
+     15.0,
+     0.875,
+     63.02
+    ],
+    [
+     20.0,
+     0.875,
+     52.89
+    ],
+    [
+     30.01,
+     0.925000011920929,
+     48.2
+    ]
+   ],
+   "revision": "fb4b33d",
+   "rerun": false
+  },
+  {
+   "tier": "h100",
+   "dataset": "lafan1",
+   "learner": "ppo",
+   "interface": "fsq",
+   "status": "completed",
+   "gpu": "NVIDIA H100 80GB HBM3",
+   "profile": "large",
+   "num_envs": 8192,
+   "frames": 183828480,
+   "train_minutes": 30.02,
+   "startup_seconds": 165.3,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.875,
+    "mpjpe_l_mm": 54.57294211229754,
+    "mpjpe_g_mm": 402.8893622647324,
+    "first_90pct_40mm_min": null
+   },
+   "curve": [
+    [
+     1.04,
+     0.0,
+     154.75
+    ],
+    [
+     2.0,
+     0.0,
+     139.1
+    ],
+    [
+     5.02,
+     0.0,
+     101.6
+    ],
+    [
+     10.03,
+     0.02500000037252903,
+     68.61
+    ],
+    [
+     15.0,
+     0.8500000238418579,
+     65.04
+    ],
+    [
+     20.01,
+     0.824999988079071,
+     59.73
+    ],
+    [
+     30.02,
+     0.875,
+     54.57
+    ]
+   ],
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "h100",
+   "dataset": "lafan1",
+   "learner": "ppo",
+   "interface": "spectral",
+   "status": "completed",
+   "gpu": "NVIDIA H100 80GB HBM3",
+   "profile": "large",
+   "num_envs": 8192,
+   "frames": 191889408,
+   "train_minutes": 30.02,
+   "startup_seconds": 163.6,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.875,
+    "mpjpe_l_mm": 55.05033650104125,
+    "mpjpe_g_mm": 368.5702770831652,
+    "first_90pct_40mm_min": null
+   },
+   "curve": [
+    [
+     1.01,
+     0.0,
+     163.54
+    ],
+    [
+     2.02,
+     0.0,
+     134.93
+    ],
+    [
+     5.02,
+     0.0,
+     96.49
+    ],
+    [
+     10.01,
+     0.25,
+     65.59
+    ],
+    [
+     15.02,
+     0.8500000238418579,
+     62.1
+    ],
+    [
+     20.01,
+     0.875,
+     56.77
+    ],
+    [
+     30.02,
+     0.875,
+     55.05
+    ]
+   ],
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "h100",
+   "dataset": "lafan1",
+   "learner": "svg",
+   "interface": "explicit",
+   "status": "completed",
+   "gpu": "NVIDIA H100 80GB HBM3",
+   "profile": "xlarge",
+   "num_envs": 16384,
+   "frames": 57229312,
+   "train_minutes": 30.01,
+   "startup_seconds": 186.5,
+   "encoder_updates": null,
+   "source_sha256": "b59eea6d67b17a41f8e15ee847c90033fb06e7ce40b6d626f01c131f3d4d03a5",
+   "board256": {
+    "success": 1.0,
+    "mpjpe_l_mm": 14.864896658325195,
+    "mpjpe_g_mm": 56.42241675720215,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     5.19,
+     0.0,
+     146.97
+    ],
+    [
+     10.0,
+     0.15000000596046448,
+     71.9
+    ],
+    [
+     15.01,
+     0.925000011920929,
+     18.42
+    ],
+    [
+     20.0,
+     1.0,
+     15.84
+    ],
+    [
+     30.01,
+     1.0,
+     14.86
+    ]
+   ],
+   "revision": "fb4b33d",
+   "rerun": false
+  },
+  {
+   "tier": "h100",
+   "dataset": "lafan1",
+   "learner": "svg",
+   "interface": "fsq",
+   "status": "completed",
+   "gpu": "NVIDIA H100 80GB HBM3",
+   "profile": "standard",
+   "num_envs": 4096,
+   "frames": 16887808,
+   "train_minutes": 30.01,
+   "startup_seconds": 166.9,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 1.0,
+    "mpjpe_l_mm": 20.295666065597533,
+    "mpjpe_g_mm": 79.57608660736084,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     5.3,
+     0.0,
+     146.89
+    ],
+    [
+     10.0,
+     0.8500000238418579,
+     52.59
+    ],
+    [
+     15.01,
+     0.8999999761581421,
+     26.5
+    ],
+    [
+     20.0,
+     0.875,
+     21.57
+    ],
+    [
+     30.01,
+     1.0,
+     20.3
+    ]
+   ],
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "h100",
+   "dataset": "lafan1",
+   "learner": "svg",
+   "interface": "spectral",
+   "status": "completed",
+   "gpu": "NVIDIA H100 80GB HBM3",
+   "profile": "standard",
+   "num_envs": 4096,
+   "frames": 16924672,
+   "train_minutes": 30.01,
+   "startup_seconds": 166.9,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 1.0,
+    "mpjpe_l_mm": 19.72297014808655,
+    "mpjpe_g_mm": 76.03341424293518,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     5.26,
+     0.0,
+     146.89
+    ],
+    [
+     10.01,
+     0.824999988079071,
+     51.06
+    ],
+    [
+     15.0,
+     0.8999999761581421,
+     24.02
+    ],
+    [
+     20.0,
+     0.949999988079071,
+     22.15
+    ],
+    [
+     30.01,
+     1.0,
+     19.72
+    ]
+   ],
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "h100",
+   "dataset": "lafan1",
+   "learner": "diffsr",
+   "interface": "explicit",
+   "status": "completed",
+   "gpu": "NVIDIA H100 80GB HBM3",
+   "profile": "xlarge",
+   "num_envs": 16384,
+   "frames": 61390848,
+   "train_minutes": 30.01,
+   "startup_seconds": 177.9,
+   "encoder_updates": null,
+   "source_sha256": "b59eea6d67b17a41f8e15ee847c90033fb06e7ce40b6d626f01c131f3d4d03a5",
+   "board256": {
+    "success": 0.9750000238418579,
+    "mpjpe_l_mm": 16.282920660669976,
+    "mpjpe_g_mm": 66.85631818480482,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     3.56,
+     0.0,
+     147.39
+    ],
+    [
+     5.01,
+     0.0,
+     152.49
+    ],
+    [
+     10.01,
+     0.8500000238418579,
+     48.7
+    ],
+    [
+     15.01,
+     0.925000011920929,
+     25.29
+    ],
+    [
+     20.01,
+     0.949999988079071,
+     20.22
+    ],
+    [
+     30.01,
+     0.9750000238418579,
+     16.28
+    ]
+   ],
+   "revision": "fb4b33d",
+   "rerun": false
+  },
+  {
+   "tier": "h100",
+   "dataset": "lafan1",
+   "learner": "diffsr",
+   "interface": "fsq",
+   "status": "completed",
+   "gpu": "NVIDIA H100 80GB HBM3",
+   "profile": "standard",
+   "num_envs": 4096,
+   "frames": 17956864,
+   "train_minutes": 30.01,
+   "startup_seconds": 166.7,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.9750000238418579,
+    "mpjpe_l_mm": 21.550856628983844,
+    "mpjpe_g_mm": 86.94359893355303,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     3.51,
+     0.0,
+     147.46
+    ],
+    [
+     5.01,
+     0.0,
+     152.18
+    ],
+    [
+     10.0,
+     0.8999999761581421,
+     52.01
+    ],
+    [
+     15.01,
+     0.925000011920929,
+     27.98
+    ],
+    [
+     20.0,
+     0.925000011920929,
+     23.04
+    ],
+    [
+     30.01,
+     0.9750000238418579,
+     21.55
+    ]
+   ],
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "h100",
+   "dataset": "lafan1",
+   "learner": "diffsr",
+   "interface": "spectral",
+   "status": "completed",
+   "gpu": "NVIDIA H100 80GB HBM3",
+   "profile": "standard",
+   "num_envs": 4096,
+   "frames": 17072128,
+   "train_minutes": 30.01,
+   "startup_seconds": 179.0,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.9750000238418579,
+    "mpjpe_l_mm": 20.62101998632409,
+    "mpjpe_g_mm": 78.23266896805168,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     3.57,
+     0.0,
+     147.8
+    ],
+    [
+     5.01,
+     0.0,
+     154.07
+    ],
+    [
+     10.01,
+     0.875,
+     49.37
+    ],
+    [
+     15.01,
+     0.925000011920929,
+     29.39
+    ],
+    [
+     20.01,
+     0.8999999761581421,
+     22.55
+    ],
+    [
+     30.01,
+     0.9750000238418579,
+     20.62
+    ]
+   ],
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "h200",
+   "dataset": "lafan1",
+   "learner": "supermimic",
+   "interface": "explicit",
+   "status": "completed",
+   "gpu": "NVIDIA H200",
+   "profile": "xlarge",
+   "num_envs": 16384,
+   "frames": 192086016,
+   "train_minutes": 30.01,
+   "startup_seconds": 176.6,
+   "encoder_updates": null,
+   "source_sha256": "b59eea6d67b17a41f8e15ee847c90033fb06e7ce40b6d626f01c131f3d4d03a5",
+   "board256": {
+    "success": 1.0,
+    "mpjpe_l_mm": 14.102010562133788,
+    "mpjpe_g_mm": 48.94240371627808,
+    "first_90pct_40mm_min": 10.0
+   },
+   "curve": [
+    [
+     3.69,
+     0.0,
+     146.87
+    ],
+    [
+     5.01,
+     0.44999998807907104,
+     82.54
+    ],
+    [
+     10.01,
+     1.0,
+     14.57
+    ],
+    [
+     15.01,
+     1.0,
+     13.22
+    ],
+    [
+     20.01,
+     1.0,
+     12.74
+    ],
+    [
+     30.01,
+     1.0,
+     14.1
+    ]
+   ],
+   "revision": "fb4b33d",
+   "rerun": false
+  },
+  {
+   "tier": "h200",
+   "dataset": "lafan1",
+   "learner": "supermimic",
+   "interface": "fsq",
+   "status": "completed",
+   "gpu": "NVIDIA H200",
+   "profile": "xlarge",
+   "num_envs": 16384,
+   "frames": 179126272,
+   "train_minutes": 30.01,
+   "startup_seconds": 187.1,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 1.0,
+    "mpjpe_l_mm": 16.432836059570313,
+    "mpjpe_g_mm": 61.73114595489502,
+    "first_90pct_40mm_min": 10.0
+   },
+   "curve": [
+    [
+     3.84,
+     0.0,
+     147.42
+    ],
+    [
+     5.01,
+     0.0,
+     144.32
+    ],
+    [
+     10.0,
+     1.0,
+     20.04
+    ],
+    [
+     15.0,
+     1.0,
+     18.04
+    ],
+    [
+     20.0,
+     1.0,
+     17.8
+    ],
+    [
+     30.01,
+     1.0,
+     16.43
+    ]
+   ],
+   "revision": "5a626b4",
+   "rerun": true
+  },
+  {
+   "tier": "h200",
+   "dataset": "lafan1",
+   "learner": "supermimic",
+   "interface": "spectral",
+   "status": "completed",
+   "gpu": "NVIDIA H200",
+   "profile": "xlarge",
+   "num_envs": 16384,
+   "frames": 181567488,
+   "train_minutes": 30.01,
+   "startup_seconds": 176.6,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 1.0,
+    "mpjpe_l_mm": 15.156648806762695,
+    "mpjpe_g_mm": 50.585597848510744,
+    "first_90pct_40mm_min": 10.0
+   },
+   "curve": [
+    [
+     3.71,
+     0.0,
+     147.4
+    ],
+    [
+     5.0,
+     0.0,
+     132.91
+    ],
+    [
+     10.0,
+     1.0,
+     17.81
+    ],
+    [
+     15.0,
+     1.0,
+     17.14
+    ],
+    [
+     20.0,
+     1.0,
+     16.5
+    ],
+    [
+     30.01,
+     1.0,
+     15.16
+    ]
+   ],
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "h200",
+   "dataset": "lafan1",
+   "learner": "ppo",
+   "interface": "explicit",
+   "status": "completed",
+   "gpu": "NVIDIA H200",
+   "profile": "xlarge",
+   "num_envs": 16384,
+   "frames": 331874304,
+   "train_minutes": 30.03,
+   "startup_seconds": 157.4,
+   "encoder_updates": null,
+   "source_sha256": "b59eea6d67b17a41f8e15ee847c90033fb06e7ce40b6d626f01c131f3d4d03a5",
+   "board256": {
+    "success": 0.8999999761581421,
+    "mpjpe_l_mm": 48.30637517120774,
+    "mpjpe_g_mm": 283.4476395954923,
+    "first_90pct_40mm_min": null
+   },
+   "curve": [
+    [
+     1.03,
+     0.0,
+     160.04
+    ],
+    [
+     2.0,
+     0.0,
+     142.9
+    ],
+    [
+     5.01,
+     0.0,
+     106.08
+    ],
+    [
+     10.01,
+     0.550000011920929,
+     81.26
+    ],
+    [
+     15.01,
+     0.8500000238418579,
+     63.76
+    ],
+    [
+     20.02,
+     0.875,
+     55.01
+    ],
+    [
+     30.03,
+     0.8999999761581421,
+     48.31
+    ]
+   ],
+   "revision": "fb4b33d",
+   "rerun": false
+  },
+  {
+   "tier": "h200",
+   "dataset": "lafan1",
+   "learner": "ppo",
+   "interface": "fsq",
+   "status": "completed",
+   "gpu": "NVIDIA H200",
+   "profile": "xlarge",
+   "num_envs": 16384,
+   "frames": 274857984,
+   "train_minutes": 30.01,
+   "startup_seconds": 161.2,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.8999999761581421,
+    "mpjpe_l_mm": 64.75674420840855,
+    "mpjpe_g_mm": 344.54672498177246,
+    "first_90pct_40mm_min": null
+   },
+   "curve": [
+    [
+     1.01,
+     0.0,
+     148.22
+    ],
+    [
+     2.02,
+     0.0,
+     154.67
+    ],
+    [
+     5.02,
+     0.0,
+     119.79
+    ],
+    [
+     10.02,
+     0.44999998807907104,
+     90.05
+    ],
+    [
+     15.04,
+     0.8999999761581421,
+     82.81
+    ],
+    [
+     20.01,
+     0.8500000238418579,
+     73.12
+    ],
+    [
+     30.01,
+     0.8999999761581421,
+     64.76
+    ]
+   ],
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "h200",
+   "dataset": "lafan1",
+   "learner": "ppo",
+   "interface": "spectral",
+   "status": "completed",
+   "gpu": "NVIDIA H200",
+   "profile": "xlarge",
+   "num_envs": 16384,
+   "frames": 275644416,
+   "train_minutes": 30.01,
+   "startup_seconds": 160.4,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.8999999761581421,
+    "mpjpe_l_mm": 52.39994619046152,
+    "mpjpe_g_mm": 312.45655279005337,
+    "first_90pct_40mm_min": null
+   },
+   "curve": [
+    [
+     1.01,
+     0.0,
+     155.08
+    ],
+    [
+     2.01,
+     0.0,
+     157.66
+    ],
+    [
+     5.0,
+     0.0,
+     122.06
+    ],
+    [
+     10.04,
+     0.550000011920929,
+     82.43
+    ],
+    [
+     15.04,
+     0.8500000238418579,
+     66.41
+    ],
+    [
+     20.0,
+     0.8999999761581421,
+     62.62
+    ],
+    [
+     30.01,
+     0.8999999761581421,
+     52.4
+    ]
+   ],
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "h200",
+   "dataset": "lafan1",
+   "learner": "svg",
+   "interface": "explicit",
+   "status": "completed",
+   "gpu": "NVIDIA H200",
+   "profile": "xlarge",
+   "num_envs": 16384,
+   "frames": 68567040,
+   "train_minutes": 30.01,
+   "startup_seconds": 176.1,
+   "encoder_updates": null,
+   "source_sha256": "b59eea6d67b17a41f8e15ee847c90033fb06e7ce40b6d626f01c131f3d4d03a5",
+   "board256": {
+    "success": 1.0,
+    "mpjpe_l_mm": 14.772404911613464,
+    "mpjpe_g_mm": 53.66352639656067,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     5.17,
+     0.0,
+     147.04
+    ],
+    [
+     10.01,
+     0.8500000238418579,
+     37.2
+    ],
+    [
+     15.01,
+     1.0,
+     16.95
+    ],
+    [
+     20.01,
+     1.0,
+     15.3
+    ],
+    [
+     30.01,
+     1.0,
+     14.77
+    ]
+   ],
+   "revision": "fb4b33d",
+   "rerun": false
+  },
+  {
+   "tier": "h200",
+   "dataset": "lafan1",
+   "learner": "svg",
+   "interface": "fsq",
+   "status": "completed",
+   "gpu": "NVIDIA H200",
+   "profile": "xlarge",
+   "num_envs": 16384,
+   "frames": 62423040,
+   "train_minutes": 30.01,
+   "startup_seconds": 184.0,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 1.0,
+    "mpjpe_l_mm": 18.7162168510437,
+    "mpjpe_g_mm": 71.36673239250183,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     5.3,
+     0.0,
+     146.9
+    ],
+    [
+     10.0,
+     0.824999988079071,
+     53.29
+    ],
+    [
+     15.0,
+     0.925000011920929,
+     23.51
+    ],
+    [
+     20.0,
+     1.0,
+     19.22
+    ],
+    [
+     30.01,
+     1.0,
+     18.72
+    ]
+   ],
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "h200",
+   "dataset": "lafan1",
+   "learner": "svg",
+   "interface": "spectral",
+   "status": "completed",
+   "gpu": "NVIDIA H200",
+   "profile": "xlarge",
+   "num_envs": 16384,
+   "frames": 63307776,
+   "train_minutes": 30.01,
+   "startup_seconds": 177.6,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 1.0,
+    "mpjpe_l_mm": 18.176316635131837,
+    "mpjpe_g_mm": 62.07857224311829,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     5.3,
+     0.0,
+     146.89
+    ],
+    [
+     10.0,
+     0.7749999761581421,
+     54.1
+    ],
+    [
+     15.0,
+     0.925000011920929,
+     21.51
+    ],
+    [
+     20.01,
+     1.0,
+     18.37
+    ],
+    [
+     30.01,
+     1.0,
+     18.18
+    ]
+   ],
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "h200",
+   "dataset": "lafan1",
+   "learner": "diffsr",
+   "interface": "explicit",
+   "status": "completed",
+   "gpu": "NVIDIA H200",
+   "profile": "xlarge",
+   "num_envs": 16384,
+   "frames": 63602688,
+   "train_minutes": 30.01,
+   "startup_seconds": 176.5,
+   "encoder_updates": null,
+   "source_sha256": "b59eea6d67b17a41f8e15ee847c90033fb06e7ce40b6d626f01c131f3d4d03a5",
+   "board256": {
+    "success": 1.0,
+    "mpjpe_l_mm": 16.196404519081117,
+    "mpjpe_g_mm": 82.44271918869019,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     3.55,
+     0.0,
+     147.41
+    ],
+    [
+     5.01,
+     0.0,
+     153.3
+    ],
+    [
+     10.0,
+     0.8999999761581421,
+     43.96
+    ],
+    [
+     15.0,
+     0.949999988079071,
+     23.91
+    ],
+    [
+     20.01,
+     0.9750000238418579,
+     18.47
+    ],
+    [
+     30.01,
+     1.0,
+     16.2
+    ]
+   ],
+   "revision": "fb4b33d",
+   "rerun": false
+  },
+  {
+   "tier": "h200",
+   "dataset": "lafan1",
+   "learner": "diffsr",
+   "interface": "fsq",
+   "status": "completed",
+   "gpu": "NVIDIA H200",
+   "profile": "xlarge",
+   "num_envs": 16384,
+   "frames": 58146816,
+   "train_minutes": 30.01,
+   "startup_seconds": 179.8,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 1.0,
+    "mpjpe_l_mm": 20.911304219818117,
+    "mpjpe_g_mm": 79.06461935119628,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     3.68,
+     0.0,
+     147.39
+    ],
+    [
+     5.0,
+     0.0,
+     153.8
+    ],
+    [
+     10.01,
+     0.6000000238418579,
+     67.75
+    ],
+    [
+     15.0,
+     0.925000011920929,
+     31.6
+    ],
+    [
+     20.02,
+     0.9750000238418579,
+     24.16
+    ],
+    [
+     30.01,
+     1.0,
+     20.91
+    ]
+   ],
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "h200",
+   "dataset": "lafan1",
+   "learner": "diffsr",
+   "interface": "spectral",
+   "status": "completed",
+   "gpu": "NVIDIA H200",
+   "profile": "xlarge",
+   "num_envs": 16384,
+   "frames": 62144512,
+   "train_minutes": 30.01,
+   "startup_seconds": 185.3,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 1.0,
+    "mpjpe_l_mm": 18.936541659927368,
+    "mpjpe_g_mm": 85.03483443946838,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     3.55,
+     0.0,
+     147.33
+    ],
+    [
+     5.0,
+     0.0,
+     156.52
+    ],
+    [
+     10.01,
+     0.7749999761581421,
+     62.4
+    ],
+    [
+     15.01,
+     0.925000011920929,
+     27.87
+    ],
+    [
+     20.01,
+     1.0,
+     22.67
+    ],
+    [
+     30.01,
+     1.0,
+     18.94
+    ]
+   ],
+   "revision": "5a626b4",
+   "rerun": true
+  },
+  {
+   "tier": "rtx4080",
+   "dataset": "bones_seed",
+   "learner": "supermimic",
+   "interface": "explicit",
+   "status": "completed",
+   "gpu": "NVIDIA GeForce RTX 4080",
+   "profile": "standard",
+   "num_envs": 4096,
+   "frames": 68751360,
+   "train_minutes": 30.01,
+   "startup_seconds": 46.1,
+   "encoder_updates": null,
+   "source_sha256": "aebdefbd8015789bd383d7897372136a2d6d0c55fb721bfc3c6d6fb7ecd7fc24",
+   "board256": {
+    "success": 0.99609375,
+    "mpjpe_l_mm": 15.989633293492787,
+    "mpjpe_g_mm": 74.77800812958742,
+    "first_90pct_40mm_min": 5.0
+   },
+   "curve": [
+    [
+     1.0,
+     0.015625,
+     112.34
+    ],
+    [
+     2.0,
+     0.9453125,
+     55.1
+    ],
+    [
+     5.01,
+     0.9921875,
+     23.67
+    ],
+    [
+     10.0,
+     0.9921875,
+     18.45
+    ],
+    [
+     15.0,
+     0.9921875,
+     17.76
+    ],
+    [
+     20.01,
+     0.99609375,
+     17.56
+    ],
+    [
+     30.01,
+     0.99609375,
+     15.99
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9985591584413506,
+    "mpjpe_l_mm": 15.663961880530396,
+    "mpjpe_g_mm": 82.34304962085339,
+    "curve": [
+     [
+      1.0,
+      0.013283507339948994,
+      104.13
+     ],
+     [
+      2.0,
+      0.9429903272942806,
+      52.9
+     ],
+     [
+      5.01,
+      0.9928343035932562,
+      22.2
+     ],
+     [
+      10.0,
+      0.9971645403212354,
+      17.41
+     ],
+     [
+      15.0,
+      0.9979812788380981,
+      16.98
+     ],
+     [
+      20.01,
+      0.9984975147532972,
+      16.44
+     ],
+     [
+      30.01,
+      0.9985591584413506,
+      15.66
+     ]
+    ]
+   },
+   "revision": "fb4b33d",
+   "rerun": false
+  },
+  {
+   "tier": "rtx4080",
+   "dataset": "bones_seed",
+   "learner": "supermimic",
+   "interface": "fsq",
+   "status": "completed",
+   "gpu": "NVIDIA GeForce RTX 4080",
+   "profile": "small",
+   "num_envs": 1024,
+   "frames": 28661760,
+   "train_minutes": 30.0,
+   "startup_seconds": 42.5,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.9921875,
+    "mpjpe_l_mm": 22.763573113476035,
+    "mpjpe_g_mm": 108.61007761128204,
+    "first_90pct_40mm_min": 5.0
+   },
+   "curve": [
+    [
+     1.0,
+     0.015625,
+     112.29
+    ],
+    [
+     2.0,
+     0.96875,
+     47.18
+    ],
+    [
+     5.0,
+     0.98046875,
+     29.54
+    ],
+    [
+     10.0,
+     0.98828125,
+     25.12
+    ],
+    [
+     15.0,
+     0.9921875,
+     24.36
+    ],
+    [
+     20.0,
+     0.9921875,
+     23.21
+    ],
+    [
+     30.0,
+     0.9921875,
+     22.76
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9939823536626334,
+    "mpjpe_l_mm": 21.57279852063604,
+    "mpjpe_g_mm": 110.61007063505065,
+    "curve": [
+     [
+      1.0,
+      0.013360557846785928,
+      103.03
+     ],
+     [
+      2.0,
+      0.958076816368081,
+      45.38
+     ],
+     [
+      5.0,
+      0.9825634673159153,
+      27.31
+     ],
+     [
+      10.0,
+      0.9885580029556315,
+      25.28
+     ],
+     [
+      15.0,
+      0.9905150825406837,
+      23.88
+     ],
+     [
+      20.0,
+      0.9913626365059627,
+      22.3
+     ],
+     [
+      30.0,
+      0.9939823536626334,
+      21.57
+     ]
+    ]
+   },
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "rtx4080",
+   "dataset": "bones_seed",
+   "learner": "supermimic",
+   "interface": "spectral",
+   "status": "completed",
+   "gpu": "NVIDIA GeForce RTX 4080",
+   "profile": "small",
+   "num_envs": 1024,
+   "frames": 28437504,
+   "train_minutes": 30.0,
+   "startup_seconds": 45.9,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.99609375,
+    "mpjpe_l_mm": 21.608719376352763,
+    "mpjpe_g_mm": 94.85500183150475,
+    "first_90pct_40mm_min": 5.0
+   },
+   "curve": [
+    [
+     1.0,
+     0.015625,
+     113.47
+    ],
+    [
+     2.0,
+     0.96484375,
+     49.65
+    ],
+    [
+     5.0,
+     0.984375,
+     29.23
+    ],
+    [
+     10.0,
+     0.984375,
+     24.37
+    ],
+    [
+     15.0,
+     0.98828125,
+     22.11
+    ],
+    [
+     20.0,
+     0.9921875,
+     22.41
+    ],
+    [
+     30.0,
+     0.99609375,
+     21.61
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9946449900626879,
+    "mpjpe_l_mm": 20.332538688258104,
+    "mpjpe_g_mm": 104.45912663359218,
+    "curve": [
+     [
+      1.0,
+      0.013206456833341913,
+      104.94
+     ],
+     [
+      2.0,
+      0.9564664654781901,
+      48.47
+     ],
+     [
+      5.0,
+      0.9842739920772848,
+      28.37
+     ],
+     [
+      10.0,
+      0.9876333903787812,
+      23.57
+     ],
+     [
+      15.0,
+      0.9917093686758611,
+      21.9
+     ],
+     [
+      20.0,
+      0.9920098635404252,
+      21.34
+     ],
+     [
+      30.0,
+      0.9946449900626879,
+      20.33
+     ]
+    ]
+   },
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "rtx4080",
+   "dataset": "bones_seed",
+   "learner": "ppo",
+   "interface": "explicit",
+   "status": "completed",
+   "gpu": "NVIDIA GeForce RTX 4080",
+   "profile": "small",
+   "num_envs": 1024,
+   "frames": 99999744,
+   "train_minutes": 30.0,
+   "startup_seconds": 35.3,
+   "encoder_updates": null,
+   "source_sha256": "aebdefbd8015789bd383d7897372136a2d6d0c55fb721bfc3c6d6fb7ecd7fc24",
+   "board256": {
+    "success": 0.859375,
+    "mpjpe_l_mm": 75.73422747767971,
+    "mpjpe_g_mm": 615.4938475659708,
+    "first_90pct_40mm_min": null
+   },
+   "curve": [
+    [
+     1.0,
+     0.00390625,
+     124.44
+    ],
+    [
+     2.01,
+     0.0,
+     92.85
+    ],
+    [
+     5.0,
+     0.0,
+     56.36
+    ],
+    [
+     10.0,
+     0.16796875,
+     61.94
+    ],
+    [
+     15.01,
+     0.6484375,
+     79.67
+    ],
+    [
+     20.0,
+     0.70703125,
+     81.68
+    ],
+    [
+     30.0,
+     0.859375,
+     75.73
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.8209423292664629,
+    "mpjpe_l_mm": 74.78064990180586,
+    "mpjpe_g_mm": 628.341826966945,
+    "curve": [
+     [
+      1.0,
+      0.0010401818391955926,
+      106.41
+     ],
+     [
+      2.01,
+      0.000246561621142659,
+      110.04
+     ],
+     [
+      5.0,
+      1.541010132141619e-05,
+      63.67
+     ],
+     [
+      10.0,
+      0.12037600645054267,
+      65.44
+     ],
+     [
+      15.01,
+      0.6350733913414356,
+      76.52
+     ],
+     [
+      20.0,
+      0.7312709487728655,
+      79.64
+     ],
+     [
+      30.0,
+      0.8209423292664629,
+      74.78
+     ]
+    ]
+   },
+   "revision": "fb4b33d",
+   "rerun": false
+  },
+  {
+   "tier": "rtx4080",
+   "dataset": "bones_seed",
+   "learner": "ppo",
+   "interface": "fsq",
+   "status": "completed",
+   "gpu": "NVIDIA GeForce RTX 4080",
+   "profile": "small",
+   "num_envs": 1024,
+   "frames": 22634496,
+   "train_minutes": 30.02,
+   "startup_seconds": 37.6,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.15625,
+    "mpjpe_l_mm": 79.61200426334014,
+    "mpjpe_g_mm": 263.32603774310223,
+    "first_90pct_40mm_min": null
+   },
+   "curve": [
+    [
+     1.01,
+     0.01171875,
+     125.95
+    ],
+    [
+     2.02,
+     0.01171875,
+     136.96
+    ],
+    [
+     5.02,
+     0.00390625,
+     68.51
+    ],
+    [
+     10.03,
+     0.00390625,
+     50.83
+    ],
+    [
+     15.03,
+     0.00390625,
+     59.72
+    ],
+    [
+     20.01,
+     0.015625,
+     66.47
+    ],
+    [
+     30.02,
+     0.15625,
+     79.61
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.11108371520616375,
+    "mpjpe_l_mm": 77.08009574779119,
+    "mpjpe_g_mm": 303.5714791885417,
+    "curve": [
+     [
+      1.01,
+      0.01289825480602535,
+      126.53
+     ],
+     [
+      2.02,
+      0.012274145702507995,
+      129.63
+     ],
+     [
+      5.02,
+      0.001063296991177717,
+      86.99
+     ],
+     [
+      10.03,
+      0.0008706707246600146,
+      67.11
+     ],
+     [
+      15.03,
+      0.0010941171931309914,
+      60.53
+     ],
+     [
+      20.01,
+      0.01548715182210944,
+      66.79
+     ],
+     [
+      30.02,
+      0.11108371520616375,
+      77.08
+     ]
+    ]
+   },
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "rtx4080",
+   "dataset": "bones_seed",
+   "learner": "ppo",
+   "interface": "spectral",
+   "status": "completed",
+   "gpu": "NVIDIA GeForce RTX 4080",
+   "profile": "small",
+   "num_envs": 1024,
+   "frames": 22487040,
+   "train_minutes": 30.01,
+   "startup_seconds": 37.5,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.16015625,
+    "mpjpe_l_mm": 72.77768641401926,
+    "mpjpe_g_mm": 278.3426319210859,
+    "first_90pct_40mm_min": null
+   },
+   "curve": [
+    [
+     1.02,
+     0.0078125,
+     134.16
+    ],
+    [
+     2.0,
+     0.01171875,
+     127.2
+    ],
+    [
+     5.0,
+     0.00390625,
+     76.21
+    ],
+    [
+     10.03,
+     0.00390625,
+     51.82
+    ],
+    [
+     15.03,
+     0.00390625,
+     65.61
+    ],
+    [
+     20.0,
+     0.01953125,
+     68.53
+    ],
+    [
+     30.01,
+     0.16015625,
+     72.78
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.12038371145961194,
+    "mpjpe_l_mm": 71.65640553340256,
+    "mpjpe_g_mm": 304.3421835573353,
+    "curve": [
+     [
+      1.02,
+      0.011287899217937358,
+      135.59
+     ],
+     [
+      2.0,
+      0.013399083098971375,
+      117.21
+     ],
+     [
+      5.0,
+      0.00214200408367685,
+      98.86
+     ],
+     [
+      10.03,
+      0.0009708363832492199,
+      75.93
+     ],
+     [
+      15.03,
+      0.001194282852179902,
+      67.64
+     ],
+     [
+      20.0,
+      0.016835535693386163,
+      68.46
+     ],
+     [
+      30.01,
+      0.12038371145961194,
+      71.66
+     ]
+    ]
+   },
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "rtx4080",
+   "dataset": "bones_seed",
+   "learner": "svg",
+   "interface": "explicit",
+   "status": "completed",
+   "gpu": "NVIDIA GeForce RTX 4080",
+   "profile": "standard",
+   "num_envs": 4096,
+   "frames": 32858112,
+   "train_minutes": 30.0,
+   "startup_seconds": 40.3,
+   "encoder_updates": null,
+   "source_sha256": "aebdefbd8015789bd383d7897372136a2d6d0c55fb721bfc3c6d6fb7ecd7fc24",
+   "board256": {
+    "success": 1.0,
+    "mpjpe_l_mm": 18.233910680905744,
+    "mpjpe_g_mm": 89.61707197572575,
+    "first_90pct_40mm_min": 10.0
+   },
+   "curve": [
+    [
+     2.98,
+     0.015625,
+     110.25
+    ],
+    [
+     5.0,
+     0.4296875,
+     60.97
+    ],
+    [
+     10.0,
+     0.9765625,
+     21.78
+    ],
+    [
+     15.0,
+     0.98828125,
+     19.93
+    ],
+    [
+     20.0,
+     0.99609375,
+     19.15
+    ],
+    [
+     30.0,
+     1.0,
+     18.23
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9966868255728726,
+    "mpjpe_l_mm": 17.51917917293878,
+    "mpjpe_g_mm": 99.57627228166604,
+    "curve": [
+     [
+      2.98,
+      0.0132372770346368,
+      102.07
+     ],
+     [
+      5.0,
+      0.4046230288383961,
+      59.51
+     ],
+     [
+      10.0,
+      0.9777940458471035,
+      20.9
+     ],
+     [
+      15.0,
+      0.9919328114943893,
+      19.34
+     ],
+     [
+      20.0,
+      0.9948299120822444,
+      18.5
+     ],
+     [
+      30.0,
+      0.9966868255728726,
+      17.52
+     ]
+    ]
+   },
+   "revision": "fb4b33d",
+   "rerun": false
+  },
+  {
+   "tier": "rtx4080",
+   "dataset": "bones_seed",
+   "learner": "svg",
+   "interface": "fsq",
+   "status": "completed",
+   "gpu": "NVIDIA GeForce RTX 4080",
+   "profile": "small",
+   "num_envs": 1024,
+   "frames": 8639488,
+   "train_minutes": 30.0,
+   "startup_seconds": 39.7,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.9765625,
+    "mpjpe_l_mm": 27.494568614629,
+    "mpjpe_g_mm": 144.0395689144224,
+    "first_90pct_40mm_min": 10.0
+   },
+   "curve": [
+    [
+     1.56,
+     0.015625,
+     110.42
+    ],
+    [
+     2.0,
+     0.015625,
+     110.92
+    ],
+    [
+     5.0,
+     0.93359375,
+     45.53
+    ],
+    [
+     10.0,
+     0.96875,
+     32.67
+    ],
+    [
+     15.0,
+     0.97265625,
+     29.38
+    ],
+    [
+     20.0,
+     0.9765625,
+     28.4
+    ],
+    [
+     30.0,
+     0.9765625,
+     27.49
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9713911463089421,
+    "mpjpe_l_mm": 25.707143092084852,
+    "mpjpe_g_mm": 148.17874044255652,
+    "curve": [
+     [
+      1.56,
+      0.01324498208529751,
+      102.16
+     ],
+     [
+      2.0,
+      0.0132372770346368,
+      102.48
+     ],
+     [
+      5.0,
+      0.9249682151982398,
+      44.11
+     ],
+     [
+      10.0,
+      0.9537157597373538,
+      30.53
+     ],
+     [
+      15.0,
+      0.9644874184778348,
+      28.42
+     ],
+     [
+      20.0,
+      0.9677004293575765,
+      27.0
+     ],
+     [
+      30.0,
+      0.9713911463089421,
+      25.71
+     ]
+    ]
+   },
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "rtx4080",
+   "dataset": "bones_seed",
+   "learner": "svg",
+   "interface": "spectral",
+   "status": "completed",
+   "gpu": "NVIDIA GeForce RTX 4080",
+   "profile": "small",
+   "num_envs": 1024,
+   "frames": 8790016,
+   "train_minutes": 30.0,
+   "startup_seconds": 39.8,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.9765625,
+    "mpjpe_l_mm": 25.906488574752174,
+    "mpjpe_g_mm": 131.91109677496254,
+    "first_90pct_40mm_min": 10.0
+   },
+   "curve": [
+    [
+     1.43,
+     0.015625,
+     110.35
+    ],
+    [
+     2.0,
+     0.015625,
+     110.94
+    ],
+    [
+     5.0,
+     0.93359375,
+     44.08
+    ],
+    [
+     10.0,
+     0.96875,
+     31.74
+    ],
+    [
+     15.0,
+     0.9609375,
+     28.45
+    ],
+    [
+     20.0,
+     0.98046875,
+     27.49
+    ],
+    [
+     30.0,
+     0.9765625,
+     25.91
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9712986856330437,
+    "mpjpe_l_mm": 24.826808131134,
+    "mpjpe_g_mm": 142.6593025352302,
+    "curve": [
+     [
+      1.43,
+      0.013252687135958216,
+      102.17
+     ],
+     [
+      2.0,
+      0.013198751782911059,
+      102.45
+     ],
+     [
+      5.0,
+      0.9265323393668288,
+      42.48
+     ],
+     [
+      10.0,
+      0.9569287684099073,
+      30.4
+     ],
+     [
+      15.0,
+      0.9629078863071873,
+      26.98
+     ],
+     [
+      20.0,
+      0.9673768157863827,
+      26.3
+     ],
+     [
+      30.0,
+      0.9712986856330437,
+      24.83
+     ]
+    ]
+   },
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "rtx4080",
+   "dataset": "bones_seed",
+   "learner": "diffsr",
+   "interface": "explicit",
+   "status": "completed",
+   "gpu": "NVIDIA GeForce RTX 4080",
+   "profile": "standard",
+   "num_envs": 4096,
+   "frames": 27185152,
+   "train_minutes": 30.01,
+   "startup_seconds": 40.8,
+   "encoder_updates": null,
+   "source_sha256": "aebdefbd8015789bd383d7897372136a2d6d0c55fb721bfc3c6d6fb7ecd7fc24",
+   "board256": {
+    "success": 0.99609375,
+    "mpjpe_l_mm": 18.371224797345583,
+    "mpjpe_g_mm": 88.9122311492675,
+    "first_90pct_40mm_min": 10.0
+   },
+   "curve": [
+    [
+     1.0,
+     0.015625,
+     110.33
+    ],
+    [
+     2.0,
+     0.015625,
+     112.51
+    ],
+    [
+     5.0,
+     0.96484375,
+     46.95
+    ],
+    [
+     10.0,
+     0.98046875,
+     25.05
+    ],
+    [
+     15.01,
+     0.9921875,
+     21.99
+    ],
+    [
+     20.0,
+     0.9921875,
+     19.79
+    ],
+    [
+     30.01,
+     0.99609375,
+     18.37
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9973725766211045,
+    "mpjpe_l_mm": 17.593020682013417,
+    "mpjpe_g_mm": 100.79452741565609,
+    "curve": [
+     [
+      1.0,
+      0.013252687135958216,
+      102.05
+     ],
+     [
+      2.0,
+      0.013576299263248251,
+      103.14
+     ],
+     [
+      5.0,
+      0.9511499760119404,
+      44.9
+     ],
+     [
+      10.0,
+      0.9880032328104952,
+      24.73
+     ],
+     [
+      15.01,
+      0.9902454045280248,
+      20.73
+     ],
+     [
+      20.0,
+      0.995692874473476,
+      18.74
+     ],
+     [
+      30.01,
+      0.9973725766211045,
+      17.59
+     ]
+    ]
+   },
+   "revision": "fb4b33d",
+   "rerun": false
+  },
+  {
+   "tier": "rtx4080",
+   "dataset": "bones_seed",
+   "learner": "diffsr",
+   "interface": "fsq",
+   "status": "completed",
+   "gpu": "NVIDIA GeForce RTX 4080",
+   "profile": "small",
+   "num_envs": 1024,
+   "frames": 9105408,
+   "train_minutes": 30.0,
+   "startup_seconds": 40.0,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.98828125,
+    "mpjpe_l_mm": 26.16253756055137,
+    "mpjpe_g_mm": 129.65263567392188,
+    "first_90pct_40mm_min": 10.0
+   },
+   "curve": [
+    [
+     1.01,
+     0.015625,
+     110.6
+    ],
+    [
+     2.01,
+     0.015625,
+     110.09
+    ],
+    [
+     5.0,
+     0.9453125,
+     50.82
+    ],
+    [
+     10.0,
+     0.9765625,
+     33.05
+    ],
+    [
+     15.0,
+     0.984375,
+     30.79
+    ],
+    [
+     20.0,
+     0.984375,
+     28.39
+    ],
+    [
+     30.0,
+     0.98828125,
+     26.16
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9831952849847857,
+    "mpjpe_l_mm": 25.746710250189842,
+    "mpjpe_g_mm": 136.96087668440077,
+    "curve": [
+     [
+      1.01,
+      0.013275802287940341,
+      102.37
+     ],
+     [
+      2.01,
+      0.01326039218615922,
+      100.55
+     ],
+     [
+      5.0,
+      0.9569672925876314,
+      51.43
+     ],
+     [
+      10.0,
+      0.9784335661275216,
+      32.25
+     ],
+     [
+      15.0,
+      0.9808221267382646,
+      29.74
+     ],
+     [
+      20.0,
+      0.9824093675422353,
+      28.25
+     ],
+     [
+      30.0,
+      0.9831952849847857,
+      25.75
+     ]
+    ]
+   },
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "rtx4080",
+   "dataset": "bones_seed",
+   "learner": "diffsr",
+   "interface": "spectral",
+   "status": "completed",
+   "gpu": "NVIDIA GeForce RTX 4080",
+   "profile": "small",
+   "num_envs": 1024,
+   "frames": 9204736,
+   "train_minutes": 30.0,
+   "startup_seconds": 39.8,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.9921875,
+    "mpjpe_l_mm": 27.539227342548593,
+    "mpjpe_g_mm": 133.95189851445036,
+    "first_90pct_40mm_min": 10.0
+   },
+   "curve": [
+    [
+     1.01,
+     0.015625,
+     109.97
+    ],
+    [
+     2.0,
+     0.015625,
+     111.66
+    ],
+    [
+     5.0,
+     0.9609375,
+     48.6
+    ],
+    [
+     10.0,
+     0.98046875,
+     34.36
+    ],
+    [
+     15.0,
+     0.984375,
+     30.73
+    ],
+    [
+     20.0,
+     0.98828125,
+     29.53
+    ],
+    [
+     30.0,
+     0.9921875,
+     27.54
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9843972725199914,
+    "mpjpe_l_mm": 26.214817310742966,
+    "mpjpe_g_mm": 137.2941541627947,
+    "curve": [
+     [
+      1.01,
+      0.013291212389261757,
+      101.86
+     ],
+     [
+      2.0,
+      0.013322032591444884,
+      103.46
+     ],
+     [
+      5.0,
+      0.9551566032712667,
+      48.79
+     ],
+     [
+      10.0,
+      0.9760758188539915,
+      32.21
+     ],
+     [
+      15.0,
+      0.9834418450664996,
+      29.33
+     ],
+     [
+      20.0,
+      0.9860923816900837,
+      28.13
+     ],
+     [
+      30.0,
+      0.9843972725199914,
+      26.21
+     ]
+    ]
+   },
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "rtxpro6000",
+   "dataset": "bones_seed",
+   "learner": "supermimic",
+   "interface": "explicit",
+   "status": "completed",
+   "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition MIG 2g.48gb",
+   "profile": "large",
+   "num_envs": 8192,
+   "frames": 78520320,
+   "train_minutes": 30.01,
+   "startup_seconds": 269.4,
+   "encoder_updates": null,
+   "source_sha256": "b59eea6d67b17a41f8e15ee847c90033fb06e7ce40b6d626f01c131f3d4d03a5",
+   "board256": {
+    "success": 0.99609375,
+    "mpjpe_l_mm": 15.797172548124552,
+    "mpjpe_g_mm": 73.42700907047208,
+    "first_90pct_40mm_min": 10.0
+   },
+   "curve": [
+    [
+     3.61,
+     0.015625,
+     110.28
+    ],
+    [
+     5.01,
+     0.03515625,
+     107.04
+    ],
+    [
+     10.01,
+     0.9921875,
+     20.64
+    ],
+    [
+     15.01,
+     0.99609375,
+     17.34
+    ],
+    [
+     20.0,
+     0.99609375,
+     16.58
+    ],
+    [
+     30.01,
+     0.99609375,
+     15.8
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9988442440762626,
+    "mpjpe_l_mm": 15.646920457350415,
+    "mpjpe_g_mm": 78.86369742904863,
+    "curve": [
+     [
+      3.61,
+      0.0132372770346368,
+      102.08
+     ],
+     [
+      5.01,
+      0.03671456638120263,
+      94.94
+     ],
+     [
+      10.01,
+      0.9955310724960682,
+      20.38
+     ],
+     [
+      15.01,
+      0.9977193055762051,
+      16.44
+     ],
+     [
+      20.0,
+      0.9986747301827641,
+      16.05
+     ],
+     [
+      30.01,
+      0.9988442440762626,
+      15.65
+     ]
+    ]
+   },
+   "revision": "fb4b33d",
+   "rerun": false
+  },
+  {
+   "tier": "rtxpro6000",
+   "dataset": "bones_seed",
+   "learner": "supermimic",
+   "interface": "fsq",
+   "status": "completed",
+   "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition MIG 2g.48gb",
+   "profile": "standard",
+   "num_envs": 4096,
+   "frames": 56860672,
+   "train_minutes": 30.01,
+   "startup_seconds": 240.5,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.99609375,
+    "mpjpe_l_mm": 19.81156190630004,
+    "mpjpe_g_mm": 77.25890729623751,
+    "first_90pct_40mm_min": 10.0
+   },
+   "curve": [
+    [
+     3.57,
+     0.015625,
+     110.43
+    ],
+    [
+     5.0,
+     0.890625,
+     71.17
+    ],
+    [
+     10.0,
+     0.98046875,
+     25.24
+    ],
+    [
+     15.0,
+     0.98828125,
+     22.16
+    ],
+    [
+     20.0,
+     0.99609375,
+     20.75
+    ],
+    [
+     30.01,
+     0.99609375,
+     19.81
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9968717488319632,
+    "mpjpe_l_mm": 18.757418214694777,
+    "mpjpe_g_mm": 86.98422757083894,
+    "curve": [
+     [
+      3.57,
+      0.013260392186618924,
+      102.21
+     ],
+     [
+      5.0,
+      0.8970065883776897,
+      68.16
+     ],
+     [
+      10.0,
+      0.9888507924016702,
+      25.41
+     ],
+     [
+      15.0,
+      0.9947143383655672,
+      21.77
+     ],
+     [
+      20.0,
+      0.9959856692455158,
+      20.15
+     ],
+     [
+      30.01,
+      0.9968717488319632,
+      18.76
+     ]
+    ]
+   },
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "rtxpro6000",
+   "dataset": "bones_seed",
+   "learner": "supermimic",
+   "interface": "spectral",
+   "status": "completed",
+   "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition MIG 2g.48gb",
+   "profile": "standard",
+   "num_envs": 4096,
+   "frames": 57634816,
+   "train_minutes": 30.01,
+   "startup_seconds": 244.0,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.99609375,
+    "mpjpe_l_mm": 19.08450405667106,
+    "mpjpe_g_mm": 75.56794213009779,
+    "first_90pct_40mm_min": 10.0
+   },
+   "curve": [
+    [
+     3.59,
+     0.015625,
+     110.32
+    ],
+    [
+     5.0,
+     0.93359375,
+     70.37
+    ],
+    [
+     10.01,
+     0.984375,
+     24.74
+    ],
+    [
+     15.0,
+     0.98828125,
+     21.99
+    ],
+    [
+     20.0,
+     0.99609375,
+     20.47
+    ],
+    [
+     30.01,
+     0.99609375,
+     19.08
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.996887156890051,
+    "mpjpe_l_mm": 17.88792323264875,
+    "mpjpe_g_mm": 83.22886599199232,
+    "curve": [
+     [
+      3.59,
+      0.013260392186618924,
+      102.17
+     ],
+     [
+      5.0,
+      0.9194051701326227,
+      67.07
+     ],
+     [
+      10.01,
+      0.9889663653146478,
+      24.31
+     ],
+     [
+      15.0,
+      0.9922641269294609,
+      21.1
+     ],
+     [
+      20.0,
+      0.9956851730734476,
+      19.48
+     ],
+     [
+      30.01,
+      0.996887156890051,
+      17.89
+     ]
+    ]
+   },
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "rtxpro6000",
+   "dataset": "bones_seed",
+   "learner": "ppo",
+   "interface": "explicit",
+   "status": "completed",
+   "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition MIG 2g.48gb",
+   "profile": "standard",
+   "num_envs": 4096,
+   "frames": 171638784,
+   "train_minutes": 30.0,
+   "startup_seconds": 272.5,
+   "encoder_updates": null,
+   "source_sha256": "b59eea6d67b17a41f8e15ee847c90033fb06e7ce40b6d626f01c131f3d4d03a5",
+   "board256": {
+    "success": 0.92578125,
+    "mpjpe_l_mm": 59.8636143905905,
+    "mpjpe_g_mm": 630.8900110777925,
+    "first_90pct_40mm_min": null
+   },
+   "curve": [
+    [
+     1.0,
+     0.01171875,
+     129.38
+    ],
+    [
+     2.0,
+     0.015625,
+     95.72
+    ],
+    [
+     5.0,
+     0.01171875,
+     59.01
+    ],
+    [
+     10.01,
+     0.53515625,
+     58.17
+    ],
+    [
+     15.02,
+     0.80078125,
+     60.62
+    ],
+    [
+     20.0,
+     0.8984375,
+     59.62
+    ],
+    [
+     30.0,
+     0.92578125,
+     59.86
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9119004539079061,
+    "mpjpe_l_mm": 58.84499107352251,
+    "mpjpe_g_mm": 638.7900823231615,
+    "curve": [
+     [
+      1.0,
+      0.01103363254613399,
+      112.38
+     ],
+     [
+      2.0,
+      0.010971992140848326,
+      87.32
+     ],
+     [
+      5.0,
+      0.013853681088611541,
+      60.76
+     ],
+     [
+      10.01,
+      0.4904110650901972,
+      59.24
+     ],
+     [
+      15.02,
+      0.7942520323862219,
+      59.97
+     ],
+     [
+      20.0,
+      0.8586046143530991,
+      58.34
+     ],
+     [
+      30.0,
+      0.9119004539079061,
+      58.84
+     ]
+    ]
+   },
+   "revision": "fb4b33d",
+   "rerun": false
+  },
+  {
+   "tier": "rtxpro6000",
+   "dataset": "bones_seed",
+   "learner": "ppo",
+   "interface": "fsq",
+   "status": "completed",
+   "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition MIG 2g.48gb",
+   "profile": "standard",
+   "num_envs": 4096,
+   "frames": 107151360,
+   "train_minutes": 30.0,
+   "startup_seconds": 165.2,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.91015625,
+    "mpjpe_l_mm": 69.92078197250069,
+    "mpjpe_g_mm": 655.0542266203124,
+    "first_90pct_40mm_min": null
+   },
+   "curve": [
+    [
+     1.02,
+     0.01171875,
+     129.45
+    ],
+    [
+     2.02,
+     0.01171875,
+     106.17
+    ],
+    [
+     5.01,
+     0.015625,
+     77.8
+    ],
+    [
+     10.01,
+     0.17578125,
+     74.81
+    ],
+    [
+     15.01,
+     0.72265625,
+     70.07
+    ],
+    [
+     20.02,
+     0.875,
+     72.86
+    ],
+    [
+     30.0,
+     0.91015625,
+     69.92
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.8992718694013215,
+    "mpjpe_l_mm": 68.569063597063,
+    "mpjpe_g_mm": 661.8998497332663,
+    "curve": [
+     [
+      1.02,
+      0.012197095195900913,
+      129.09
+     ],
+     [
+      2.02,
+      0.011580691143044266,
+      108.56
+     ],
+     [
+      5.01,
+      0.013391378048080814,
+      71.15
+     ],
+     [
+      10.01,
+      0.13768925504823465,
+      72.36
+     ],
+     [
+      15.01,
+      0.7379820452194972,
+      69.41
+     ],
+     [
+      20.02,
+      0.8533112459085928,
+      71.72
+     ],
+     [
+      30.0,
+      0.8992718694013215,
+      68.57
+     ]
+    ]
+   },
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "rtxpro6000",
+   "dataset": "bones_seed",
+   "learner": "ppo",
+   "interface": "spectral",
+   "status": "completed",
+   "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition MIG 2g.48gb",
+   "profile": "standard",
+   "num_envs": 4096,
+   "frames": 108036096,
+   "train_minutes": 30.01,
+   "startup_seconds": 163.8,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.91796875,
+    "mpjpe_l_mm": 69.19387007385541,
+    "mpjpe_g_mm": 668.111081122644,
+    "first_90pct_40mm_min": null
+   },
+   "curve": [
+    [
+     1.01,
+     0.015625,
+     142.42
+    ],
+    [
+     2.02,
+     0.015625,
+     120.16
+    ],
+    [
+     5.0,
+     0.015625,
+     75.35
+    ],
+    [
+     10.01,
+     0.2109375,
+     74.9
+    ],
+    [
+     15.01,
+     0.73046875,
+     72.18
+    ],
+    [
+     20.03,
+     0.8671875,
+     72.54
+    ],
+    [
+     30.01,
+     0.91796875,
+     69.19
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9020302800568786,
+    "mpjpe_l_mm": 67.7975450760935,
+    "mpjpe_g_mm": 669.4335194545637,
+    "curve": [
+     [
+      1.01,
+      0.012135454790615249,
+      125.47
+     ],
+     [
+      2.02,
+      0.012358901259775783,
+      99.56
+     ],
+     [
+      5.0,
+      0.013807450783529199,
+      66.02
+     ],
+     [
+      10.01,
+      0.188604230125168,
+      75.13
+     ],
+     [
+      15.01,
+      0.7384828762473176,
+      71.43
+     ],
+     [
+      20.03,
+      0.8398428198566247,
+      72.5
+     ],
+     [
+      30.01,
+      0.9020302800568786,
+      67.8
+     ]
+    ]
+   },
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "rtxpro6000",
+   "dataset": "bones_seed",
+   "learner": "svg",
+   "interface": "explicit",
+   "status": "completed",
+   "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition MIG 2g.48gb",
+   "profile": "large",
+   "num_envs": 8192,
+   "frames": 28860416,
+   "train_minutes": 30.01,
+   "startup_seconds": 192.0,
+   "encoder_updates": null,
+   "source_sha256": "b59eea6d67b17a41f8e15ee847c90033fb06e7ce40b6d626f01c131f3d4d03a5",
+   "board256": {
+    "success": 0.9921875,
+    "mpjpe_l_mm": 18.054654602985163,
+    "mpjpe_g_mm": 84.61566092461322,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     5.21,
+     0.015625,
+     110.29
+    ],
+    [
+     10.0,
+     0.76953125,
+     52.36
+    ],
+    [
+     15.01,
+     0.97265625,
+     24.76
+    ],
+    [
+     20.01,
+     0.98046875,
+     20.5
+    ],
+    [
+     30.01,
+     0.9921875,
+     18.05
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9946603968812416,
+    "mpjpe_l_mm": 17.296040943989937,
+    "mpjpe_g_mm": 94.18765284950122,
+    "curve": [
+     [
+      5.21,
+      0.0132372770346368,
+      102.09
+     ],
+     [
+      10.0,
+      0.7656200611357578,
+      51.16
+     ],
+     [
+      15.01,
+      0.9756135157743937,
+      22.51
+     ],
+     [
+      20.01,
+      0.9878029076230174,
+      19.34
+     ],
+     [
+      30.01,
+      0.9946603968812416,
+      17.3
+     ]
+    ]
+   },
+   "revision": "fb4b33d",
+   "rerun": false
+  },
+  {
+   "tier": "rtxpro6000",
+   "dataset": "bones_seed",
+   "learner": "svg",
+   "interface": "fsq",
+   "status": "completed",
+   "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition MIG 2g.48gb",
+   "profile": "standard",
+   "num_envs": 4096,
+   "frames": 12574720,
+   "train_minutes": 30.01,
+   "startup_seconds": 253.5,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.98046875,
+    "mpjpe_l_mm": 24.71290263837105,
+    "mpjpe_g_mm": 123.84031539595463,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     5.44,
+     0.015625,
+     110.22
+    ],
+    [
+     10.01,
+     0.22265625,
+     79.54
+    ],
+    [
+     15.01,
+     0.96875,
+     33.91
+    ],
+    [
+     20.01,
+     0.9765625,
+     27.77
+    ],
+    [
+     30.01,
+     0.98046875,
+     24.71
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9766768105863979,
+    "mpjpe_l_mm": 24.0720190415444,
+    "mpjpe_g_mm": 125.95872403309653,
+    "curve": [
+     [
+      5.44,
+      0.013221866933315384,
+      102.11
+     ],
+     [
+      10.01,
+      0.23257695500004358,
+      73.91
+     ],
+     [
+      15.01,
+      0.9655121900117989,
+      32.9
+     ],
+     [
+      20.01,
+      0.9719767296553512,
+      26.24
+     ],
+     [
+      30.01,
+      0.9766768105863979,
+      24.07
+     ]
+    ]
+   },
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "rtxpro6000",
+   "dataset": "bones_seed",
+   "learner": "svg",
+   "interface": "spectral",
+   "status": "completed",
+   "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition MIG 2g.48gb",
+   "profile": "standard",
+   "num_envs": 4096,
+   "frames": 12496896,
+   "train_minutes": 30.01,
+   "startup_seconds": 195.8,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.98046875,
+    "mpjpe_l_mm": 24.58540227421427,
+    "mpjpe_g_mm": 110.49330552061537,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     5.4,
+     0.015625,
+     110.28
+    ],
+    [
+     10.01,
+     0.15625,
+     82.53
+    ],
+    [
+     15.0,
+     0.96875,
+     34.76
+    ],
+    [
+     20.0,
+     0.9765625,
+     27.5
+    ],
+    [
+     30.01,
+     0.98046875,
+     24.59
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9759294199365798,
+    "mpjpe_l_mm": 23.44693636399406,
+    "mpjpe_g_mm": 121.84312481915298,
+    "curve": [
+     [
+      5.4,
+      0.0132372770346368,
+      102.08
+     ],
+     [
+      10.01,
+      0.1374581038832467,
+      78.4
+     ],
+     [
+      15.0,
+      0.9589783128133543,
+      32.66
+     ],
+     [
+      20.0,
+      0.9715375405961267,
+      26.42
+     ],
+     [
+      30.01,
+      0.9759294199365798,
+      23.45
+     ]
+    ]
+   },
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "rtxpro6000",
+   "dataset": "bones_seed",
+   "learner": "diffsr",
+   "interface": "explicit",
+   "status": "completed",
+   "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition MIG 2g.48gb",
+   "profile": "large",
+   "num_envs": 8192,
+   "frames": 26525696,
+   "train_minutes": 30.01,
+   "startup_seconds": 178.1,
+   "encoder_updates": null,
+   "source_sha256": "b59eea6d67b17a41f8e15ee847c90033fb06e7ce40b6d626f01c131f3d4d03a5",
+   "board256": {
+    "success": 0.99609375,
+    "mpjpe_l_mm": 21.29057598797848,
+    "mpjpe_g_mm": 96.50224803922464,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     3.5,
+     0.015625,
+     110.54
+    ],
+    [
+     5.01,
+     0.015625,
+     112.07
+    ],
+    [
+     10.01,
+     0.640625,
+     72.97
+    ],
+    [
+     15.01,
+     0.984375,
+     31.61
+    ],
+    [
+     20.01,
+     0.98828125,
+     25.0
+    ],
+    [
+     30.01,
+     0.99609375,
+     21.29
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9953384441863169,
+    "mpjpe_l_mm": 19.294792885640398,
+    "mpjpe_g_mm": 108.1376474086973,
+    "curve": [
+     [
+      3.5,
+      0.013275802287940341,
+      102.31
+     ],
+     [
+      5.01,
+      0.013375967947877493,
+      102.81
+     ],
+     [
+      10.01,
+      0.5946064663070209,
+      70.11
+     ],
+     [
+      15.01,
+      0.9767923903648055,
+      30.41
+     ],
+     [
+      20.01,
+      0.9891898134591771,
+      23.91
+     ],
+     [
+      30.01,
+      0.9953384441863169,
+      19.29
+     ]
+    ]
+   },
+   "revision": "fb4b33d",
+   "rerun": false
+  },
+  {
+   "tier": "rtxpro6000",
+   "dataset": "bones_seed",
+   "learner": "diffsr",
+   "interface": "fsq",
+   "status": "completed",
+   "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition MIG 2g.48gb",
+   "profile": "standard",
+   "num_envs": 4096,
+   "frames": 15892480,
+   "train_minutes": 30.01,
+   "startup_seconds": 240.1,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.984375,
+    "mpjpe_l_mm": 25.09670493345176,
+    "mpjpe_g_mm": 114.7859728670788,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     3.47,
+     0.015625,
+     110.63
+    ],
+    [
+     5.01,
+     0.015625,
+     111.85
+    ],
+    [
+     10.01,
+     0.9453125,
+     57.61
+    ],
+    [
+     15.0,
+     0.9765625,
+     33.38
+    ],
+    [
+     20.01,
+     0.97265625,
+     28.04
+    ],
+    [
+     30.01,
+     0.984375,
+     25.1
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9862850081205561,
+    "mpjpe_l_mm": 25.260101709653707,
+    "mpjpe_g_mm": 124.95631816687283,
+    "curve": [
+     [
+      3.47,
+      0.013260392186618924,
+      102.34
+     ],
+     [
+      5.01,
+      0.013314327542821679,
+      102.84
+     ],
+     [
+      10.01,
+      0.9215702875289582,
+      55.2
+     ],
+     [
+      15.0,
+      0.9801594978034297,
+      31.78
+     ],
+     [
+      20.01,
+      0.9817621425790211,
+      28.13
+     ],
+     [
+      30.01,
+      0.9862850081205561,
+      25.26
+     ]
+    ]
+   },
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "rtxpro6000",
+   "dataset": "bones_seed",
+   "learner": "diffsr",
+   "interface": "spectral",
+   "status": "completed",
+   "gpu": "NVIDIA RTX PRO 6000 Blackwell Server Edition MIG 2g.48gb",
+   "profile": "standard",
+   "num_envs": 4096,
+   "frames": 13508608,
+   "train_minutes": 30.01,
+   "startup_seconds": 188.0,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.984375,
+    "mpjpe_l_mm": 26.578837374756123,
+    "mpjpe_g_mm": 120.45418669732514,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     3.73,
+     0.015625,
+     110.6
+    ],
+    [
+     5.01,
+     0.015625,
+     113.05
+    ],
+    [
+     10.01,
+     0.54296875,
+     76.12
+    ],
+    [
+     15.0,
+     0.98046875,
+     39.47
+    ],
+    [
+     20.0,
+     0.984375,
+     31.29
+    ],
+    [
+     30.01,
+     0.984375,
+     26.58
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9845436691503043,
+    "mpjpe_l_mm": 25.7133688045032,
+    "mpjpe_g_mm": 130.8076781091249,
+    "curve": [
+     [
+      3.73,
+      0.013221866933315384,
+      102.27
+     ],
+     [
+      5.01,
+      0.013322032591904589,
+      104.47
+     ],
+     [
+      10.01,
+      0.5160457680909389,
+      72.07
+     ],
+     [
+      15.0,
+      0.9712755732320097,
+      37.33
+     ],
+     [
+      20.0,
+      0.976314677059887,
+      29.44
+     ],
+     [
+      30.01,
+      0.9845436691503043,
+      25.71
+     ]
+    ]
+   },
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "h100",
+   "dataset": "bones_seed",
+   "learner": "supermimic",
+   "interface": "explicit",
+   "status": "completed",
+   "gpu": "NVIDIA H100 80GB HBM3",
+   "profile": "xlarge",
+   "num_envs": 16384,
+   "frames": 176668672,
+   "train_minutes": 30.01,
+   "startup_seconds": 277.2,
+   "encoder_updates": null,
+   "source_sha256": "b59eea6d67b17a41f8e15ee847c90033fb06e7ce40b6d626f01c131f3d4d03a5",
+   "board256": {
+    "success": 0.99609375,
+    "mpjpe_l_mm": 14.7014805886956,
+    "mpjpe_g_mm": 64.49846001114545,
+    "first_90pct_40mm_min": 10.0
+   },
+   "curve": [
+    [
+     3.75,
+     0.015625,
+     110.3
+    ],
+    [
+     5.01,
+     0.03515625,
+     106.27
+    ],
+    [
+     10.01,
+     0.9921875,
+     17.79
+    ],
+    [
+     15.01,
+     0.99609375,
+     15.86
+    ],
+    [
+     20.0,
+     1.0,
+     15.79
+    ],
+    [
+     30.01,
+     0.99609375,
+     14.7
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9990908040220364,
+    "mpjpe_l_mm": 14.381698776059366,
+    "mpjpe_g_mm": 69.03178033598061,
+    "curve": [
+     [
+      3.75,
+      0.0132372770346368,
+      102.15
+     ],
+     [
+      5.01,
+      0.040913818998643825,
+      95.93
+     ],
+     [
+      10.01,
+      0.9973956930805907,
+      17.94
+     ],
+     [
+      15.01,
+      0.9984975132138684,
+      15.22
+     ],
+     [
+      20.0,
+      0.9990060476610693,
+      15.23
+     ],
+     [
+      30.01,
+      0.9990908040220364,
+      14.38
+     ]
+    ]
+   },
+   "revision": "fb4b33d",
+   "rerun": true
+  },
+  {
+   "tier": "h100",
+   "dataset": "bones_seed",
+   "learner": "supermimic",
+   "interface": "fsq",
+   "status": "completed",
+   "gpu": "NVIDIA H100 80GB HBM3",
+   "profile": "large",
+   "num_envs": 8192,
+   "frames": 125542400,
+   "train_minutes": 30.0,
+   "startup_seconds": 242.9,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.9921875,
+    "mpjpe_l_mm": 17.213569190830754,
+    "mpjpe_g_mm": 67.10710383927271,
+    "first_90pct_40mm_min": 10.0
+   },
+   "curve": [
+    [
+     3.76,
+     0.015625,
+     110.26
+    ],
+    [
+     5.0,
+     0.8359375,
+     73.88
+    ],
+    [
+     10.0,
+     0.9921875,
+     23.49
+    ],
+    [
+     15.0,
+     0.9921875,
+     20.24
+    ],
+    [
+     20.0,
+     0.9921875,
+     19.05
+    ],
+    [
+     30.0,
+     0.9921875,
+     17.21
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9974111039856115,
+    "mpjpe_l_mm": 17.259943358407764,
+    "mpjpe_g_mm": 76.26730324031573,
+    "curve": [
+     [
+      3.76,
+      0.01324498208529751,
+      102.15
+     ],
+     [
+      5.0,
+      0.8542974953121997,
+      70.29
+     ],
+     [
+      10.0,
+      0.9940902231323493,
+      22.43
+     ],
+     [
+      15.0,
+      0.9964017407416599,
+      19.5
+     ],
+     [
+      20.0,
+      0.9967176486224484,
+      18.3
+     ],
+     [
+      30.0,
+      0.9974111039856115,
+      17.26
+     ]
+    ]
+   },
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "h100",
+   "dataset": "bones_seed",
+   "learner": "supermimic",
+   "interface": "spectral",
+   "status": "completed",
+   "gpu": "NVIDIA H100 80GB HBM3",
+   "profile": "large",
+   "num_envs": 8192,
+   "frames": 94765056,
+   "train_minutes": 30.0,
+   "startup_seconds": 301.9,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.99609375,
+    "mpjpe_l_mm": 17.83462519667684,
+    "mpjpe_g_mm": 67.4177599371624,
+    "first_90pct_40mm_min": 10.0
+   },
+   "curve": [
+    [
+     3.96,
+     0.015625,
+     110.25
+    ],
+    [
+     5.0,
+     0.015625,
+     110.68
+    ],
+    [
+     10.0,
+     0.984375,
+     24.37
+    ],
+    [
+     15.0,
+     0.9921875,
+     20.98
+    ],
+    [
+     20.05,
+     0.99609375,
+     19.72
+    ],
+    [
+     30.0,
+     0.99609375,
+     17.83
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9972724130737187,
+    "mpjpe_l_mm": 16.89350093255842,
+    "mpjpe_g_mm": 75.04631603610326,
+    "curve": [
+     [
+      3.96,
+      0.013221866933315384,
+      102.1
+     ],
+     [
+      5.0,
+      0.01614208113865583,
+      103.31
+     ],
+     [
+      10.0,
+      0.9897368716202527,
+      24.0
+     ],
+     [
+      15.0,
+      0.9963786288724454,
+      19.83
+     ],
+     [
+      20.05,
+      0.9967330550731375,
+      18.3
+     ],
+     [
+      30.0,
+      0.9972724130737187,
+      16.89
+     ]
+    ]
+   },
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "h100",
+   "dataset": "bones_seed",
+   "learner": "ppo",
+   "interface": "explicit",
+   "status": "completed",
+   "gpu": "NVIDIA H100 80GB HBM3",
+   "profile": "large",
+   "num_envs": 8192,
+   "frames": 263847936,
+   "train_minutes": 30.02,
+   "startup_seconds": 244.7,
+   "encoder_updates": null,
+   "source_sha256": "b59eea6d67b17a41f8e15ee847c90033fb06e7ce40b6d626f01c131f3d4d03a5",
+   "board256": {
+    "success": 0.9375,
+    "mpjpe_l_mm": 53.194986550829086,
+    "mpjpe_g_mm": 581.166749342842,
+    "first_90pct_40mm_min": null
+   },
+   "curve": [
+    [
+     1.0,
+     0.015625,
+     122.23
+    ],
+    [
+     2.02,
+     0.015625,
+     78.55
+    ],
+    [
+     5.01,
+     0.24609375,
+     63.61
+    ],
+    [
+     10.01,
+     0.75,
+     61.56
+    ],
+    [
+     15.02,
+     0.91015625,
+     57.09
+    ],
+    [
+     20.01,
+     0.93359375,
+     54.88
+    ],
+    [
+     30.02,
+     0.9375,
+     53.19
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9390530470464035,
+    "mpjpe_l_mm": 52.150914825449306,
+    "mpjpe_g_mm": 578.8017035864553,
+    "curve": [
+     [
+      1.0,
+      0.011187733559348153,
+      109.54
+     ],
+     [
+      2.02,
+      0.010463458797241592,
+      64.36
+     ],
+     [
+      5.01,
+      0.19717995068708866,
+      63.01
+     ],
+     [
+      10.01,
+      0.7557113722480537,
+      60.33
+     ],
+     [
+      15.02,
+      0.8849250672502565,
+      55.55
+     ],
+     [
+      20.01,
+      0.9138498268348987,
+      53.45
+     ],
+     [
+      30.02,
+      0.9390530470464035,
+      52.15
+     ]
+    ]
+   },
+   "revision": "fb4b33d",
+   "rerun": false
+  },
+  {
+   "tier": "h100",
+   "dataset": "bones_seed",
+   "learner": "ppo",
+   "interface": "fsq",
+   "status": "completed",
+   "gpu": "NVIDIA H100 80GB HBM3",
+   "profile": "large",
+   "num_envs": 8192,
+   "frames": 187957248,
+   "train_minutes": 30.02,
+   "startup_seconds": 217.5,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.94140625,
+    "mpjpe_l_mm": 64.03350315463182,
+    "mpjpe_g_mm": 657.1728389681987,
+    "first_90pct_40mm_min": null
+   },
+   "curve": [
+    [
+     1.02,
+     0.01171875,
+     113.35
+    ],
+    [
+     2.0,
+     0.015625,
+     92.31
+    ],
+    [
+     5.01,
+     0.08984375,
+     65.61
+    ],
+    [
+     10.03,
+     0.76953125,
+     72.69
+    ],
+    [
+     15.0,
+     0.91015625,
+     68.1
+    ],
+    [
+     20.02,
+     0.921875,
+     66.66
+    ],
+    [
+     30.02,
+     0.94140625,
+     64.03
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9314096413491049,
+    "mpjpe_l_mm": 62.787656318305594,
+    "mpjpe_g_mm": 658.7875900566565,
+    "curve": [
+     [
+      1.02,
+      0.012335786107793659,
+      110.99
+     ],
+     [
+      2.0,
+      0.011665446700312054,
+      86.04
+     ],
+     [
+      5.01,
+      0.07864545228441039,
+      64.66
+     ],
+     [
+      10.03,
+      0.7549177498825159,
+      72.24
+     ],
+     [
+      15.0,
+      0.8873136354580257,
+      66.32
+     ],
+     [
+      20.02,
+      0.9186963046240495,
+      65.83
+     ],
+     [
+      30.02,
+      0.9314096413491049,
+      62.79
+     ]
+    ]
+   },
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "h100",
+   "dataset": "bones_seed",
+   "learner": "ppo",
+   "interface": "spectral",
+   "status": "completed",
+   "gpu": "NVIDIA H100 80GB HBM3",
+   "profile": "large",
+   "num_envs": 8192,
+   "frames": 185991168,
+   "train_minutes": 30.0,
+   "startup_seconds": 230.8,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.9375,
+    "mpjpe_l_mm": 64.83670500995967,
+    "mpjpe_g_mm": 666.6756652883656,
+    "first_90pct_40mm_min": null
+   },
+   "curve": [
+    [
+     1.0,
+     0.015625,
+     122.57
+    ],
+    [
+     2.03,
+     0.01171875,
+     88.22
+    ],
+    [
+     5.0,
+     0.05078125,
+     68.45
+    ],
+    [
+     10.03,
+     0.7265625,
+     70.22
+    ],
+    [
+     15.03,
+     0.88671875,
+     68.59
+    ],
+    [
+     20.03,
+     0.91796875,
+     67.77
+    ],
+    [
+     30.0,
+     0.9375,
+     64.84
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9297915771676492,
+    "mpjpe_l_mm": 64.62865625349886,
+    "mpjpe_g_mm": 670.4823325675126,
+    "curve": [
+     [
+      1.0,
+      0.012543822475632778,
+      110.21
+     ],
+     [
+      2.03,
+      0.011873483068151173,
+      84.75
+     ],
+     [
+      5.0,
+      0.04005855834520238,
+      67.07
+     ],
+     [
+      10.03,
+      0.739800440118342,
+      70.08
+     ],
+     [
+      15.03,
+      0.8822282983593853,
+      67.34
+     ],
+     [
+      20.03,
+      0.9107138757901883,
+      66.33
+     ],
+     [
+      30.0,
+      0.9297915771676492,
+      64.63
+     ]
+    ]
+   },
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "h100",
+   "dataset": "bones_seed",
+   "learner": "svg",
+   "interface": "explicit",
+   "status": "completed",
+   "gpu": "NVIDIA H100 80GB HBM3",
+   "profile": "xlarge",
+   "num_envs": 16384,
+   "frames": 67649536,
+   "train_minutes": 30.0,
+   "startup_seconds": 267.2,
+   "encoder_updates": null,
+   "source_sha256": "b59eea6d67b17a41f8e15ee847c90033fb06e7ce40b6d626f01c131f3d4d03a5",
+   "board256": {
+    "success": 0.99609375,
+    "mpjpe_l_mm": 16.28969974202962,
+    "mpjpe_g_mm": 67.96722556735465,
+    "first_90pct_40mm_min": 10.0
+   },
+   "curve": [
+    [
+     5.11,
+     0.015625,
+     110.22
+    ],
+    [
+     10.01,
+     0.94140625,
+     37.88
+    ],
+    [
+     15.01,
+     0.984375,
+     20.17
+    ],
+    [
+     20.01,
+     0.9921875,
+     17.89
+    ],
+    [
+     30.0,
+     0.99609375,
+     16.29
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9976807779118033,
+    "mpjpe_l_mm": 15.147754294401896,
+    "mpjpe_g_mm": 73.0634565371362,
+    "curve": [
+     [
+      5.11,
+      0.01324498208529751,
+      102.07
+     ],
+     [
+      10.01,
+      0.9395076469826341,
+      36.36
+     ],
+     [
+      15.01,
+      0.9877412672177317,
+      18.96
+     ],
+     [
+      20.01,
+      0.9953384441863169,
+      16.78
+     ],
+     [
+      30.0,
+      0.9976807779118033,
+      15.15
+     ]
+    ]
+   },
+   "revision": "fb4b33d",
+   "rerun": false
+  },
+  {
+   "tier": "h100",
+   "dataset": "bones_seed",
+   "learner": "svg",
+   "interface": "fsq",
+   "status": "completed",
+   "gpu": "NVIDIA H100 80GB HBM3",
+   "profile": "standard",
+   "num_envs": 4096,
+   "frames": 17031168,
+   "train_minutes": 30.01,
+   "startup_seconds": 232.1,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.98046875,
+    "mpjpe_l_mm": 23.792196080633275,
+    "mpjpe_g_mm": 114.46793066581095,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     5.23,
+     0.015625,
+     110.27
+    ],
+    [
+     10.0,
+     0.93359375,
+     50.45
+    ],
+    [
+     15.01,
+     0.96875,
+     28.02
+    ],
+    [
+     20.0,
+     0.96875,
+     25.59
+    ],
+    [
+     30.01,
+     0.98046875,
+     23.79
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9800053965582908,
+    "mpjpe_l_mm": 23.59464093686917,
+    "mpjpe_g_mm": 121.4232491088549,
+    "curve": [
+     [
+      5.23,
+      0.013229571983976092,
+      102.1
+     ],
+     [
+      10.0,
+      0.9312170097887339,
+      48.4
+     ],
+     [
+      15.01,
+      0.9705435916759036,
+      27.37
+     ],
+     [
+      20.0,
+      0.9744962799138986,
+      24.79
+     ],
+     [
+      30.01,
+      0.9800053965582908,
+      23.59
+     ]
+    ]
+   },
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "h100",
+   "dataset": "bones_seed",
+   "learner": "svg",
+   "interface": "spectral",
+   "status": "completed",
+   "gpu": "NVIDIA H100 80GB HBM3",
+   "profile": "standard",
+   "num_envs": 4096,
+   "frames": 15548416,
+   "train_minutes": 30.01,
+   "startup_seconds": 245.0,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.98046875,
+    "mpjpe_l_mm": 23.620275949018936,
+    "mpjpe_g_mm": 110.5588474432724,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     5.35,
+     0.015625,
+     110.26
+    ],
+    [
+     10.0,
+     0.796875,
+     59.04
+    ],
+    [
+     15.0,
+     0.96875,
+     28.63
+    ],
+    [
+     20.0,
+     0.9765625,
+     25.61
+    ],
+    [
+     30.01,
+     0.98046875,
+     23.62
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9773163313986354,
+    "mpjpe_l_mm": 22.74479690093599,
+    "mpjpe_g_mm": 118.82060473222332,
+    "curve": [
+     [
+      5.35,
+      0.013229571983976092,
+      102.07
+     ],
+     [
+      10.0,
+      0.7910390288196856,
+      57.89
+     ],
+     [
+      15.0,
+      0.9650961199191436,
+      27.55
+     ],
+     [
+      20.0,
+      0.9726008366476651,
+      24.79
+     ],
+     [
+      30.01,
+      0.9773163313986354,
+      22.74
+     ]
+    ]
+   },
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "h100",
+   "dataset": "bones_seed",
+   "learner": "diffsr",
+   "interface": "explicit",
+   "status": "completed",
+   "gpu": "NVIDIA H100 80GB HBM3",
+   "profile": "xlarge",
+   "num_envs": 16384,
+   "frames": 69353472,
+   "train_minutes": 30.01,
+   "startup_seconds": 246.1,
+   "encoder_updates": null,
+   "source_sha256": "b59eea6d67b17a41f8e15ee847c90033fb06e7ce40b6d626f01c131f3d4d03a5",
+   "board256": {
+    "success": 0.99609375,
+    "mpjpe_l_mm": 17.399451345042383,
+    "mpjpe_g_mm": 87.62304472087574,
+    "first_90pct_40mm_min": 10.0
+   },
+   "curve": [
+    [
+     2.83,
+     0.015625,
+     110.49
+    ],
+    [
+     5.01,
+     0.015625,
+     110.07
+    ],
+    [
+     10.0,
+     0.96875,
+     35.14
+    ],
+    [
+     15.0,
+     0.98828125,
+     25.27
+    ],
+    [
+     20.0,
+     0.9921875,
+     21.09
+    ],
+    [
+     30.01,
+     0.99609375,
+     17.4
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9974881565354521,
+    "mpjpe_l_mm": 16.427764500762397,
+    "mpjpe_g_mm": 87.06484470174752,
+    "curve": [
+     [
+      2.83,
+      0.013275802287940341,
+      102.31
+     ],
+     [
+      5.01,
+      0.014400739683944017,
+      102.79
+     ],
+     [
+      10.0,
+      0.9660669594212058,
+      34.95
+     ],
+     [
+      15.0,
+      0.9919096983856407,
+      23.71
+     ],
+     [
+      20.0,
+      0.9931810288297546,
+      19.74
+     ],
+     [
+      30.01,
+      0.9974881565354521,
+      16.43
+     ]
+    ]
+   },
+   "revision": "fb4b33d",
+   "rerun": false
+  },
+  {
+   "tier": "h100",
+   "dataset": "bones_seed",
+   "learner": "diffsr",
+   "interface": "fsq",
+   "status": "completed",
+   "gpu": "NVIDIA H100 80GB HBM3",
+   "profile": "standard",
+   "num_envs": 4096,
+   "frames": 17145856,
+   "train_minutes": 30.0,
+   "startup_seconds": 240.9,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.98046875,
+    "mpjpe_l_mm": 24.831799759344836,
+    "mpjpe_g_mm": 116.53684344199442,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     3.55,
+     0.015625,
+     110.51
+    ],
+    [
+     5.01,
+     0.015625,
+     112.12
+    ],
+    [
+     10.0,
+     0.9453125,
+     56.21
+    ],
+    [
+     15.01,
+     0.984375,
+     33.86
+    ],
+    [
+     20.01,
+     0.9765625,
+     29.29
+    ],
+    [
+     30.0,
+     0.98046875,
+     24.83
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9894903100670801,
+    "mpjpe_l_mm": 25.441779695369494,
+    "mpjpe_g_mm": 125.21478827849688,
+    "curve": [
+     [
+      3.55,
+      0.0132372770346368,
+      102.25
+     ],
+     [
+      5.01,
+      0.01330662249193112,
+      104.05
+     ],
+     [
+      10.0,
+      0.9291058289025136,
+      55.62
+     ],
+     [
+      15.01,
+      0.9805678611020854,
+      32.64
+     ],
+     [
+      20.01,
+      0.9835420089137799,
+      28.36
+     ],
+     [
+      30.0,
+      0.9894903100670801,
+      25.44
+     ]
+    ]
+   },
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "h100",
+   "dataset": "bones_seed",
+   "learner": "diffsr",
+   "interface": "spectral",
+   "status": "completed",
+   "gpu": "NVIDIA H100 80GB HBM3",
+   "profile": "standard",
+   "num_envs": 4096,
+   "frames": 18001920,
+   "train_minutes": 30.01,
+   "startup_seconds": 170.5,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.98828125,
+    "mpjpe_l_mm": 23.73344525484628,
+    "mpjpe_g_mm": 105.2525398640498,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     3.43,
+     0.015625,
+     110.51
+    ],
+    [
+     5.0,
+     0.015625,
+     109.26
+    ],
+    [
+     10.01,
+     0.97265625,
+     49.21
+    ],
+    [
+     15.01,
+     0.9765625,
+     30.83
+    ],
+    [
+     20.01,
+     0.984375,
+     28.35
+    ],
+    [
+     30.01,
+     0.98828125,
+     23.73
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.989536543585842,
+    "mpjpe_l_mm": 24.202294975244044,
+    "mpjpe_g_mm": 118.91709585334051,
+    "curve": [
+     [
+      3.43,
+      0.01324498208529751,
+      102.28
+     ],
+     [
+      5.0,
+      0.013322032593482388,
+      100.06
+     ],
+     [
+      10.01,
+      0.9575759934291508,
+      45.84
+     ],
+     [
+      15.01,
+      0.9767153358397014,
+      30.3
+     ],
+     [
+      20.01,
+      0.9831182319991104,
+      27.65
+     ],
+     [
+      30.01,
+      0.989536543585842,
+      24.2
+     ]
+    ]
+   },
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "h200",
+   "dataset": "bones_seed",
+   "learner": "supermimic",
+   "interface": "explicit",
+   "status": "completed",
+   "gpu": "NVIDIA H200",
+   "profile": "xlarge",
+   "num_envs": 16384,
+   "frames": 193576960,
+   "train_minutes": 30.01,
+   "startup_seconds": 315.2,
+   "encoder_updates": null,
+   "source_sha256": "b59eea6d67b17a41f8e15ee847c90033fb06e7ce40b6d626f01c131f3d4d03a5",
+   "board256": {
+    "success": 1.0,
+    "mpjpe_l_mm": 14.594915559566383,
+    "mpjpe_g_mm": 58.54853167563774,
+    "first_90pct_40mm_min": 10.0
+   },
+   "curve": [
+    [
+     3.69,
+     0.015625,
+     110.29
+    ],
+    [
+     5.0,
+     0.69140625,
+     86.71
+    ],
+    [
+     10.0,
+     0.99609375,
+     18.77
+    ],
+    [
+     15.0,
+     0.99609375,
+     16.08
+    ],
+    [
+     20.01,
+     1.0,
+     15.67
+    ],
+    [
+     30.01,
+     1.0,
+     14.59
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9991524477100898,
+    "mpjpe_l_mm": 14.31495744130047,
+    "mpjpe_g_mm": 66.81314898602272,
+    "curve": [
+     [
+      3.69,
+      0.013229571983976092,
+      102.11
+     ],
+     [
+      5.0,
+      0.6164733960677466,
+      85.73
+     ],
+     [
+      10.0,
+      0.9973725807755415,
+      17.45
+     ],
+     [
+      15.0,
+      0.998805714804462,
+      15.01
+     ],
+     [
+      20.01,
+      0.999052277161334,
+      15.2
+     ],
+     [
+      30.01,
+      0.9991524477100898,
+      14.31
+     ]
+    ]
+   },
+   "revision": "fb4b33d",
+   "rerun": false
+  },
+  {
+   "tier": "h200",
+   "dataset": "bones_seed",
+   "learner": "supermimic",
+   "interface": "fsq",
+   "status": "completed",
+   "gpu": "NVIDIA H200",
+   "profile": "xlarge",
+   "num_envs": 16384,
+   "frames": 175325184,
+   "train_minutes": 30.01,
+   "startup_seconds": 295.3,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.9921875,
+    "mpjpe_l_mm": 17.97821809172784,
+    "mpjpe_g_mm": 67.94270040940768,
+    "first_90pct_40mm_min": 10.0
+   },
+   "curve": [
+    [
+     3.9,
+     0.015625,
+     110.35
+    ],
+    [
+     5.01,
+     0.015625,
+     109.59
+    ],
+    [
+     10.0,
+     0.98828125,
+     24.51
+    ],
+    [
+     15.0,
+     0.9921875,
+     21.31
+    ],
+    [
+     20.0,
+     0.9921875,
+     20.38
+    ],
+    [
+     30.01,
+     0.9921875,
+     17.98
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.99761914115715,
+    "mpjpe_l_mm": 17.421146222970854,
+    "mpjpe_g_mm": 74.29188069851922,
+    "curve": [
+     [
+      3.9,
+      0.013252687135958216,
+      102.13
+     ],
+     [
+      5.01,
+      0.014238933620069148,
+      102.09
+     ],
+     [
+      10.0,
+      0.9926108579277951,
+      24.49
+     ],
+     [
+      15.0,
+      0.996347802540102,
+      20.13
+     ],
+     [
+      20.0,
+      0.9972570029723974,
+      18.81
+     ],
+     [
+      30.01,
+      0.99761914115715,
+      17.42
+     ]
+    ]
+   },
+   "revision": "5a626b4",
+   "rerun": true
+  },
+  {
+   "tier": "h200",
+   "dataset": "bones_seed",
+   "learner": "supermimic",
+   "interface": "spectral",
+   "status": "completed",
+   "gpu": "NVIDIA H200",
+   "profile": "xlarge",
+   "num_envs": 16384,
+   "frames": 144261120,
+   "train_minutes": 30.01,
+   "startup_seconds": 184.6,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.99609375,
+    "mpjpe_l_mm": 17.205858853902356,
+    "mpjpe_g_mm": 70.51764321395572,
+    "first_90pct_40mm_min": 10.0
+   },
+   "curve": [
+    [
+     3.7,
+     0.015625,
+     110.32
+    ],
+    [
+     5.0,
+     0.015625,
+     110.31
+    ],
+    [
+     10.0,
+     0.984375,
+     24.91
+    ],
+    [
+     15.0,
+     0.9921875,
+     20.76
+    ],
+    [
+     20.01,
+     1.0,
+     19.62
+    ],
+    [
+     30.01,
+     0.99609375,
+     17.21
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9977038946711843,
+    "mpjpe_l_mm": 16.72307902197041,
+    "mpjpe_g_mm": 72.2820441492228,
+    "curve": [
+     [
+      3.7,
+      0.013252687135958216,
+      102.15
+     ],
+     [
+      5.0,
+      0.022452517629253713,
+      102.63
+     ],
+     [
+      10.0,
+      0.9913780473430136,
+      24.52
+     ],
+     [
+      15.0,
+      0.9967638817733456,
+      19.7
+     ],
+     [
+      20.01,
+      0.9971953609597128,
+      18.11
+     ],
+     [
+      30.01,
+      0.9977038946711843,
+      16.72
+     ]
+    ]
+   },
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "h200",
+   "dataset": "bones_seed",
+   "learner": "ppo",
+   "interface": "explicit",
+   "status": "completed",
+   "gpu": "NVIDIA H200",
+   "profile": "xlarge",
+   "num_envs": 16384,
+   "frames": 351141888,
+   "train_minutes": 30.01,
+   "startup_seconds": 278.2,
+   "encoder_updates": null,
+   "source_sha256": "b59eea6d67b17a41f8e15ee847c90033fb06e7ce40b6d626f01c131f3d4d03a5",
+   "board256": {
+    "success": 0.953125,
+    "mpjpe_l_mm": 53.763701872722436,
+    "mpjpe_g_mm": 501.1935148114321,
+    "first_90pct_40mm_min": null
+   },
+   "curve": [
+    [
+     1.01,
+     0.01171875,
+     108.54
+    ],
+    [
+     2.03,
+     0.01171875,
+     76.05
+    ],
+    [
+     5.03,
+     0.40234375,
+     65.95
+    ],
+    [
+     10.0,
+     0.80859375,
+     65.31
+    ],
+    [
+     15.0,
+     0.921875,
+     62.97
+    ],
+    [
+     20.01,
+     0.95703125,
+     58.62
+    ],
+    [
+     30.01,
+     0.953125,
+     53.76
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9527911547175743,
+    "mpjpe_l_mm": 52.77578710830941,
+    "mpjpe_g_mm": 502.191765190663,
+    "curve": [
+     [
+      1.01,
+      0.012158569942482446,
+      107.81
+     ],
+     [
+      2.03,
+      0.011503640636207332,
+      76.45
+     ],
+     [
+      5.03,
+      0.3886196391121028,
+      65.11
+     ],
+     [
+      10.0,
+      0.7897291709031392,
+      63.9
+     ],
+     [
+      15.0,
+      0.9096659878807819,
+      60.07
+     ],
+     [
+      20.01,
+      0.9318257089268699,
+      56.41
+     ],
+     [
+      30.01,
+      0.9527911547175743,
+      52.78
+     ]
+    ]
+   },
+   "revision": "fb4b33d",
+   "rerun": false
+  },
+  {
+   "tier": "h200",
+   "dataset": "bones_seed",
+   "learner": "ppo",
+   "interface": "fsq",
+   "status": "completed",
+   "gpu": "NVIDIA H200",
+   "profile": "xlarge",
+   "num_envs": 16384,
+   "frames": 272891904,
+   "train_minutes": 30.04,
+   "startup_seconds": 235.6,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.9296875,
+    "mpjpe_l_mm": 65.28444564170869,
+    "mpjpe_g_mm": 648.1840778230977,
+    "first_90pct_40mm_min": null
+   },
+   "curve": [
+    [
+     1.02,
+     0.015625,
+     123.89
+    ],
+    [
+     2.03,
+     0.01171875,
+     89.05
+    ],
+    [
+     5.03,
+     0.38671875,
+     71.88
+    ],
+    [
+     10.03,
+     0.7734375,
+     75.25
+    ],
+    [
+     15.03,
+     0.92578125,
+     74.68
+    ],
+    [
+     20.04,
+     0.94140625,
+     69.82
+    ],
+    [
+     30.04,
+     0.9296875,
+     65.28
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9370420337099918,
+    "mpjpe_l_mm": 63.921489102728465,
+    "mpjpe_g_mm": 656.3932544508494,
+    "curve": [
+     [
+      1.02,
+      0.012628578032900566,
+      111.42
+     ],
+     [
+      2.03,
+      0.012197095195785986,
+      89.82
+     ],
+     [
+      5.03,
+      0.31758677785820105,
+      69.75
+     ],
+     [
+      10.03,
+      0.7642870877315125,
+      73.06
+     ],
+     [
+      15.03,
+      0.90639904249007,
+      71.41
+     ],
+     [
+      20.04,
+      0.9235658961538863,
+      67.53
+     ],
+     [
+      30.04,
+      0.9370420337099918,
+      63.92
+     ]
+    ]
+   },
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "h200",
+   "dataset": "bones_seed",
+   "learner": "ppo",
+   "interface": "spectral",
+   "status": "completed",
+   "gpu": "NVIDIA H200",
+   "profile": "xlarge",
+   "num_envs": 16384,
+   "frames": 227672064,
+   "train_minutes": 30.0,
+   "startup_seconds": 177.3,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.9453125,
+    "mpjpe_l_mm": 69.39004129751933,
+    "mpjpe_g_mm": 641.8928592978147,
+    "first_90pct_40mm_min": null
+   },
+   "curve": [
+    [
+     1.04,
+     0.01171875,
+     105.54
+    ],
+    [
+     2.02,
+     0.01171875,
+     95.85
+    ],
+    [
+     5.0,
+     0.08984375,
+     82.05
+    ],
+    [
+     10.03,
+     0.71875,
+     78.51
+    ],
+    [
+     15.03,
+     0.8515625,
+     77.77
+    ],
+    [
+     20.01,
+     0.921875,
+     73.68
+    ],
+    [
+     30.0,
+     0.9453125,
+     69.39
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9367877642192701,
+    "mpjpe_l_mm": 67.33328413123917,
+    "mpjpe_g_mm": 652.733953857043,
+    "curve": [
+     [
+      1.04,
+      0.012643988134107055,
+      102.73
+     ],
+     [
+      2.02,
+      0.0123743113610972,
+      97.63
+     ],
+     [
+      5.0,
+      0.06739607811809108,
+      77.04
+     ],
+     [
+      10.03,
+      0.7077320186007154,
+      77.22
+     ],
+     [
+      15.03,
+      0.8508995661154299,
+      74.87
+     ],
+     [
+      20.01,
+      0.9180336688118438,
+      71.26
+     ],
+     [
+      30.0,
+      0.9367877642192701,
+      67.33
+     ]
+    ]
+   },
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "h200",
+   "dataset": "bones_seed",
+   "learner": "svg",
+   "interface": "explicit",
+   "status": "completed",
+   "gpu": "NVIDIA H200",
+   "profile": "xlarge",
+   "num_envs": 16384,
+   "frames": 68321280,
+   "train_minutes": 30.01,
+   "startup_seconds": 180.6,
+   "encoder_updates": null,
+   "source_sha256": "b59eea6d67b17a41f8e15ee847c90033fb06e7ce40b6d626f01c131f3d4d03a5",
+   "board256": {
+    "success": 0.9921875,
+    "mpjpe_l_mm": 15.705463591891506,
+    "mpjpe_g_mm": 65.482090370553,
+    "first_90pct_40mm_min": 10.0
+   },
+   "curve": [
+    [
+     5.13,
+     0.015625,
+     110.22
+    ],
+    [
+     10.0,
+     0.93359375,
+     39.68
+    ],
+    [
+     15.01,
+     0.984375,
+     20.4
+    ],
+    [
+     20.0,
+     0.99609375,
+     17.23
+    ],
+    [
+     30.01,
+     0.9921875,
+     15.71
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9975035666367735,
+    "mpjpe_l_mm": 15.215586284676236,
+    "mpjpe_g_mm": 72.6834658351717,
+    "curve": [
+     [
+      5.13,
+      0.01324498208529751,
+      102.12
+     ],
+     [
+      10.0,
+      0.9345301841878466,
+      37.37
+     ],
+     [
+      15.01,
+      0.986886002507926,
+      18.86
+     ],
+     [
+      20.0,
+      0.9950533565081713,
+      16.36
+     ],
+     [
+      30.01,
+      0.9975035666367735,
+      15.22
+     ]
+    ]
+   },
+   "revision": "fb4b33d",
+   "rerun": false
+  },
+  {
+   "tier": "h200",
+   "dataset": "bones_seed",
+   "learner": "svg",
+   "interface": "fsq",
+   "status": "completed",
+   "gpu": "NVIDIA H200",
+   "profile": "xlarge",
+   "num_envs": 16384,
+   "frames": 50724864,
+   "train_minutes": 30.01,
+   "startup_seconds": 257.3,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.98828125,
+    "mpjpe_l_mm": 21.147165921935347,
+    "mpjpe_g_mm": 88.10069698675532,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     5.51,
+     0.015625,
+     110.33
+    ],
+    [
+     10.01,
+     0.25,
+     80.2
+    ],
+    [
+     15.0,
+     0.98046875,
+     32.08
+    ],
+    [
+     20.01,
+     0.98046875,
+     24.2
+    ],
+    [
+     30.01,
+     0.98828125,
+     21.15
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9914936211276606,
+    "mpjpe_l_mm": 20.358979852550956,
+    "mpjpe_g_mm": 93.33902455126992,
+    "curve": [
+     [
+      5.51,
+      0.0132372770346368,
+      102.16
+     ],
+     [
+      10.01,
+      0.23114381518712804,
+      76.06
+     ],
+     [
+      15.0,
+      0.973802826390059,
+      30.86
+     ],
+     [
+      20.01,
+      0.9816080448485746,
+      23.57
+     ],
+     [
+      30.01,
+      0.9914936211276606,
+      20.36
+     ]
+    ]
+   },
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "h200",
+   "dataset": "bones_seed",
+   "learner": "svg",
+   "interface": "spectral",
+   "status": "completed",
+   "gpu": "NVIDIA H200",
+   "profile": "xlarge",
+   "num_envs": 16384,
+   "frames": 63078400,
+   "train_minutes": 30.01,
+   "startup_seconds": 181.2,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.98828125,
+    "mpjpe_l_mm": 19.85792644367076,
+    "mpjpe_g_mm": 77.16003164400985,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     5.29,
+     0.015625,
+     110.35
+    ],
+    [
+     10.0,
+     0.89453125,
+     57.14
+    ],
+    [
+     15.01,
+     0.984375,
+     26.48
+    ],
+    [
+     20.01,
+     0.98828125,
+     22.89
+    ],
+    [
+     30.01,
+     0.98828125,
+     19.86
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9927264296012387,
+    "mpjpe_l_mm": 18.85801318540158,
+    "mpjpe_g_mm": 84.20177349156528,
+    "curve": [
+     [
+      5.29,
+      0.0132372770346368,
+      102.17
+     ],
+     [
+      10.0,
+      0.8954886903866426,
+      55.04
+     ],
+     [
+      15.01,
+      0.9784104464812524,
+      24.78
+     ],
+     [
+      20.01,
+      0.9840813677180607,
+      21.55
+     ],
+     [
+      30.01,
+      0.9927264296012387,
+      18.86
+     ]
+    ]
+   },
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "h200",
+   "dataset": "bones_seed",
+   "learner": "diffsr",
+   "interface": "explicit",
+   "status": "completed",
+   "gpu": "NVIDIA H200",
+   "profile": "xlarge",
+   "num_envs": 16384,
+   "frames": 57475072,
+   "train_minutes": 30.01,
+   "startup_seconds": 180.0,
+   "encoder_updates": null,
+   "source_sha256": "b59eea6d67b17a41f8e15ee847c90033fb06e7ce40b6d626f01c131f3d4d03a5",
+   "board256": {
+    "success": 0.9921875,
+    "mpjpe_l_mm": 19.70066647525248,
+    "mpjpe_g_mm": 82.38865883818963,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     3.51,
+     0.015625,
+     110.53
+    ],
+    [
+     5.0,
+     0.015625,
+     113.48
+    ],
+    [
+     10.0,
+     0.9296875,
+     52.44
+    ],
+    [
+     15.01,
+     0.98828125,
+     27.97
+    ],
+    [
+     20.0,
+     0.98828125,
+     22.82
+    ],
+    [
+     30.01,
+     0.9921875,
+     19.7
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9963632154883564,
+    "mpjpe_l_mm": 17.791693788786645,
+    "mpjpe_g_mm": 93.43096649800006,
+    "curve": [
+     [
+      3.51,
+      0.013275802287940341,
+      102.3
+     ],
+     [
+      5.0,
+      0.013375967948107345,
+      104.48
+     ],
+     [
+      10.0,
+      0.911630771248946,
+      49.25
+     ],
+     [
+      15.01,
+      0.9856377855404255,
+      26.54
+     ],
+     [
+      20.0,
+      0.9916323161260204,
+      21.7
+     ],
+     [
+      30.01,
+      0.9963632154883564,
+      17.79
+     ]
+    ]
+   },
+   "revision": "fb4b33d",
+   "rerun": false
+  },
+  {
+   "tier": "h200",
+   "dataset": "bones_seed",
+   "learner": "diffsr",
+   "interface": "fsq",
+   "status": "completed",
+   "gpu": "NVIDIA H200",
+   "profile": "xlarge",
+   "num_envs": 16384,
+   "frames": 61734912,
+   "train_minutes": 30.0,
+   "startup_seconds": 257.7,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.99609375,
+    "mpjpe_l_mm": 24.25105048629091,
+    "mpjpe_g_mm": 112.06196071381238,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     3.56,
+     0.015625,
+     110.56
+    ],
+    [
+     5.0,
+     0.015625,
+     112.37
+    ],
+    [
+     10.01,
+     0.91796875,
+     61.06
+    ],
+    [
+     15.0,
+     0.98046875,
+     32.72
+    ],
+    [
+     20.01,
+     0.984375,
+     26.94
+    ],
+    [
+     30.0,
+     0.99609375,
+     24.25
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9920406800924356,
+    "mpjpe_l_mm": 23.21206198372989,
+    "mpjpe_g_mm": 108.54026579444114,
+    "curve": [
+     [
+      3.56,
+      0.013229571983976092,
+      102.23
+     ],
+     [
+      5.0,
+      0.013206456831993969,
+      103.52
+     ],
+     [
+      10.01,
+      0.9144431169472926,
+      58.92
+     ],
+     [
+      15.0,
+      0.9795507936111725,
+      31.81
+     ],
+     [
+      20.01,
+      0.9849905641318589,
+      26.1
+     ],
+     [
+      30.0,
+      0.9920406800924356,
+      23.21
+     ]
+    ]
+   },
+   "revision": "5a626b4",
+   "rerun": false
+  },
+  {
+   "tier": "h200",
+   "dataset": "bones_seed",
+   "learner": "diffsr",
+   "interface": "spectral",
+   "status": "completed",
+   "gpu": "NVIDIA H200",
+   "profile": "xlarge",
+   "num_envs": 16384,
+   "frames": 61702144,
+   "train_minutes": 30.01,
+   "startup_seconds": 254.3,
+   "encoder_updates": 10000,
+   "source_sha256": "c0c3a47950b9a36efe79d6ae3193ec6b5f74cdd46c5526bc7fd888b173c87a0a",
+   "board256": {
+    "success": 0.98828125,
+    "mpjpe_l_mm": 23.01408760825293,
+    "mpjpe_g_mm": 94.80155321212008,
+    "first_90pct_40mm_min": 15.0
+   },
+   "curve": [
+    [
+     3.57,
+     0.015625,
+     110.56
+    ],
+    [
+     5.0,
+     0.015625,
+     111.17
+    ],
+    [
+     10.01,
+     0.8203125,
+     65.23
+    ],
+    [
+     15.01,
+     0.984375,
+     34.76
+    ],
+    [
+     20.01,
+     0.984375,
+     28.63
+    ],
+    [
+     30.01,
+     0.98828125,
+     23.01
+    ]
+   ],
+   "full_bank": {
+    "clips": 129785,
+    "success": 0.9901529435522316,
+    "mpjpe_l_mm": 22.764701905883097,
+    "mpjpe_g_mm": 105.16328627536694,
+    "curve": [
+     [
+      3.57,
+      0.013214161882654675,
+      102.23
+     ],
+     [
+      5.0,
+      0.013221866933085531,
+      102.32
+     ],
+     [
+      10.01,
+      0.8012867408444114,
+      63.22
+     ],
+     [
+      15.01,
+      0.979180956205565,
+      34.05
+     ],
+     [
+      20.01,
+      0.9860923860084755,
+      27.56
+     ],
+     [
+      30.01,
+      0.9901529435522316,
+      22.76
+     ]
+    ]
+   },
+   "revision": "5a626b4",
+   "rerun": false
+  }
+ ],
+ "encoders": [
+  {
+   "arm": "bones_seed_fsq",
+   "dataset": "bones_seed",
+   "interface": "fsq",
+   "updates": 10000,
+   "pretrain_wall_seconds": 461.9
+  },
+  {
+   "arm": "bones_seed_spectral",
+   "dataset": "bones_seed",
+   "interface": "spectral",
+   "updates": 10000,
+   "pretrain_wall_seconds": 451.0
+  },
+  {
+   "arm": "lafan1_fsq",
+   "dataset": "lafan1",
+   "interface": "fsq",
+   "updates": 10000,
+   "pretrain_wall_seconds": 406.4
+  },
+  {
+   "arm": "lafan1_spectral",
+   "dataset": "lafan1",
+   "interface": "spectral",
+   "updates": 10000,
+   "pretrain_wall_seconds": 399.7
+  }
+ ]
+}

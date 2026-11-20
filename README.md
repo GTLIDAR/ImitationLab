@@ -66,27 +66,35 @@ Run `imitationlab <command> --help` for the options of a command.
 
 ## Results
 
-Fresh 30-minute runs on one NVIDIA H100 80 GB, seed 42, with the current
-defaults. Each case trains on its motion bank and is evaluated on fixed boards:
-all 40 LAFAN1 clips and 256 fixed BONES-SEED clips, each for up to 10 seconds.
-The ranges cover both banks and all three interfaces.
+30-minute runs on one NVIDIA H100 80 GB, seed 42, with the current defaults.
+Each case trains on its motion bank and is evaluated on fixed boards: all 40
+LAFAN1 clips and 256 fixed BONES-SEED clips, each for up to 10 seconds. The
+ranges cover both banks and all three interfaces.
 
 | Learner | Final success | Final MPJPE-L | First ≥90% success with MPJPE-L ≤40 mm |
 | --- | ---: | ---: | --- |
-| SuperMimic (BPTT) | 99.6–100% | 13.4–19.8 mm | About 10 minutes in all six cases |
-| SVG | 92.5–100% | 13.9–23.6 mm | 10–15 minutes |
-| DiffSR dynamics | 95.0–100% | 15.0–24.2 mm | About 15 minutes |
-| PPO | 85.0–96.1% | 43.8–69.6 mm | Not reached in 30 minutes |
+| SuperMimic (BPTT) | 99.2–100% | 13.1–17.8 mm | About 10 minutes in all six cases |
+| SVG | 98.0–100% | 14.9–23.8 mm | 10–15 minutes |
+| DiffSR dynamics | 97.5–99.6% | 16.3–24.8 mm | 10–15 minutes |
+| PPO | 87.5–94.1% | 48.2–64.8 mm | Not reached in 30 minutes |
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/benchmarks/g1-learning-speed-30min/overview-dark.svg">
-  <img alt="Tracking success and local pose error versus policy training time for SuperMimic, SVG, DiffSR and PPO: median and range over six G1 runs" src="docs/benchmarks/g1-learning-speed-30min/overview-light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/benchmarks/g1-release-check/overview-dark.svg">
+  <img alt="Tracking success and local pose error versus policy training time for SuperMimic, SVG, DiffSR and PPO: median and range over six G1 runs" src="docs/benchmarks/g1-release-check/overview-light.svg">
 </picture>
 
 Lines are medians over the six cases (two motion banks × three interfaces);
 bands span their range. These are single-seed measurements on training motions: they measure
 acquisition, not held-out generalization. Encoder pretraining and startup add
-2.6–8.2 minutes. Two follow-up studies tried to close the gaps:
+2.8–12.5 minutes. FSQ and spectral policies read a window of the reference
+motion only, so they need an IMU but no position estimate on the robot.
+
+The same 24 cases were run on four GPUs, from a 16 GB RTX 4080 to an H200, and
+every BONES-SEED policy was evaluated on all 129,785 clips. SuperMimic reaches
+99.4–99.9% full-bank success on every tier. See the
+[four-tier release check](docs/benchmarks/g1-release-check.md).
+
+Two earlier studies tried to close the gaps:
 
 - **PPO tuning.** Three stronger PPO recipes did not improve tracking
   reliably. The best screened recipe lowered local error in only two of six
@@ -95,8 +103,9 @@ acquisition, not held-out generalization. Encoder pretraining and startup add
 - **SVG tuning.** No SVG recipe improved tracking over BPTT in both seeds in
   any of the six cases. See [SVG tuning](docs/benchmarks/svg-tuning.md).
 
-The [full 30-minute report](docs/benchmarks/g1-learning-speed-30min/README.md)
-has the per-case tables, global errors, survival, threshold times, and costs.
+The earlier [30-minute H100 report](docs/benchmarks/g1-learning-speed-30min/README.md)
+has per-case survival, threshold times, and costs; its latent policies used
+the first-release encoder window, which also reads the robot's position.
 
 ## Repository layout
 
