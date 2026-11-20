@@ -4,7 +4,8 @@
 
 **Train whole-body motion trackers for the Unitree G1 in minutes on one GPU.**
 
-[![Checks](https://github.com/GTLIDAR/ImitationLab/actions/workflows/static-checks.yml/badge.svg)](https://github.com/GTLIDAR/ImitationLab/actions/workflows/static-checks.yml)
+[![Checks](https://github.com/GTLIDAR/ImitationLab/actions/workflows/checks.yml/badge.svg)](https://github.com/GTLIDAR/ImitationLab/actions/workflows/checks.yml)
+[![arXiv](https://img.shields.io/badge/arXiv-2609.37677-b31b1b.svg)](https://arxiv.org/abs/2609.37677)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](pixi.toml)
 [![Isaac Lab](https://img.shields.io/badge/simulator-Isaac%20Lab%20%C2%B7%20Newton%2FMJWarp-76b900.svg)](docs/setup.md)
@@ -55,22 +56,46 @@ and interfaces can be compared on equal terms.
 git clone https://github.com/GTLIDAR/ImitationLab.git
 cd ImitationLab
 pixi install --locked -e isaaclab
-pixi run -e isaaclab smoke-g1
 ```
 
-The smoke test runs one PPO iteration on the bundled Dance102 clip. Starting
-Isaac Sim requires accepting the NVIDIA Omniverse license; see
-[setup](docs/setup.md).
+No motion data is distributed with the repository. Download the public LAFAN1
+retargeting, convert it, and pack it into a reference bank
+([motion data](data/README.md) explains each step):
 
-Next, prepare a motion bank ([motion data](data/README.md)), then train and
-evaluate a tracker:
+```bash
+pixi run -e isaaclab imitationlab data prepare lafan1 \
+  --data-root data/lafan1 --batch-size 64
+
+MANIFEST=data/lafan1/manifests/g1_lafan1_manifest.json
+PERSIST_ID="g1@$(sha256sum "$MANIFEST" | cut -c1-12)"
+BANK="data/reference_arrays/${PERSIST_ID}"
+pixi run -e isaaclab imitationlab data pack "$MANIFEST" \
+  --output-dir "$BANK" --persist-id "$PERSIST_ID" \
+  --anchor-body pelvis --workers 4 --verify-load \
+  --body-names pelvis left_hip_roll_link left_knee_link left_ankle_roll_link \
+    right_hip_roll_link right_knee_link right_ankle_roll_link torso_link \
+    left_shoulder_roll_link left_elbow_link left_wrist_yaw_link \
+    right_shoulder_roll_link right_elbow_link right_wrist_yaw_link
+```
+
+Check the installation with a smoke test, which runs one PPO iteration on the
+bank:
+
+```bash
+BANK="$BANK" pixi run -e isaaclab smoke-g1
+```
+
+Starting Isaac Sim, for conversion or training, requires accepting the NVIDIA
+Omniverse license; see [setup](docs/setup.md).
+
+Then train and evaluate a tracker:
 
 ```bash
 pixi run -e isaaclab imitationlab train \
   --policy supermimic --interface explicit --data "$BANK"
 
 pixi run -e isaaclab imitationlab evaluate --checkpoint "$RUN" --data "$BANK" \
-  --num-envs 4 --trajectory_ranks 0 1 2 3
+  --num-envs 4 --trajectory-ranks 0 1 2 3
 ```
 
 `evaluate` writes `outputs/evaluation/result.json`; pass `--overwrite` or a
@@ -162,10 +187,10 @@ on every tier. See the
 | [LAFAN1, retargeted to G1](https://huggingface.co/datasets/lvhaidong/LAFAN1_Retargeting_Dataset) | 40 | Public download |
 | [BONES-SEED](https://huggingface.co/datasets/bones-studio/seed) | 129,785 | Gated; separately licensed by Bones Studio |
 
-No motion data beyond one Unitree Dance102 clip is distributed with this
-repository. `imitationlab data` downloads or converts each dataset into a
-packed reference bank; see [motion data](data/README.md). Review the
-BONES-SEED license before sharing weights or other results trained on it.
+No motion data is distributed with this repository. `imitationlab data`
+downloads or converts each dataset into a packed reference bank; see
+[motion data](data/README.md). Review the BONES-SEED license before sharing
+weights or other results trained on it.
 
 ## Documentation
 
@@ -175,7 +200,6 @@ BONES-SEED license before sharing weights or other results trained on it.
 | [Motion data](data/README.md) | LAFAN1 and BONES-SEED preparation and packed reference banks |
 | [Training and evaluation](docs/training.md) | Commands, learners, interfaces, checkpoints, export, and benchmarks |
 | [Hardware selection](docs/hardware.md) | Automatic execution sizes and local throughput tuning |
-| [Running on a Slurm cluster](docs/cluster.md) | Profiles, campaigns, and the plan/submit workflow |
 | [Architecture](docs/architecture.md) | Package boundaries and module ownership |
 
 The [documentation index](docs/README.md) lists every guide and report.
@@ -208,6 +232,21 @@ pixi run -e static ci-static
 and what to record when reporting results. Please use
 [GitHub issues](https://github.com/GTLIDAR/ImitationLab/issues) for bugs and
 questions.
+
+## Citation
+
+If you use ImitationLab or its spectral skill encoders in your research,
+please cite:
+
+```bibtex
+@article{wu2026spectral,
+  title   = {Learning Expressive and Compositional Motion Representation via Spectral Skills},
+  author  = {Wu, Feiyang and Gao, Chenxiao and Yang, Chen and Zhao, Ye and Dai, Bo and Wu, Anqi},
+  journal = {arXiv preprint arXiv:2609.37677},
+  year    = {2026},
+  url     = {https://arxiv.org/abs/2609.37677}
+}
+```
 
 ## Acknowledgments
 

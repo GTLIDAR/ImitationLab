@@ -598,9 +598,6 @@ class AlgorithmRuntime(Checkpointing, TrainingMetrics, Learner[CfgT]):
         Implement this method in subclasses to build the policy network architecture.
         The network should map observations to action distributions or deterministic actions.
 
-        Args:
-            policy_net: Optional pre-constructed network. If None, build from config.
-
         Returns:
             TensorDictModule wrapping the policy network with appropriate input/output keys.
 
@@ -613,9 +610,6 @@ class AlgorithmRuntime(Checkpointing, TrainingMetrics, Learner[CfgT]):
         """Construct the value function network (critic) from configuration.
 
         Implement this method in subclasses that use value-based methods (e.g., PPO, A2C).
-
-        Args:
-            value_net: Optional pre-constructed network. If None, build from config.
 
         Returns:
             TensorDictModule wrapping the value network.
@@ -631,9 +625,6 @@ class AlgorithmRuntime(Checkpointing, TrainingMetrics, Learner[CfgT]):
 
         Implement this method in subclasses that use Q-learning (off-policy learners).
 
-        Args:
-            q_net: Optional pre-constructed network. If None, build from config.
-
         Returns:
             TensorDictModule wrapping the Q-network.
 
@@ -648,9 +639,6 @@ class AlgorithmRuntime(Checkpointing, TrainingMetrics, Learner[CfgT]):
         """Construct a shared feature extraction network from configuration.
 
         Implement this method when using shared representations between policy and value networks.
-
-        Args:
-            feature_extractor_net: Optional pre-constructed network. If None, build from config.
 
         Returns:
             TensorDictModule for shared feature extraction.

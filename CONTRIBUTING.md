@@ -38,7 +38,7 @@ pixi run -e static ci-static
 | `pixi run test-default` | Every change | CPU test suites |
 | `pixi run -e static ci-static` | Every change | `ruff check` and `ruff format --check` over the whole repository, and a compile check |
 | `pixi run -e isaaclab test-isaaclab` | Simulator or environment changes | Isaac Lab suite on a local GPU |
-| `pixi run -e isaaclab smoke-g1` | Trainer or simulator wiring changes | The [local Isaac Lab smoke](docs/setup.md#isaac-lab) |
+| `BANK=<bank> pixi run -e isaaclab smoke-g1` | Trainer or simulator wiring changes | The [local Isaac Lab smoke](docs/setup.md#isaac-lab) on a packed reference bank |
 
 CI runs the first two commands. Run `pixi run -e static ruff format .` before
 committing. To run the ruff and file checks on every commit, run
@@ -83,4 +83,6 @@ Git.
 ## Documentation
 
 Update the corresponding setup or training guide when changing an entry point
-or recipe. The [documentation index](docs/README.md) lists every guide.
+or recipe. Write command-line options in kebab-case (`--num-envs`); the
+snake-case spellings recorded by earlier runs remain accepted. The
+[documentation index](docs/README.md) lists every guide.

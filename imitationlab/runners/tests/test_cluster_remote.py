@@ -139,7 +139,10 @@ def test_workspace_store_is_content_addressed_and_reused(
     plan_two = control_root / "plans/p2"
 
     sha, store_path, reused = sync_workspace_archive(
-        "ice", archive, control_root=str(control_root), remote_plan_dir=str(plan_one)
+        "mycluster",
+        archive,
+        control_root=str(control_root),
+        remote_plan_dir=str(plan_one),
     )
 
     assert not reused
@@ -153,7 +156,10 @@ def test_workspace_store_is_content_addressed_and_reused(
 
     stored_mtime = Path(store_path).stat().st_mtime_ns
     _sha_again, _store_again, reused_again = sync_workspace_archive(
-        "ice", archive, control_root=str(control_root), remote_plan_dir=str(plan_two)
+        "mycluster",
+        archive,
+        control_root=str(control_root),
+        remote_plan_dir=str(plan_two),
     )
 
     assert reused_again
@@ -174,7 +180,7 @@ def test_workspace_store_replaces_a_corrupt_entry(
     store_path.write_text("truncated")
 
     _sha, _path, reused = sync_workspace_archive(
-        "ice",
+        "mycluster",
         archive,
         control_root=str(control_root),
         remote_plan_dir=str(control_root / "plans/p1"),
@@ -191,7 +197,7 @@ def test_upload_and_verify_roundtrip(
     archive = tmp_path / "workspace.tar.gz"
     build_workspace_archive(_fixture_repo(tmp_path), archive)
     remote_dir = tmp_path / "remote/plans/p1"
-    sha = upload_and_verify_archive("ice", archive, str(remote_dir))
+    sha = upload_and_verify_archive("mycluster", archive, str(remote_dir))
     assert (remote_dir / "workspace.tar.gz").is_file()
     assert (remote_dir / "workspace.tar.gz.sha256").read_text().strip() == sha
     assert not (remote_dir / "workspace.tar.gz.partial").exists()
@@ -208,7 +214,7 @@ def test_upload_detects_corruption(
     archive = tmp_path / "workspace.tar.gz"
     build_workspace_archive(_fixture_repo(tmp_path), archive)
     with pytest.raises(PipelineError, match="hash mismatch"):
-        upload_and_verify_archive("ice", archive, str(tmp_path / "remote"))
+        upload_and_verify_archive("mycluster", archive, str(tmp_path / "remote"))
 
 
 def test_ssh_upload_is_atomic_rename(
@@ -218,7 +224,7 @@ def test_ssh_upload_is_atomic_rename(
     payload = tmp_path / "payload.txt"
     payload.write_text("payload with spaces & specials\n")
     target = tmp_path / "remote dir/nested/upload.txt"
-    ssh_upload("ice", payload, str(target))
+    ssh_upload("mycluster", payload, str(target))
     assert target.read_text() == payload.read_text()
 
 
@@ -229,12 +235,14 @@ def test_sbatch_parsable_strict_parse(
     fake_sbatch = bin_dir / "sbatch"
     fake_sbatch.write_text("#!/bin/sh\necho 12345\n")
     fake_sbatch.chmod(0o755)
-    job_id = sbatch_parsable("ice", str(tmp_path / "batch.sh"), chdir=str(tmp_path))
+    job_id = sbatch_parsable(
+        "mycluster", str(tmp_path / "batch.sh"), chdir=str(tmp_path)
+    )
     assert job_id == "12345"
 
     fake_sbatch.write_text("#!/bin/sh\necho 'Submitted batch job 12345'\n")
     with pytest.raises(PipelineError, match="unparseable"):
-        sbatch_parsable("ice", str(tmp_path / "batch.sh"), chdir=str(tmp_path))
+        sbatch_parsable("mycluster", str(tmp_path / "batch.sh"), chdir=str(tmp_path))
 
 
 def test_sbatch_parsable_forwards_dependency(
@@ -246,7 +254,7 @@ def test_sbatch_parsable_forwards_dependency(
     fake_sbatch.write_text(f'#!/bin/sh\necho "$@" >> "{argv_log}"\necho 777\n')
     fake_sbatch.chmod(0o755)
     job_id = sbatch_parsable(
-        "ice", "/plans/p1/batch.sh", chdir=str(tmp_path), dependency="afterok:123"
+        "mycluster", "/plans/p1/batch.sh", chdir=str(tmp_path), dependency="afterok:123"
     )
     assert job_id == "777"
     assert "--dependency=afterok:123" in argv_log.read_text()
@@ -259,8 +267,8 @@ def test_remote_failure_raises_with_stderr(
     from imitationlab.runners.pipeline.cluster.remote import ssh_run
 
     with pytest.raises(PipelineError, match="remote command failed"):
-        ssh_run("ice", "echo doomed >&2; exit 3")
+        ssh_run("mycluster", "echo doomed >&2; exit 3")
     proc = subprocess.run(
-        ["ssh", "ice", "bash", "-s"], input=b"echo ok", capture_output=True
+        ["ssh", "mycluster", "bash", "-s"], input=b"echo ok", capture_output=True
     )
     assert proc.stdout.strip() == b"ok"

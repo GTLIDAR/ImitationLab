@@ -6,7 +6,11 @@ import numpy as np
 import pytest
 
 from imitationlab.data_tools.bones_seed.csv import BONES_G1_EXPECTED_COLUMNS
-from imitationlab.data_tools.bones_seed.prepare import _plan_buckets, stage_extract, stage_normalize
+from imitationlab.data_tools.bones_seed.prepare import (
+    _plan_buckets,
+    stage_extract,
+    stage_normalize,
+)
 
 
 def test_extract_normalize_and_resume_two_clips(tmp_path):

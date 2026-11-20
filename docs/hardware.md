@@ -200,4 +200,3 @@ For measurements on four GPU tiers, see the
 ## Related guides
 
 - [Training and evaluation](training.md): the commands these sizes apply to.
-- [Running on a Slurm cluster](cluster.md): submitting runs to cluster GPUs.

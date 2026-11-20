@@ -8,6 +8,7 @@ import os
 import sys
 from pathlib import Path
 
+from imitationlab.cli_args import add_kebab_aliases, canonical_argv
 from imitationlab.runners.provenance.config_keys import assert_no_unknown_config_keys
 from imitationlab.runners.registry import resolve_agent_cfg_entry_point
 from imitationlab.runners.runtime_bootstrap import (
@@ -144,14 +145,15 @@ def _build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Distributed qualification wall-clock cap, checked between iterations.",
     )
-    return parser
+    # setup_preset_cli chooses the help formatter, so both spellings are listed.
+    return add_kebab_aliases(parser, hide_snake_case=False)
 
 
 def _parse_args(argv: list[str]) -> argparse.Namespace:
     from isaaclab_tasks.utils import setup_preset_cli
 
     parser = _build_parser()
-    args_cli, hydra_args = setup_preset_cli(parser, argv)
+    args_cli, hydra_args = setup_preset_cli(parser, canonical_argv(argv, parser))
     sys.argv = [sys.argv[0]] + hydra_args
     return args_cli
 

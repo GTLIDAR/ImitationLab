@@ -5,9 +5,9 @@ command interface and a policy learner, pretraining a command encoder,
 training, evaluating, exporting, and measuring learning speed. It is for users
 who have a working installation and want to train or compare trackers.
 
-**Before you start.** Install the `isaaclab` environment and run the smoke
-test ([setup](setup.md)), and prepare a motion bank
-([motion data](../data/README.md)). Run all commands from the repository root.
+**Before you start.** Install the `isaaclab` environment
+([setup](setup.md)), prepare a motion bank
+([motion data](../data/README.md)), and run the smoke test on it. Run all commands from the repository root.
 
 Terms used in this guide:
 
@@ -73,11 +73,14 @@ examples below use two shell variables:
 
 | Variable | Value |
 | --- | --- |
-| `MANIFEST` | A motion manifest. The bundled Dance102 manifest is enough to check an installation |
+| `MANIFEST` | A motion manifest, as written by `imitationlab data prepare` |
 | `BANK` | A packed reference-bank directory, used for standard training |
 
+The repository distributes no motion data. With LAFAN1 prepared at the
+default location:
+
 ```bash
-MANIFEST=data/unitree/manifests/g1_unitree_dance102_manifest.json
+MANIFEST=data/lafan1/manifests/g1_lafan1_manifest.json
 pixi run imitationlab data validate "$MANIFEST"
 ```
 
@@ -97,7 +100,7 @@ INTERFACE=fsq
 pixi run -e isaaclab imitationlab pretrain \
   --interface "$INTERFACE" --data "$MANIFEST" \
   --output-dir "outputs/encoders/$INTERFACE" \
-  --num_updates 2000 --wandb_mode disabled
+  --num-updates 2000 --wandb-mode disabled
 ```
 
 The output directory holds two checkpoints:
@@ -243,13 +246,13 @@ termination rule.
 pixi run -e isaaclab imitationlab evaluate \
   --checkpoint "$RUN" --data "$EVAL_BANK" \
   --num-envs 4 --steps 500 --seed 42 \
-  --output outputs/evaluation/tracker.json --trajectory_ranks 0 1 2 3
+  --output outputs/evaluation/tracker.json --trajectory-ranks 0 1 2 3
 ```
 
 | Option | Effect |
 | --- | --- |
 | `--data` | Score a separate packed bank or manifest instead of the saved one |
-| `--trajectory_ranks` | Evaluate specific clips by rank. Set the environment count to a multiple of the number of ranks |
+| `--trajectory-ranks` | Evaluate specific clips by rank. Set the environment count to a multiple of the number of ranks |
 | `--assert-kitless` | Run numerical Newton evaluation without a Kit renderer. The learning-speed benchmark uses this mode |
 | `--overwrite` | Replace an existing result file at `--output` |
 
@@ -351,6 +354,4 @@ Keep all raw results and checkpoints outside Git, especially for BONES-SEED.
 
 - [Hardware selection](hardware.md): automatic execution sizes and throughput
   calibration.
-- [Running on a Slurm cluster](cluster.md): submit training and benchmark
-  stages to a cluster.
 - [Results](README.md#results): measured reports produced with these commands.

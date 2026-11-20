@@ -42,8 +42,6 @@ dependencies = [
 [project.optional-dependencies]
 # Imported lazily: dataset download and publication on the Hugging Face Hub.
 hub = ["huggingface_hub"]
-# Imported lazily: ONNX policy bundles (imitationlab export --format onnx).
-export = ["onnx", "onnxruntime"]
 # Imported lazily: benchmark plots and MuJoCo-based world-model validation.
 viz = ["matplotlib>=3.10", "mujoco"]
 
@@ -52,6 +50,7 @@ Homepage = "https://github.com/GTLIDAR/ImitationLab"
 Repository = "https://github.com/GTLIDAR/ImitationLab"
 Issues = "https://github.com/GTLIDAR/ImitationLab/issues"
 Documentation = "https://github.com/GTLIDAR/ImitationLab/tree/main/docs"
+Paper = "https://arxiv.org/abs/2609.37677"
 
 [project.scripts]
 imitationlab = "imitationlab.cli:main"

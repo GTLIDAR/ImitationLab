@@ -1,1 +1,1 @@
-"""Packaged assets and robot configurations for IsaacLab-Imitation."""
+"""Packaged assets and robot configurations for ImitationLab."""

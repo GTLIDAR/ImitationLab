@@ -22,7 +22,7 @@ def _submission_record(tmp_path: Path) -> Path:
         "plan_sha": "f" * 64,
         "plan_id": "demo-a1-s0-x",
         "drift": False,
-        "cluster": {"profile": "t", "login": "ice"},
+        "cluster": {"profile": "t", "login": "mycluster"},
         "remote_plan_dir": str(tmp_path / "remote/plans/p1"),
         "workspace_archive_sha256": "0" * 64,
         "workspace_sync_mode": "archive",

@@ -4,7 +4,7 @@ repos:
     hooks:
       - id: check-added-large-files
         args: ["--maxkb=2000"]
-        exclude: ^imitationlab/envs/isaaclab/assets/unitree/|^data/unitree/
+        exclude: ^imitationlab/envs/isaaclab/assets/unitree/
       - id: check-merge-conflict
       - id: check-toml
       - id: check-yaml

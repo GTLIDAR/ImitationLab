@@ -16,6 +16,7 @@ import argparse
 import json
 import sys
 
+from imitationlab.cli_args import add_kebab_aliases
 from imitationlab.evaluation.world_model.validation import (
     comparison_stats,
     qualification_failures,
@@ -52,7 +53,7 @@ def build_parser():
         help="Restore this WMBPTT checkpoint before the frozen replay check.",
     )
     add_launcher_args(parser)
-    return parser
+    return add_kebab_aliases(parser, hide_snake_case=False)
 
 
 def main() -> int:

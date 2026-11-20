@@ -28,7 +28,7 @@ from imitationlab.runners.pipeline.cluster.envfile import (
 
 CAMPAIGN_YAML = """\
 name: demo
-profile: ice
+profile: mycluster
 wandb_project: proj
 wandb_group: grp
 vars:

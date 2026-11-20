@@ -8,6 +8,7 @@ import argparse
 import sys
 
 from isaaclab.app import AppLauncher
+from imitationlab.cli_args import add_kebab_aliases
 from imitationlab.runners.launch_compat import add_launcher_args
 
 # add argparse arguments
@@ -68,6 +69,7 @@ parser.add_argument(
 )
 # append launcher cli args
 add_launcher_args(parser)
+add_kebab_aliases(parser)
 # parse the arguments
 args_cli, hydra_args = parser.parse_known_args()
 

@@ -9,8 +9,8 @@ Conversion needs the `isaaclab` environment and a local NVIDIA GPU; validation
 and packing run in the default environment. Run all commands from the
 repository root.
 
-Keep source motions and generated banks outside Git. The repository includes
-one Unitree Dance102 clip and a
+Keep source motions and generated banks outside Git. The repository
+distributes no motion data; it includes a
 [manifest template](../imitationlab/envs/isaaclab/manifests/g1_npz_manifest.template.json).
 
 ## Overview
@@ -52,7 +52,9 @@ pixi run --locked -e isaaclab imitationlab data prepare lafan1 \
 ```
 
 Each Isaac batch converts motions in parallel. Rerun with the same inputs and
-options to continue an interrupted conversion.
+options to continue an interrupted conversion. The manifest is written to
+`data/lafan1/manifests/g1_lafan1_manifest.json`; set `MANIFEST` to it and
+continue with [validate and pack](#validate-and-pack).
 
 | Option | Effect |
 | --- | --- |
@@ -155,8 +157,7 @@ pixi run --locked imitationlab data validate "$MANIFEST"
 ### Pack a reference bank
 
 For packed training, use an NPZ manifest with modern `qpos`, `qvel`, and named
-bodies and joints. Bake any trims into the NPZ files before packing. The
-legacy Dance102 clip works directly through its manifest.
+bodies and joints. Bake any trims into the NPZ files before packing.
 
 The persist ID is the bank's identity; the example derives it from the
 manifest hash.
@@ -196,6 +197,13 @@ pixi run --locked imitationlab data validate "$ARRAYS" --persist-id "$PERSIST_ID
 on different hardware or software versions can change floating-point values.
 
 ## Next steps
+
+Check the installation on the new bank with the smoke test, which runs one
+PPO iteration:
+
+```bash
+BANK="$ARRAYS" pixi run -e isaaclab smoke-g1
+```
 
 Use the validated manifest or bank with the training commands in the
 [training guide](../docs/training.md). The

@@ -31,16 +31,24 @@ The workspace defines three Pixi environments. Install only the ones you need.
 
 ## Isaac Lab
 
-Install the simulation environment and run the smoke test:
+Install the simulation environment:
 
 ```bash
 pixi install --locked -e isaaclab
-pixi run -e isaaclab smoke-g1
 ```
 
-The smoke test runs one PPO iteration on the bundled Dance102 motion and
-writes a checkpoint under `outputs/smoke-g1`. The first simulation launch may
-fetch Isaac Sim ground-plane assets and compile Warp kernels.
+The repository distributes no motion data, so the smoke test needs a packed
+reference bank. Prepare one from the public LAFAN1 retargeting with the
+[motion data guide](../data/README.md), then pass its directory as `BANK`:
+
+```bash
+BANK=data/reference_arrays/<persist-id> pixi run -e isaaclab smoke-g1
+```
+
+The smoke test runs one PPO iteration on that bank and writes a checkpoint
+under `outputs/smoke-g1`. It stops with a one-line message when `BANK` is not
+set. The first simulation launch may fetch Isaac Sim ground-plane assets and
+compile Warp kernels.
 
 **License.** Isaac Sim requires accepting the
 [NVIDIA Omniverse License Agreement](https://docs.omniverse.nvidia.com/platform/latest/common/NVIDIA_Omniverse_License_Agreement.html).
@@ -66,7 +74,7 @@ calibration.
 
 | Command | Covers |
 | --- | --- |
-| `pixi run --locked test-default` | Learner, data-tool, and script suites (CPU) |
+| `pixi run --locked test-default` | Learner, data-tool, task-math, runner, and evaluation suites (CPU) |
 | `pixi run --locked -e isaaclab test-isaaclab` | G1 environment suite (GPU) |
 | `pixi run --locked -e static ci-static` | Lint and compile checks |
 
@@ -88,14 +96,15 @@ The official runner uses Python 3.13 and HybridRobotics' mjlab fork.
    (cd third_party/supermimic && uv sync --locked)
    ```
 
-2. Provide a local motion file in mjlab's tracking format. To convert the
-   bundled Dance102 clip, run this from the repository root after installing
-   the default Pixi environment:
+2. Provide a local motion file in mjlab's tracking format. To convert one
+   50 Hz G1 clip produced by `imitationlab data prepare`
+   ([motion data](../data/README.md)), run this from the repository root
+   after installing the default Pixi environment. Replace the input path
+   with your clip; `--start` and `--stop` optionally select a frame range:
 
    ```bash
    pixi run python scripts/data/convert_mjlab_motion.py \
-     data/unitree/npz/g1/G1_Take_102.bvh_60hz.npz outputs/dance102-mjlab.npz \
-     --start 1 --stop 1457
+     data/lafan1/npz/g1/<clip>.npz outputs/motion-mjlab.npz
    ```
 
 3. Run the official generalized-coordinate task from an output directory so
@@ -107,7 +116,7 @@ The official runner uses Python 3.13 and HybridRobotics' mjlab fork.
      cd outputs/official-supermimic
      runner=../../third_party/supermimic
      "$runner/.venv/bin/python" "$runner/src/supermimic/scripts/train.py" \
-       SuperMimic-GenCoord-G1 --motion-file ../dance102-mjlab.npz \
+       SuperMimic-GenCoord-G1 --motion-file ../motion-mjlab.npz \
        --runner.run-name g1-baseline
    )
    ```

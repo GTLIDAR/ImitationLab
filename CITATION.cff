@@ -1,0 +1,38 @@
+cff-version: 1.2.0
+message: >-
+  If you use ImitationLab or its spectral skill encoders in your research,
+  please cite the paper below.
+type: software
+title: ImitationLab
+version: 0.1.0
+license: MIT
+repository-code: "https://github.com/GTLIDAR/ImitationLab"
+authors:
+  - family-names: Wu
+    given-names: Feiyang
+preferred-citation:
+  type: article
+  title: >-
+    Learning Expressive and Compositional Motion Representation via Spectral
+    Skills
+  authors:
+    - family-names: Wu
+      given-names: Feiyang
+    - family-names: Gao
+      given-names: Chenxiao
+    - family-names: Yang
+      given-names: Chen
+    - family-names: Zhao
+      given-names: Ye
+    - family-names: Dai
+      given-names: Bo
+    - family-names: Wu
+      given-names: Anqi
+  year: 2026
+  journal: "arXiv preprint arXiv:2609.37677"
+  url: "https://arxiv.org/abs/2609.37677"
+  doi: 10.48550/arXiv.2609.37677
+  identifiers:
+    - type: other
+      value: "arXiv:2609.37677"
+      description: arXiv identifier

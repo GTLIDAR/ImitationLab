@@ -35,6 +35,7 @@ import json
 import math
 import sys
 
+from imitationlab.cli_args import add_kebab_aliases
 from imitationlab.runners.launch_compat import add_launcher_args
 
 parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
@@ -54,6 +55,7 @@ parser.add_argument(
     "records the cluster path)",
 )
 add_launcher_args(parser)
+add_kebab_aliases(parser, hide_snake_case=False)
 
 
 def main() -> int:

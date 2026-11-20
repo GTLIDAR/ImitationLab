@@ -12,6 +12,7 @@
 import argparse
 
 from isaaclab.app import AppLauncher
+from imitationlab.cli_args import add_kebab_aliases
 from imitationlab.runners.launch_compat import add_launcher_args
 
 # add argparse arguments
@@ -46,6 +47,7 @@ parser.add_argument(
 )
 # append AppLauncher cli args
 add_launcher_args(parser)
+add_kebab_aliases(parser)
 # parse the arguments
 args_cli = parser.parse_args()
 

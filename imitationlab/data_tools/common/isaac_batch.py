@@ -381,7 +381,7 @@ class MotionLoader:
         except ImportError as exc:
             raise ImportError(
                 "LeRobot batch replay requires the Hugging Face `datasets` package. "
-                "Install the workspace with INSTALL_LEROBOT=1 or install datasets."
+                "Install datasets in the Pixi environment that runs the conversion."
             ) from exc
 
         repo_id = self.job.repo_id or UNITREE_G1_WBT_DEFAULT_REPO_ID
