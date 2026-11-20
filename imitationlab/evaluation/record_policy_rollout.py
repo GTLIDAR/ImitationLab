@@ -11,6 +11,7 @@ import random
 import sys
 
 from isaaclab.app import AppLauncher
+from imitationlab.cli_args import add_kebab_aliases
 from imitationlab.runners.launch_compat import add_launcher_args
 
 
@@ -89,6 +90,7 @@ parser.add_argument("--video", action="store_true", default=False)
 parser.add_argument("--video_folder", type=Path, default=None)
 parser.add_argument("--video_length", type=int, default=None)
 add_launcher_args(parser)
+add_kebab_aliases(parser)
 args_cli, hydra_args = parser.parse_known_args()
 
 sys.argv = [sys.argv[0]] + hydra_args

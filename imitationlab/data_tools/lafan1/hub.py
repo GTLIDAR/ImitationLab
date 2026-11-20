@@ -31,7 +31,7 @@ try:
 except ImportError as exc:  # pragma: no cover - import guard for misconfigured envs
     raise ImportError(
         "huggingface_hub is required. Run this script through the Pixi "
-        "default or lerobot environment."
+        "default or isaaclab environment."
     ) from exc
 
 

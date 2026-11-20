@@ -13,10 +13,3 @@ extend-exclude = [
     # Untracked scratch space for debugging sessions.
     "scratchpad",
 ]
-
-# The vendor-derived Isaac Lab example script keeps its upstream formatting, so
-# a diff against upstream shows only the real changes. Lint still covers it.
-[format]
-exclude = [
-    "scripts/random_agent.py",
-]

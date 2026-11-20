@@ -15,6 +15,12 @@ import subprocess
 import sys
 import threading
 
+from imitationlab.cli_args import (
+    PRETRAIN_MODULES,
+    TRAIN_MODULES,
+    canonical_argv,
+    snake_case_options,
+)
 from imitationlab.runners.registry import (
     INTERFACES,
     canonical_interface,
@@ -338,6 +344,9 @@ def main(argv: list[str] | None = None, *, calibrate: bool = False) -> int:
             help="Profiles to measure (default: every profile that fits this machine).",
         )
     args, rest = parser.parse_known_args(argv)
+    # Workload options are the trainer's or the pretrainer's, declared in snake
+    # case; accept kebab case too.
+    rest = canonical_argv(rest, snake_case_options(*TRAIN_MODULES, *PRETRAIN_MODULES))
     with reported_by(parser):
         return _run(parser, args, rest, calibrate=calibrate)
 

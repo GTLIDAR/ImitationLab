@@ -39,7 +39,7 @@ def _write_profile(tmp_path: Path) -> Path:
     remote = tmp_path / "remote"
     profile = tmp_path / "profile_t.yaml"
     profile.write_text(
-        f"name: t\nlogin: cluster\ncontrol_root: {remote / 'control'}\n"
+        f"name: t\nlogin: mycluster\ncontrol_root: {remote / 'control'}\n"
         f"data_dir: {remote / 'data'}\nshared_sif_path: {remote / 'sif/runtime.sif'}\n"
         f"isaac_cache_dir: {remote / 'cache'}\n"
         f"slurm:\n  gres: gpu:a40:1\n  cpus_per_task: 4\n  mem: 8G\n"

@@ -12,8 +12,8 @@ embedding table (the ``{motion_name: embedding}`` format read by
 Relative paths resolve against the repository root. Example::
 
     pixi run python -m imitationlab.data_tools.merge_manifests \
-        --output-manifest data/unified/manifests/g1_lafan1_dance102_bones_seed_manifest.json \
-        --output-language data/unified/language/g1_lafan1_dance102_bones_seed_language.json
+        --output-manifest data/unified/manifests/g1_lafan1_bones_seed_manifest.json \
+        --output-language data/unified/language/g1_lafan1_bones_seed_language.json
 """
 
 from __future__ import annotations
@@ -41,9 +41,6 @@ DEFAULT_LAFAN1_LANGUAGE = (
     REPO_ROOT
     / "data/lafan1/language/g1_lafan1_manifest.with_language.json"
 )
-DEFAULT_DANCE102_MANIFEST = (
-    REPO_ROOT / "data/unitree/manifests/g1_unitree_dance102_manifest.json"
-)
 DEFAULT_BONES_MANIFEST = (
     REPO_ROOT / "data/bones_seed/manifests/g1_bones_seed_manifest.json"
 )
@@ -51,10 +48,10 @@ DEFAULT_BONES_LANGUAGE = (
     REPO_ROOT / "data/bones_seed/language/g1_bones_seed_language.json"
 )
 DEFAULT_OUTPUT_MANIFEST = (
-    REPO_ROOT / "data/unified/manifests/g1_lafan1_dance102_bones_seed_manifest.json"
+    REPO_ROOT / "data/unified/manifests/g1_lafan1_bones_seed_manifest.json"
 )
 DEFAULT_OUTPUT_LANGUAGE = (
-    REPO_ROOT / "data/unified/language/g1_lafan1_dance102_bones_seed_language.json"
+    REPO_ROOT / "data/unified/language/g1_lafan1_bones_seed_language.json"
 )
 
 LANGUAGE_FIELD_PRIORITY = (
@@ -226,15 +223,6 @@ def _source_specs_from_args(args: argparse.Namespace) -> list[SourceSpec]:
             else None,
         ),
         SourceSpec(
-            label="unitree_dance102",
-            prefix=args.dance102_prefix,
-            manifest_path=_resolve_path(args.dance102_manifest),
-            fallback_goal=(
-                "Perform a full-body humanoid dance routine with rhythmic steps, "
-                "turns, and coordinated arm motion."
-            ),
-        ),
-        SourceSpec(
             label="bones_seed",
             prefix=args.bones_prefix,
             manifest_path=_resolve_path(args.bones_manifest),
@@ -243,10 +231,22 @@ def _source_specs_from_args(args: argparse.Namespace) -> list[SourceSpec]:
             else None,
         ),
     ]
+    if args.dance102_manifest and not args.exclude_dance102:
+        # Optional: the Dance102 clip is not distributed with the repository.
+        specs.insert(
+            1,
+            SourceSpec(
+                label="unitree_dance102",
+                prefix=args.dance102_prefix,
+                manifest_path=_resolve_path(args.dance102_manifest),
+                fallback_goal=(
+                    "Perform a full-body humanoid dance routine with rhythmic steps, "
+                    "turns, and coordinated arm motion."
+                ),
+            ),
+        )
     if args.exclude_lafan1:
         specs = [spec for spec in specs if spec.label != "lafan1"]
-    if args.exclude_dance102:
-        specs = [spec for spec in specs if spec.label != "unitree_dance102"]
     if args.exclude_bones:
         specs = [spec for spec in specs if spec.label != "bones_seed"]
     return specs
@@ -423,7 +423,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--dance102-manifest",
         "--dance102_manifest",
-        default=str(DEFAULT_DANCE102_MANIFEST),
+        default=None,
+        help="Manifest of a Unitree Dance102 clip to include. The clip is not "
+        "distributed with the repository; without this option it is left out.",
     )
     parser.add_argument(
         "--bones-manifest", "--bones_manifest", default=str(DEFAULT_BONES_MANIFEST)
@@ -440,7 +442,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--dataset-name",
         "--dataset_name",
-        default="g1_lafan1_dance102_bones_seed",
+        default="g1_lafan1_bones_seed",
         help="Dataset name stored in the merged manifest.",
     )
     parser.add_argument("--lafan1-prefix", "--lafan1_prefix", default="lafan1__")

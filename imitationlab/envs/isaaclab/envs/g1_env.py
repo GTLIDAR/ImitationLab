@@ -1,8 +1,8 @@
 """``imitation-g1-v1``: the G1 full-body tracking environment.
 
 MDP design reimplemented from zita-ch/supermimic_vibed 0525a23 (MIT).
-IsaacLab-Imitation's existing ExpertDataPlane owns loading and delivering the
-reference arrays. This class changes only the protocol: the post-action state
+ImitationLab's ExpertDataPlane owns loading and delivering the reference
+arrays. This class changes only the protocol: the post-action state
 is scored at f+1, context randomization and return-based resets are coupled,
 and terminal observations contain the actual pre-reset state and history.
 """

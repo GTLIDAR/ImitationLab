@@ -27,6 +27,7 @@ if strict_kitless:
     install_kit_import_guard()
 
 from imitationlab.runners.launch_compat import add_launcher_args
+from imitationlab.cli_args import add_kebab_aliases
 
 parser = argparse.ArgumentParser(
     description="Train an offline high-level skill encoder."
@@ -761,6 +762,7 @@ parser.add_argument(
     help="Require a Newton configuration that never imports or starts Kit.",
 )
 add_launcher_args(parser)
+add_kebab_aliases(parser)
 args_cli, hydra_args = parser.parse_known_args()
 
 sys.argv = [sys.argv[0]] + hydra_args

@@ -70,5 +70,3 @@ license header:
 - `imitationlab/evaluation/tests/test_backend_determinism.py`
 - `imitationlab/evaluation/validation/backend_determinism.py`
 - `imitationlab/runners/zero_agent.py`
-- `scripts/list_envs.py`
-- `scripts/random_agent.py`

@@ -10,6 +10,13 @@ import sys
 from pathlib import Path
 
 from imitationlab import __version__
+from imitationlab.cli_args import (
+    EVALUATE_MODULES,
+    PRETRAIN_MODULES,
+    add_kebab_aliases,
+    canonical_argv,
+    snake_case_options,
+)
 from imitationlab.runners.errors import UserError, reported_by
 from imitationlab.runners.registry import (
     DEFAULT_TASK,
@@ -69,6 +76,8 @@ def _pretrain(argv: list[str]) -> int:
         help="Choose execution sizes from local resources (default: auto); off keeps recipe sizes.",
     )
     args, rest = parser.parse_known_args(argv)
+    # The pretrainer declares its options in snake case; accept kebab case too.
+    rest = canonical_argv(rest, snake_case_options(*PRETRAIN_MODULES))
     with reported_by(parser):
         return _run_pretrain(parser, args, rest)
 
@@ -164,7 +173,10 @@ def _evaluate(argv: list[str]) -> int:
     parser.add_argument(
         "--dry-run", action="store_true", help="Print the command and exit."
     )
+    add_kebab_aliases(parser)
     args, rest = parser.parse_known_args(argv)
+    # The evaluator declares its options in snake case; accept kebab case too.
+    rest = canonical_argv(rest, snake_case_options(*EVALUATE_MODULES))
     with reported_by(parser):
         return _run_evaluate(args, rest)
 
@@ -286,19 +298,6 @@ def _run_evaluate(args, rest: list[str]) -> int:
 
 def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
-    spellings = {
-        "--num-envs": "--num_envs",
-        "--max-iterations": "--max_iterations",
-        "--max-train-seconds": "--max_train_seconds",
-        "--args-file": "--args_file",
-    }
-    argv = [
-        spellings.get(value.split("=", 1)[0], value.split("=", 1)[0])
-        + ("=" + value.split("=", 1)[1] if "=" in value else "")
-        if value.startswith("--")
-        else value
-        for value in argv
-    ]
     parser = argparse.ArgumentParser(
         prog="imitationlab",
         description="Motion data, command encoders, and imitation policy learning.",

@@ -31,7 +31,7 @@ _BASE_DIRECTIVES = SlurmDirectives(
     cpus_per_task=16,
     gres="gpu:h200:1",
     mem="160G",
-    qos="gpu",
+    qos="normal",
     partition="gpu",
 )
 
@@ -50,10 +50,10 @@ def _render(d: SlurmDirectives, job_args: tuple[str, ...] = ("--seed", "0")) -> 
     )
 
 
-def test_directive_block_matches_pace_semantics() -> None:
+def test_directive_block_matches_slurm_semantics() -> None:
     script = _render(_directives())
     assert "#SBATCH --gres=gpu:h200:1" in script
-    assert "#SBATCH --qos=gpu" in script
+    assert "#SBATCH --qos=normal" in script
     assert "#SBATCH --partition=gpu" in script
     assert (
         "#SBATCH --output=/scratch/slurm_logs/quant-fsq64-s0-pretrain_%j.log" in script

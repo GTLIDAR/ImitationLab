@@ -42,6 +42,7 @@ from collections.abc import Iterable, Mapping
 from pathlib import Path
 from typing import Any
 
+from imitationlab.cli_args import add_kebab_aliases
 from imitationlab.evaluation.validation.collect_equivalence import (
     _hash,
     _install_deterministic_kernels,
@@ -285,7 +286,7 @@ def main(argv: list[str] | None = None) -> int:
     cmp.add_argument("a")
     cmp.add_argument("b")
     cmp.add_argument("--require", action="append", default=[])
-    args = parser.parse_args(argv)
+    args = add_kebab_aliases(parser).parse_args(argv)
     if args.command == "run":
         _run(args, overrides)
         return 0

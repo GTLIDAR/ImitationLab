@@ -8,6 +8,7 @@ import shlex
 import sys
 from pathlib import Path
 
+from imitationlab.cli_args import TRAIN_MODULES, canonical_argv, snake_case_options
 from imitationlab.paths import recipes_root
 from imitationlab.runners.artifacts import (
     MissingRunConfiguration,
@@ -146,6 +147,8 @@ def main(argv: list[str] | None = None) -> None:
         "--checkpoint", type=Path, help="Resume using the saved run settings."
     )
     args, overrides = parser.parse_known_args(argv)
+    # The trainer declares its options in snake case; accept kebab case too.
+    overrides = canonical_argv(overrides, snake_case_options(*TRAIN_MODULES))
     with reported_by(parser):
         _launch(parser, args, overrides)
 

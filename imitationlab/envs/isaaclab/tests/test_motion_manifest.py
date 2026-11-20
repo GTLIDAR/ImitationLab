@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
 from pathlib import Path
 
 import pytest
@@ -21,9 +22,16 @@ _MODULE = importlib.util.module_from_spec(_MODULE_SPEC)
 _MODULE_SPEC.loader.exec_module(_MODULE)
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
+# Manifests written by the data tools, checked when present. The repository
+# distributes no motion data, so these are skipped on a fresh checkout; set
+# IMITATIONLAB_TEST_MANIFEST to check one stored elsewhere.
 REAL_MANIFESTS = (
-    REPO_ROOT / "data" / "unitree" / "manifests" / "g1_unitree_dance102_manifest.json",
     REPO_ROOT / "data" / "lafan1" / "manifests" / "g1_lafan1_manifest.json",
+    *(
+        (Path(os.environ["IMITATIONLAB_TEST_MANIFEST"]).expanduser(),)
+        if os.environ.get("IMITATIONLAB_TEST_MANIFEST")
+        else ()
+    ),
 )
 
 # Keys the read path may emit per normalized entry: the required loader keys
@@ -38,13 +46,51 @@ ALLOWED_ENTRY_KEYS = {
 }
 
 
+def _legacy_manifest(root: Path) -> Path:
+    """Write a manifest in the layout of the earlier converter, without family or role."""
+    manifest_path = root / "manifests" / "g1_legacy_manifest.json"
+    manifest_path.parent.mkdir(parents=True)
+    payload = {
+        "dataset_name": "lafan1",
+        "dataset": {
+            "trajectories": {
+                "lafan1_csv": [
+                    {
+                        "name": "dance",
+                        "path": "../npz/g1/dance.npz",
+                        "input_fps": 50.0,
+                        "frame_range": [1, 1457],
+                    },
+                    {"name": "walk", "path": "../npz/g1/walk.npz", "input_fps": 50},
+                ]
+            }
+        },
+        "metadata": {
+            "npz_dir": "../npz/g1",
+            "num_motions": 2,
+            "input_fps": 60.0,
+            "output_fps": 50.0,
+            "paths_are_relative_to_manifest": True,
+        },
+    }
+    manifest_path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    return manifest_path
+
+
+def test_legacy_manifest_read_path_structural_invariants(tmp_path: Path) -> None:
+    _check_read_path_structural_invariants(_legacy_manifest(tmp_path))
+
+
 @pytest.mark.parametrize(
     "manifest_path", REAL_MANIFESTS, ids=[path.stem for path in REAL_MANIFESTS]
 )
 def test_real_manifest_read_path_structural_invariants(manifest_path: Path) -> None:
     if not manifest_path.is_file():
         pytest.skip(f"manifest not present: {manifest_path}")
+    _check_read_path_structural_invariants(manifest_path)
 
+
+def _check_read_path_structural_invariants(manifest_path: Path) -> None:
     raw = json.loads(manifest_path.read_text(encoding="utf-8"))
     raw_entries = raw["dataset"]["trajectories"]["lafan1_csv"]
 

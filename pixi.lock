@@ -1819,8 +1819,6 @@ packages:
   - wandb
   - zarr>3
   - huggingface-hub ; extra == 'hub'
-  - onnx ; extra == 'export'
-  - onnxruntime ; extra == 'export'
   - matplotlib>=3.10 ; extra == 'viz'
   - mujoco ; extra == 'viz'
   requires_python: '>=3.12'

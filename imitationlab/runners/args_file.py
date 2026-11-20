@@ -24,6 +24,8 @@ from pathlib import Path
 from imitationlab.paths import REPO_ROOT
 
 FLAG = "--args_file"
+# The documented kebab-case spelling; both are expanded.
+FLAGS = (FLAG, "--args-file")
 ENV_PREFIX = "%env "
 
 
@@ -82,12 +84,12 @@ def _expand(
         if token == "--":  # everything after a bare "--" belongs to another program
             out += tokens[i:]
             break
-        if token == FLAG:
+        if token in FLAGS:
             if i + 1 >= len(tokens):
                 raise ValueError(f"{FLAG} needs a path")
             raw, i = tokens[i + 1], i + 2
-        elif token.startswith(FLAG + "="):
-            raw, i = token[len(FLAG) + 1 :], i + 1
+        elif token.startswith(tuple(flag + "=" for flag in FLAGS)):
+            raw, i = token.partition("=")[2], i + 1
         else:
             out.append(token)
             i += 1

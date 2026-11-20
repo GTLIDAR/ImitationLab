@@ -12,7 +12,6 @@ order; the [project README](../README.md) has the short version.
 | [Motion data](../data/README.md) | LAFAN1 and BONES-SEED preparation and packed reference banks |
 | [Training and evaluation](training.md) | Commands, policy learners, command interfaces, checkpoints, export, and learning-speed measurements |
 | [Hardware selection](hardware.md) | Automatic execution sizes and local throughput tuning |
-| [Running on a Slurm cluster](cluster.md) | Profiles, campaigns, and the plan/submit workflow |
 
 ## Design and development
 
@@ -22,6 +21,7 @@ order; the [project README](../README.md) has the short version.
 | [Policy learners](../imitationlab/algorithms/README.md) | Layout of the learner package |
 | [Motion data tools](../imitationlab/data_tools/README.md) | Python API for loaders, replay storage, and reset sampling |
 | [Contributing](../CONTRIBUTING.md) | Workflow, checks, and what to record when reporting results |
+| [Changelog](../CHANGELOG.md) | Notable changes in each release |
 | [Migration](migration.md) | Earlier scripts, task IDs, module names, and checkpoints |
 | [Provenance](provenance.md) | Source revisions this repository started from |
 

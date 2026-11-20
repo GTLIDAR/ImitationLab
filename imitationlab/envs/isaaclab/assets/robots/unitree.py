@@ -3,7 +3,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
-"""Unitree robot configurations vendored for IsaacLab-Imitation.
+"""Unitree robot configurations vendored for ImitationLab.
 
 The G1 URDF and referenced meshes are packaged under
 ``imitationlab/envs/isaaclab/assets/unitree/g1_description`` so G1 imitation tasks do not

@@ -2,7 +2,13 @@
 authors = ["Feiyang Wu"]
 channels = ["conda-forge"]
 name = "ImitationLab"
-platforms = ["linux-64"]
+# The isaaclab feature needs glibc 2.35 and selects the second entry. The
+# default and static environments stay on the linux-64 defaults (glibc 2.28)
+# through the base-platform and static features below.
+platforms = [
+    "linux-64",
+    { name = "linux-64-glibc-2-35", platform = "linux-64", glibc = "2.35" },
+]
 requires-pixi = ">=0.83"
 version = "0.1.0"
 
@@ -12,7 +18,7 @@ format-check = "ruff format --check ."
 typecheck = "ty check"
 check = { depends-on = ["lint", "format-check", "test-default"] }
 test-algorithms = "pytest -q imitationlab/algorithms/tests"
-test-data-tools = "pytest -q imitationlab/data_tools/tests scripts/data"
+test-data-tools = "pytest -q imitationlab/data_tools/tests"
 # Env tests that import only the task math; the rest need Isaac Lab (test-isaaclab).
 test-env-cpu = "pytest -q imitationlab/envs/isaaclab/tests/test_causal_planner_observation.py imitationlab/envs/isaaclab/tests/test_counter_rng.py imitationlab/envs/isaaclab/tests/test_g1_graph_step_equivalence.py imitationlab/envs/isaaclab/tests/test_g1_reset_sampler.py imitationlab/envs/isaaclab/tests/test_g1_reset_sampler_masked.py imitationlab/envs/isaaclab/tests/test_g1_step_equivalence.py imitationlab/envs/isaaclab/tests/test_g1_task.py imitationlab/envs/isaaclab/tests/test_motion_manifest.py imitationlab/envs/isaaclab/tests/test_planner_publish_schedule.py imitationlab/envs/isaaclab/tests/test_shared_store.py imitationlab/envs/isaaclab/tests/test_terminal_obs_reader.py imitationlab/envs/isaaclab/tests/test_training_runtime_bootstrap.py imitationlab/envs/isaaclab/tests/test_world_model_task_math.py"
 test-runtime = "pytest -q imitationlab/runners/tests imitationlab/evaluation/tests"
@@ -61,6 +67,12 @@ matplotlib = ">=3.10"
 imitationlab = { path = ".", editable = true }
 ty = ">=0.0.65, <0.0.66"
 
+[feature.base-platform]
+platforms = ["linux-64"]
+
+[feature.isaaclab]
+platforms = ["linux-64-glibc-2-35"]
+
 [feature.isaaclab.pypi-options]
 extra-index-urls = ["https://pypi.nvidia.com"]
 index-strategy = "unsafe-best-match"
@@ -78,9 +90,6 @@ torchvision = { version = "==0.27.0", index = "https://download.pytorch.org/whl/
 torchaudio = { version = "==2.11.0", index = "https://download.pytorch.org/whl/cu130" }
 packaging = ">=20,<27"
 
-[feature.isaaclab.system-requirements]
-libc = { family = "glibc", version = "2.35" }
-
 [feature.isaaclab.dependencies]
 libxml2 = "<2.14"
 
@@ -95,9 +104,14 @@ tinyobjloader = "==2.0.0rc13"
 opencv-python-headless = "*"
 
 [feature.isaaclab.tasks]
-smoke-g1 = "env TERM=xterm OMNI_KIT_ACCEPT_EULA=YES PYTHONUNBUFFERED=1 HYDRA_FULL_ERROR=1 TORCHDYNAMO_DISABLE=1 imitationlab train --interface explicit --policy ppo --assert-kitless --num_envs 16 --max_iterations 1 env.data.manifest=./data/unitree/manifests/g1_unitree_dance102_manifest.json agent.logger.backend= agent.logger.log_dir=outputs/smoke-g1 agent.save_interval=1"
+# BANK is a packed reference bank directory (or a motion manifest); see data/README.md.
+smoke-g1 = "test -n \"$BANK\" || (echo 'smoke-g1: set BANK to a packed reference bank directory, e.g. BANK=data/reference_arrays/<id> pixi run -e isaaclab smoke-g1' >&2 && exit 1) && env TERM=xterm OMNI_KIT_ACCEPT_EULA=YES PYTHONUNBUFFERED=1 HYDRA_FULL_ERROR=1 TORCHDYNAMO_DISABLE=1 imitationlab train --interface explicit --policy ppo --assert-kitless --num-envs 16 --max-iterations 1 --data \"$BANK\" agent.logger.backend= agent.logger.log_dir=outputs/smoke-g1 agent.save_interval=1"
 test-isaaclab = "env TERM=xterm OMNI_KIT_ACCEPT_EULA=YES pytest -q imitationlab/envs/isaaclab/tests"
-zero-agent = "env TERM=xterm OMNI_KIT_ACCEPT_EULA=YES python scripts/zero_agent.py --task imitation-g1-v1 --num_envs 4 --max_steps 20 --manifest ./data/unitree/manifests/g1_unitree_dance102_manifest.json"
+# MANIFEST is a motion manifest JSON; see data/README.md.
+zero-agent = "test -n \"$MANIFEST\" || (echo 'zero-agent: set MANIFEST to a motion manifest, e.g. MANIFEST=data/lafan1/manifests/g1_lafan1_manifest.json pixi run -e isaaclab zero-agent' >&2 && exit 1) && env TERM=xterm OMNI_KIT_ACCEPT_EULA=YES python scripts/zero_agent.py --task imitation-g1-v1 --num-envs 4 --max-steps 20 --manifest \"$MANIFEST\""
+
+[feature.static]
+platforms = ["linux-64"]
 
 [feature.static.dependencies]
 python = "3.12.*"
@@ -110,5 +124,6 @@ compile-owned = "python -m compileall -q imitationlab scripts"
 ci-static = { depends-on = ["lint-owned", "format-owned", "compile-owned"] }
 
 [environments]
+default = ["base-platform"]
 isaaclab = ["isaaclab"]
 static = { features = ["static"], no-default-feature = true }

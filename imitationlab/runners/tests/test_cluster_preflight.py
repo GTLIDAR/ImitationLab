@@ -21,7 +21,7 @@ from imitationlab.runners.pipeline.cluster.preflight import (
 
 CAMPAIGN_TEMPLATE = """\
 name: demo
-profile: cluster
+profile: mycluster
 wandb_project: proj
 wandb_group: grp
 preflight:
@@ -41,7 +41,7 @@ def _profile(tmp_path: Path, *, min_free_gb: int = 0):
     profile_yaml = tmp_path / "profile_t.yaml"
     profile_yaml.write_text(
         f"name: t\n"
-        f"login: cluster\n"
+        f"login: mycluster\n"
         f"control_root: {remote / 'control'}\n"
         f"data_dir: {remote / 'data'}\n"
         f"shared_sif_path: {remote / 'sif/runtime.sif'}\n"

@@ -1,4 +1,4 @@
-"""Simulator-independent comparison helpers retained from IsaacLab-Imitation."""
+"""Simulator-independent comparison helpers for ImitationLab."""
 
 from __future__ import annotations
 

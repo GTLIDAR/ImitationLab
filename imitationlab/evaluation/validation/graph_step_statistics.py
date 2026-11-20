@@ -63,6 +63,7 @@ import time
 from pathlib import Path
 from typing import Any
 
+from imitationlab.cli_args import add_kebab_aliases
 from imitationlab.evaluation.validation.step_statistics import (
     LENGTH_BIN_EDGES,
     START_BINS,
@@ -676,7 +677,7 @@ def main(argv: list[str] | None = None) -> int:
     cmp.add_argument("--skip-blocks", type=int, default=1)
     cmp.add_argument("--z", type=float, default=4.0)
     cmp.add_argument("--p", type=float, default=1e-3)
-    args = parser.parse_args(argv)
+    args = add_kebab_aliases(parser).parse_args(argv)
     modes = {
         "run": _run,
         "sync": _sync,
