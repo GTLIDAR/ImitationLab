@@ -1,7 +1,7 @@
 """Render and parse the frozen job environment file.
 
 ``run_singularity.sh`` sources ``docker/cluster/job_env.resolved.sh`` when
-present and then skips its legacy ``.env.cluster`` re-source entirely, so this
+present and reads no other configuration file, so this
 file is the single config channel between ``plan`` and the compute node.
 """
 

@@ -1,8 +1,8 @@
 """Gate: preflight maps container paths through the real bind model and fails loudly.
 
 Failure classes under test all have recorded incidents: unmapped dataset paths
-("manifest missing", cluster run), outputs outside the binds (node-local tmp,
-cluster run), and quota exhaustion (the cluster 300 GB cap).
+("manifest missing"), outputs outside the binds (node-local tmp), and quota
+exhaustion (a 300 GB scratch cap on a Slurm cluster).
 """
 
 from __future__ import annotations

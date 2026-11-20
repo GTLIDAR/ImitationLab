@@ -1,9 +1,15 @@
 # Motion data tools
 
 ImitationLab's data package prepares reference motions and manages replay
-storage, trajectory cursors, and reset frames. See the
-[motion data guide](../../data/README.md) for dataset access and conversion
-commands. Pixi installs the dependencies from the repository root.
+storage, trajectory cursors, and reset frames. This page describes the
+package's Python API and is for developers who call it directly or extend it.
+To download, convert, and pack a dataset from the command line, follow the
+[motion data guide](../../data/README.md) instead.
+
+Pixi installs the dependencies from the repository root; see
+[setup](../../docs/setup.md).
+
+## Modules
 
 | Module | Purpose |
 | --- | --- |
@@ -18,10 +24,18 @@ commands. Pixi installs the dependencies from the repository root.
 
 ## Commands
 
-Run `imitationlab data --help` for preparation, packing, and validation.
-Dataset preparation keeps completed batches and can resume from the same
-work directory. Packing writes the manifest last, so an interrupted pack
-does not appear to be a complete bank.
+`imitationlab data` has three subcommands. Run `imitationlab data --help` for
+their options.
+
+| Subcommand | Purpose |
+| --- | --- |
+| `data prepare` | Run a resumable dataset conversion |
+| `data pack` | Pack an NPZ manifest into a reference bank |
+| `data validate` | Validate a reference bank directory or a clip manifest |
+
+Dataset preparation keeps completed batches and can resume from the same work
+directory. Packing writes the manifest last, so an interrupted pack does not
+appear to be a complete bank.
 
 ## LAFAN1 loader
 
@@ -78,6 +92,9 @@ names.
 
 ## Replay buffer and trajectory manager
 
+This example continues from the loader above: it reads the Zarr store the
+loader wrote and steps one reference cursor per environment.
+
 ```python
 import torch
 
@@ -122,21 +139,29 @@ walking the Zarr store again; pass `persist_rebuild=True` after the store
 changes.
 
 `ParallelTrajectoryManager` keeps a `(trajectory_rank, local_step)` cursor per
-environment. `sample()` indexes the buffer storage directly with the global
-indices of all cursors (one frame per environment) and, by default, advances
-them; `sample_slice()` returns a window per environment; `advance_cursors()`
-moves cursors without reading storage; `reset_envs()` reassigns trajectories
-according to `reset_schedule` and sets the start frame. Both joint-name lists
-are required: the manager maps the reference joint order to the target order
-and marks joints the reference does not provide.
+environment.
+
+| Method | Behavior |
+| --- | --- |
+| `sample()` | Indexes the buffer storage directly with the global indices of all cursors (one frame per environment) and, by default, advances them |
+| `sample_slice()` | Returns a window per environment |
+| `advance_cursors()` | Moves cursors without reading storage |
+| `reset_envs()` | Reassigns trajectories according to `reset_schedule` and sets the start frame |
+
+Both joint-name lists are required: the manager maps the reference joint order
+to the target order and marks joints the reference does not provide.
 
 ## Reset sampling
 
 Trajectory selection belongs to the manager. `StartFrameSampler` answers the
-second question, which frame to start at, in four modes: `fixed`, `random`
-(uniform in a configured range), `uniform` (uniform over each trajectory's own
-length) and `adaptive` (proportional to a caller-supplied
-`weight_fn(ranks, steps)`).
+second question, which frame to start at, in four modes:
+
+| Mode | Start frame |
+| --- | --- |
+| `fixed` | Always `fixed_step` |
+| `random` | Uniform in a configured range |
+| `uniform` | Uniform over each trajectory's own length |
+| `adaptive` | Proportional to a caller-supplied `weight_fn(ranks, steps)` |
 
 `SonicAdaptiveResetSampler` is a failure-aware sampler: it keeps per-bin visit
 and failure counts, mixes the failure-rate distribution with a uniform floor,
@@ -174,4 +199,5 @@ no dataset download is needed.
 
 ## License
 
-MIT, see [LICENSE](LICENSE).
+MIT, see [LICENSE](LICENSE). Motion datasets are licensed separately by their
+owners.

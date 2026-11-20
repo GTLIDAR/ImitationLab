@@ -1,81 +1,126 @@
 # Setup
 
-Run the commands from the repository root. Pixi installs ImitationLab in
+This guide installs ImitationLab and checks that it runs. It is for anyone
+running the code for the first time, on a workstation or a cluster node. The
+[official SuperMimic runner](#official-supermimic) is optional and has its own
+environment.
+
+Run all commands from the repository root. Pixi installs ImitationLab in
 editable mode and installs Isaac Lab from a pinned Git revision. The
 `imitationlab` command provides the data, pretrain, train, evaluate, and
 export workflows.
 
+## Requirements
+
+| Requirement | Details |
+| --- | --- |
+| Operating system | Linux x86-64. The Isaac Lab environment targets glibc 2.35 or newer |
+| GPU | Training requires an NVIDIA GPU and a driver compatible with the CUDA 13.0 PyTorch build |
+| Pixi | [Pixi](https://pixi.sh/latest/installation/) 0.83 or newer |
+| Disk | Several tens of gigabytes for the simulation stack and package cache |
+
+## Environments
+
+The workspace defines three Pixi environments. Install only the ones you need.
+
+| Environment | Install | Used for |
+| --- | --- | --- |
+| `isaaclab` | `pixi install --locked -e isaaclab` | Simulation: motion conversion, pretraining, training, evaluation |
+| default | `pixi install --locked` | CPU tests and data-bank validation |
+| `static` | `pixi install --locked -e static` | Lint and compile checks |
+
 ## Isaac Lab
 
-Install [Pixi](https://pixi.sh/latest/installation/) 0.83 or newer. The workspace targets
-Linux x86-64. Training requires an NVIDIA GPU and a driver compatible with
-the CUDA 13.0 PyTorch build. The Isaac Lab environment targets glibc 2.35 or
-newer. Allow several tens of gigabytes for the simulation stack and package
-cache.
+Install the simulation environment and run the smoke test:
 
 ```bash
 pixi install --locked -e isaaclab
 pixi run -e isaaclab smoke-g1
 ```
 
-Isaac Sim requires accepting the [NVIDIA Omniverse License Agreement](https://docs.omniverse.nvidia.com/platform/latest/common/NVIDIA_Omniverse_License_Agreement.html).
+The smoke test runs one PPO iteration on the bundled Dance102 motion and
+writes a checkpoint under `outputs/smoke-g1`. The first simulation launch may
+fetch Isaac Sim ground-plane assets and compile Warp kernels.
+
+**License.** Isaac Sim requires accepting the
+[NVIDIA Omniverse License Agreement](https://docs.omniverse.nvidia.com/platform/latest/common/NVIDIA_Omniverse_License_Agreement.html).
 The `smoke-g1`, `test-isaaclab`, `benchmark` and `tune` commands set
 `OMNI_KIT_ACCEPT_EULA=YES` for their simulator processes, so running them
 accepts it. Other commands that start Isaac Sim, such as motion conversion,
 ask in a terminal; set `OMNI_KIT_ACCEPT_EULA=YES` to run them unattended.
 
-The one-iteration smoke uses the bundled Dance102 motion and writes a
-checkpoint under `outputs/smoke-g1`. The first simulation launch may fetch
-Isaac Sim ground-plane assets and compile Warp kernels. See [training and
-evaluation](training.md) for full runs. For CPU tests and data-bank validation,
-install the default environment with `pixi install --locked`.
+## Check the machine
 
-Inspect the local machine before training with
-`pixi run -e isaaclab imitationlab hardware --data "$BANK"`.
+Inspect the local machine before training. `BANK` is a packed reference bank
+from the [motion data guide](../data/README.md).
+
+```bash
+pixi run -e isaaclab imitationlab hardware --data "$BANK"
+```
+
 Fresh runs use automatic hardware sizing by default; see
-[hardware selection](hardware.md) for manual settings and optional calibration.
+[hardware selection](hardware.md) for manual settings and optional
+calibration.
+
+## Run the tests
+
+| Command | Covers |
+| --- | --- |
+| `pixi run --locked test-default` | Learner, data-tool, and script suites (CPU) |
+| `pixi run --locked -e isaaclab test-isaaclab` | G1 environment suite (GPU) |
+| `pixi run --locked -e static ci-static` | Lint and compile checks |
 
 ## Official SuperMimic
 
-The official runner uses Python 3.13 and HybridRobotics' mjlab fork. Install
-[uv](https://docs.astral.sh/uv/getting-started/installation/), then prepare the
-external simulator beside the vendored SuperMimic package.
+This section is optional. The repository vendors the official SuperMimic
+baseline under `third_party/supermimic`. It runs on mjlab rather than Isaac
+Lab; its task IDs, data format, and checkpoints belong to the mjlab baseline.
 
-```bash
-git clone https://github.com/HybridRobotics/mjlab_research.git third_party/mjlab_research
-git -C third_party/mjlab_research checkout --detach dd51a9fcc98791a2f0b018b3c7f71a3eefd5ecdd
-(cd third_party/supermimic && uv sync --locked)
-```
+The official runner uses Python 3.13 and HybridRobotics' mjlab fork.
 
-The sibling checkout is ignored by Git. Use a local motion file in mjlab's
-tracking format. To convert the bundled Dance102 clip, run from the repository
-root after installing the default Pixi environment.
+1. Install [uv](https://docs.astral.sh/uv/getting-started/installation/),
+   then prepare the external simulator beside the vendored SuperMimic
+   package. The sibling checkout is ignored by Git.
 
-```bash
-pixi run python scripts/data/convert_mjlab_motion.py \
-  data/unitree/npz/g1/G1_Take_102.bvh_60hz.npz outputs/dance102-mjlab.npz \
-  --start 1 --stop 1457
-```
+   ```bash
+   git clone https://github.com/HybridRobotics/mjlab_research.git third_party/mjlab_research
+   git -C third_party/mjlab_research checkout --detach dd51a9fcc98791a2f0b018b3c7f71a3eefd5ecdd
+   (cd third_party/supermimic && uv sync --locked)
+   ```
 
-Run the official generalized-coordinate task from an output directory so the
-runner's relative `logs/` path stays under `outputs/`.
+2. Provide a local motion file in mjlab's tracking format. To convert the
+   bundled Dance102 clip, run this from the repository root after installing
+   the default Pixi environment:
 
-```bash
-mkdir -p outputs/official-supermimic
-(
-  cd outputs/official-supermimic
-  runner=../../third_party/supermimic
-  "$runner/.venv/bin/python" "$runner/src/supermimic/scripts/train.py" \
-    SuperMimic-GenCoord-G1 --motion-file ../dance102-mjlab.npz \
-    --runner.run-name g1-baseline
-)
-```
+   ```bash
+   pixi run python scripts/data/convert_mjlab_motion.py \
+     data/unitree/npz/g1/G1_Take_102.bvh_60hz.npz outputs/dance102-mjlab.npz \
+     --start 1 --stop 1457
+   ```
+
+3. Run the official generalized-coordinate task from an output directory so
+   the runner's relative `logs/` path stays under `outputs/`:
+
+   ```bash
+   mkdir -p outputs/official-supermimic
+   (
+     cd outputs/official-supermimic
+     runner=../../third_party/supermimic
+     "$runner/.venv/bin/python" "$runner/src/supermimic/scripts/train.py" \
+       SuperMimic-GenCoord-G1 --motion-file ../dance102-mjlab.npz \
+       --runner.run-name g1-baseline
+   )
+   ```
 
 The official runner also exposes `SuperMimic-MaxCoord-G1` and accepts a W&B
-motion artifact. Its task IDs, data format, and checkpoints belong to the
-mjlab baseline. See the [upstream README](../third_party/supermimic/README.md).
+motion artifact. See the
+[upstream README](../third_party/supermimic/README.md).
 
-For first-release dataset setup, see [motion data](../data/README.md). Run
-`pixi run --locked test-default` for the learner, data-tool, and script suites,
-`pixi run --locked -e isaaclab test-isaaclab` for the G1 environment suite, and
-`pixi run --locked -e static ci-static` for lint and compile checks.
+## Next steps
+
+- [Motion data](../data/README.md): download or convert LAFAN1 and BONES-SEED
+  and pack a reference bank.
+- [Training and evaluation](training.md): pretrain an encoder, train a
+  tracker, and evaluate it.
+- [Hardware selection](hardware.md): how execution sizes are chosen for your
+  GPU.

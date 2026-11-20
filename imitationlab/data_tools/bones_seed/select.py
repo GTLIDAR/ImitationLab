@@ -8,7 +8,7 @@ Run from the repo root:
 
     pixi run python scripts/data/select_bones_seed_sonic.py \
         --metadata-csv data/bones_seed/raw/metadata/seed_metadata_v004.csv \
-        --output ~/Storage/bones_seed_full/selection/g1_bones_seed_sonic_selection.json
+        --output data/bones_seed/selection/g1_bones_seed_sonic_selection.json
 """
 
 from __future__ import annotations

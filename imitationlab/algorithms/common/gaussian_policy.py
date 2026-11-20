@@ -1,7 +1,7 @@
 """Gaussian policy components for continuous action spaces.
 
 This module provides components for building Gaussian (Normal) policies with
-learned standard deviation parameters, supporting both PPO and SAC imitationlab.algorithms.
+learned standard deviation parameters, as used by the PPO learner.
 """
 
 from __future__ import annotations
@@ -81,8 +81,8 @@ class GaussianPolicyHead(nn.Module):
     parameter to output both mean (loc) and standard deviation (scale) for
     a Gaussian action distribution.
 
-    This is the standard parameterization used in PPO and can also be used
-    in SAC for consistency.
+    This is the standard parameterization used in PPO; off-policy learners
+    can use it as well.
 
     Args:
         base: Base network that maps observations to action means.

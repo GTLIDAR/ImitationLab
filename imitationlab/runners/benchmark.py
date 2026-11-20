@@ -549,23 +549,63 @@ def main(argv=None) -> int:
             if name == "run"
             else "Pretrain a command encoder for later runs.",
         )
-        p.add_argument("--dataset", choices=DATASETS, required=True)
-        p.add_argument("--data", type=Path, required=True)
+        p.add_argument(
+            "--dataset",
+            choices=DATASETS,
+            required=True,
+            help="Dataset label recorded with the result.",
+        )
+        p.add_argument(
+            "--data", type=Path, required=True, help="Packed reference bank directory."
+        )
         p.add_argument(
             "--interface",
             type=interface_arg,
             choices=INTERFACES if name == "run" else INTERFACES[1:],
             default="explicit" if name == "run" else None,
             required=name == "pretrain",
+            help="Command interface (default: explicit)."
+            if name == "run"
+            else "Encoder to pretrain.",
         )
-        p.add_argument("--output", type=Path, required=True)
-        p.add_argument("--seed", type=int, default=42)
-        p.add_argument("--timeout", type=float, default=7200)
+        p.add_argument(
+            "--output",
+            type=Path,
+            required=True,
+            help="New directory for the logs and the result record.",
+        )
+        p.add_argument(
+            "--seed",
+            type=int,
+            default=42,
+            help="Policy seed (default: %(default)s)."
+            if name == "run"
+            else "Encoder seed (default: %(default)s).",
+        )
+        p.add_argument(
+            "--timeout",
+            type=float,
+            default=7200,
+            help="Wall-clock limit for the training process, in seconds (default: %(default)s)."
+            if name == "run"
+            else "Wall-clock limit for pretraining, in seconds (default: %(default)s).",
+        )
     p = actions.choices["pretrain"]
-    p.add_argument("--updates", type=int, default=2000)
+    p.add_argument(
+        "--updates",
+        type=int,
+        default=2000,
+        help="Encoder gradient updates (default: %(default)s).",
+    )
     p = actions.choices["run"]
-    p.add_argument("--policy", choices=POLICIES, required=True)
-    p.add_argument("--encoder-run", type=Path)
+    p.add_argument(
+        "--policy", choices=POLICIES, required=True, help="Policy learner to train."
+    )
+    p.add_argument(
+        "--encoder-run",
+        type=Path,
+        help="Output directory of a completed benchmark pretrain; required for a latent interface.",
+    )
     p.add_argument(
         "--encoder-seed",
         type=int,
@@ -575,21 +615,42 @@ def main(argv=None) -> int:
         "--encoder-source-sha256",
         help="Expected frozen encoder source fingerprint; defaults to current source.",
     )
-    p.add_argument("--seconds", type=float, default=1800)
+    p.add_argument(
+        "--seconds",
+        type=float,
+        default=1800,
+        help="Policy-training time budget, in seconds (default: %(default)s).",
+    )
     p.add_argument(
         "--milestones",
         type=float,
         nargs="+",
         default=[60, 120, 300, 600, 900, 1200, 1800],
+        help="Increasing training times, in seconds, at which a checkpoint is saved and evaluated.",
     )
-    p.add_argument("--eval-clips", type=int, default=256)
+    p.add_argument(
+        "--eval-clips",
+        type=int,
+        default=256,
+        help="Clips sampled from the bank for evaluation (default: %(default)s).",
+    )
     p.add_argument(
         "--eval-seed",
         type=int,
         help="Fixed board/evaluation seed, independent of the policy seed; defaults to --seed.",
     )
-    p.add_argument("--eval-steps", type=int, default=500)
-    p.add_argument("--eval-timeout", type=float, default=900)
+    p.add_argument(
+        "--eval-steps",
+        type=int,
+        default=500,
+        help="Control steps per evaluation rollout (default: %(default)s).",
+    )
+    p.add_argument(
+        "--eval-timeout",
+        type=float,
+        default=900,
+        help="Wall-clock limit per checkpoint evaluation, in seconds (default: %(default)s).",
+    )
     args, rest = parser.parse_known_args(argv)
     action = pretrain if args.action == "pretrain" else run
     try:

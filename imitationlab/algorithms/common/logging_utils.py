@@ -265,7 +265,7 @@ def _build_wandb_identity(exp_name: Any, run_dir: Path) -> tuple[str, list[str]]
     Deliberately the NAME and not the run id: ImitationLab also tags the run
     ``logdir:<19-char timestamp>_wandb-<run id>``, and W&B caps a tag at 64
     characters, which leaves 31 for the id. Appending 20 more characters there
-    overflows the cap and the run creation fails (job 5580199).
+    overflows the cap and the run creation fails.
 
     On a walltime-segmented chain every segment resumes one run id and passes
     its own name, so the displayed name tracks the most recent segment W&B

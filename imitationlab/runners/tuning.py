@@ -265,24 +265,78 @@ def main(argv: list[str] | None = None, *, calibrate: bool = False) -> int:
         else "Inspect local hardware and recommended execution sizes without starting Isaac Lab.",
     )
     parser.add_argument(
-        "--policy", choices=("ppo", "supermimic", "svg", "diffsr"), default="supermimic"
+        "--policy",
+        choices=("ppo", "supermimic", "svg", "diffsr"),
+        default="supermimic",
+        help="Policy learner (default: %(default)s).",
     )
     parser.add_argument(
-        "--interface", type=interface_arg, choices=INTERFACES, default="explicit"
+        "--interface",
+        type=interface_arg,
+        choices=INTERFACES,
+        default="explicit",
+        help="Command interface (default: %(default)s).",
     )
-    parser.add_argument("--data", type=Path, required=calibrate)
-    parser.add_argument("--encoder", type=Path)
-    parser.add_argument("--stage", choices=("train", "pretrain"), default="train")
     parser.add_argument(
-        "--hardware", choices=("auto", "off", *PROFILE_NAMES), default="auto"
+        "--data",
+        type=Path,
+        required=calibrate,
+        help="Motion manifest or packed reference bank.",
     )
-    parser.add_argument("--json", action="store_true")
-    parser.add_argument("--output", type=Path)
+    parser.add_argument(
+        "--encoder",
+        type=Path,
+        help="Pretrained spectral or FSQ encoder checkpoint, for a latent interface.",
+    )
+    parser.add_argument(
+        "--stage",
+        choices=("train", "pretrain"),
+        default="train",
+        help="Workload to size (default: %(default)s). Calibration supports train only.",
+    )
+    parser.add_argument(
+        "--hardware",
+        choices=("auto", "off", *PROFILE_NAMES),
+        default="auto",
+        help="Execution-size profile (default: auto, chosen from local resources).",
+    )
+    parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Print the recommendation as JSON (imitationlab hardware).",
+    )
+    parser.add_argument(
+        "--output",
+        type=Path,
+        help="New directory for trial logs and selection.json (default: outputs/tuning/<UTC time>)."
+        if calibrate
+        else "Also write the recommendation JSON to this file.",
+    )
     if calibrate:
-        parser.add_argument("--seconds", type=float, default=30)
-        parser.add_argument("--warmup-iterations", type=int, default=5)
-        parser.add_argument("--timeout", type=float, default=900)
-        parser.add_argument("--candidates", nargs="+", choices=PROFILE_NAMES)
+        parser.add_argument(
+            "--seconds",
+            type=float,
+            default=30,
+            help="Measured seconds per candidate after warmup (default: %(default)s).",
+        )
+        parser.add_argument(
+            "--warmup-iterations",
+            type=int,
+            default=5,
+            help="Training iterations discarded before measuring (default: %(default)s).",
+        )
+        parser.add_argument(
+            "--timeout",
+            type=float,
+            default=900,
+            help="Wall-clock limit per candidate, in seconds (default: %(default)s).",
+        )
+        parser.add_argument(
+            "--candidates",
+            nargs="+",
+            choices=PROFILE_NAMES,
+            help="Profiles to measure (default: every profile that fits this machine).",
+        )
     args, rest = parser.parse_known_args(argv)
     with reported_by(parser):
         return _run(parser, args, rest, calibrate=calibrate)

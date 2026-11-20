@@ -3,8 +3,8 @@
 
 Each algorithm that can run here trains for a few iterations against a backend
 double that applies wandb's step rule, with the progress bar on and
-``trainer.log_interval`` far beyond the run. That is the configuration of job
-6808096, whose PPO run kept wandb empty while ``training.log`` filled. Algorithms
+``trainer.log_interval`` far beyond the run. That is the configuration of a
+cluster run whose PPO run kept wandb empty while ``training.log`` filled. Algorithms
 that cannot run here are covered by the source scan at the end of the file.
 """
 
@@ -128,7 +128,7 @@ def _base_cfg(cfg, tmp_path: Path):
     cfg.logger.log_dir = str(tmp_path)
     cfg.logger.log_to_console = False
     cfg.save_interval = 0
-    # Job 6808096: the bar on, the text cadence longer than the run.
+    # The failing configuration: the bar on, the text cadence longer than the run.
     cfg.trainer.progress_bar = True
     cfg.trainer.log_interval = 10**9
     for network in (cfg.policy, cfg.value_function, cfg.q_function):

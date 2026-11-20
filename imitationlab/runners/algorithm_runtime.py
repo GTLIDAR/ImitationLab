@@ -629,7 +629,7 @@ class AlgorithmRuntime(Checkpointing, TrainingMetrics, Learner[CfgT]):
     def _construct_q_function(self) -> TensorDictModule:
         """Construct the Q-function network from configuration.
 
-        Implement this method in subclasses that use Q-learning (e.g., SAC, DDPG, TD3).
+        Implement this method in subclasses that use Q-learning (off-policy learners).
 
         Args:
             q_net: Optional pre-constructed network. If None, build from config.
@@ -679,7 +679,7 @@ class AlgorithmRuntime(Checkpointing, TrainingMetrics, Learner[CfgT]):
         """Construct the loss module for computing training objectives.
 
         Implement this method to create the algorithm-specific loss module
-        (e.g., ClipPPOLoss, SACLoss, DDPGLoss).
+        (e.g., ClipPPOLoss).
 
         Returns:
             TorchRL loss module configured for the algorithm.

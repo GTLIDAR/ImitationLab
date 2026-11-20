@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "imitationlab"
 version = "0.1.0"
-description = "Native policy learning and motion processing for ImitationLab"
+description = "Whole-body motion tracking for the Unitree G1 in Isaac Lab"
 readme = "README.md"
 requires-python = ">=3.12"
 license = "MIT"
@@ -51,6 +51,7 @@ viz = ["matplotlib>=3.10", "mujoco"]
 Homepage = "https://github.com/GTLIDAR/ImitationLab"
 Repository = "https://github.com/GTLIDAR/ImitationLab"
 Issues = "https://github.com/GTLIDAR/ImitationLab/issues"
+Documentation = "https://github.com/GTLIDAR/ImitationLab/tree/main/docs"
 
 [project.scripts]
 imitationlab = "imitationlab.cli:main"

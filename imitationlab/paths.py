@@ -1,9 +1,8 @@
 """Location-independent repository paths for the ImitationLab package.
 
-Earlier reorganizations moved this directory twice and silently broke every
-``Path(__file__).resolve().parents[N]`` that hard-coded a nesting depth. Resolve
-the repository root by walking up to its markers instead, so a future move stays
-correct without editing each caller.
+The repository root is found by walking up from this file to its markers
+(``pixi.toml`` and ``experiments/``) instead of counting parent directories, so
+callers do not depend on how deeply a module is nested.
 """
 
 from __future__ import annotations

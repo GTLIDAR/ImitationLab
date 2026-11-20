@@ -27,7 +27,7 @@ on the same source snapshot and then frozen for their policy runs.
 | --- | --- |
 | Policy budget | 30 training minutes per combination; 12 GPU-hours total |
 | Hardware | One NVIDIA H100 per job; 8 CPU cores; 96 GiB host-memory request |
-| cluster scheduling | `gpu` partition, `gpu` QoS; 60-minute policy walltime limit |
+| Scheduling | A Slurm cluster; 60-minute policy walltime limit |
 | Seed | 42 |
 | Motion banks | LAFAN1: 40 clips; BONES-SEED: 129,785 clips |
 | Evaluation board | All 40 LAFAN1 clips; the same deterministic 256-clip BONES-SEED sample |
@@ -63,8 +63,7 @@ All eight jobs accepted before an interrupted submission were retained. The
 remaining twenty stages were submitted after verifying job identities,
 dependencies and remote script/archive hashes. The recovered submission record
 contains all 28 unique job IDs; no accepted job was duplicated or cancelled.
-Policy walltime reservations were reduced from 90 to 60 minutes to release
-cluster's per-user GPU-minute quota. This retains the full 30-minute training
+Policy walltime reservations were reduced from 90 to 60 minutes. This retains the full 30-minute training
 budget and leaves additional time for startup and checkpoint evaluation.
 
 The report audit requires positive policy/world-model/critic optimizer counters

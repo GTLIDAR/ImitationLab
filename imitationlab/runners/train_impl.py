@@ -100,7 +100,6 @@ warnings.filterwarnings(
     module=r"wandb\.analytics\.sentry",
 )
 
-# import logger
 logger = logging.getLogger(__name__)
 logging.getLogger("imitationlab.data_tools").setLevel(logging.WARNING)
 

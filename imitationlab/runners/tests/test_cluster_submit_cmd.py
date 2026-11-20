@@ -1,8 +1,8 @@
 """Gate: ``submit`` executes only a confirmed, undrifted plan and records everything.
 
 Includes the regression test for the config-forwarding failure class:
-run_singularity.sh must prefer the frozen job_env.resolved.sh over the legacy
-.env.cluster re-source.
+run_singularity.sh must source the frozen job_env.resolved.sh and refuse to
+run without it.
 """
 
 from __future__ import annotations

@@ -39,3 +39,36 @@ The G1 assets retain their bundled upstream notices under
 The `imitation-g1-v1` environment credits the MIT-licensed
 [supermimic_vibed](https://github.com/zita-ch/supermimic_vibed) replica.
 See [its license](third_party/licenses/supermimic_vibed.txt).
+
+## Isaac Lab
+
+The following files are derived from
+[Isaac Lab](https://github.com/isaac-sim/IsaacLab) and carry its BSD-3-Clause
+license header:
+
+- `imitationlab/data_tools/common/isaac_batch.py`
+- `imitationlab/data_tools/lafan1/hub.py`
+- `imitationlab/data_tools/lafan1/manifest.py`
+- `imitationlab/data_tools/lafan1/prepare.py`
+- `imitationlab/data_tools/lafan1/setup.py`
+- `imitationlab/envs/isaaclab/__init__.py`
+- `imitationlab/envs/isaaclab/assets/robots/unitree.py`
+- `imitationlab/envs/isaaclab/contracts/__init__.py`
+- `imitationlab/envs/isaaclab/contracts/command_channels.py`
+- `imitationlab/envs/isaaclab/envs/imitation_interface.py`
+- `imitationlab/envs/isaaclab/envs/torchrl_adapter.py`
+- `imitationlab/envs/isaaclab/tasks/__init__.py`
+- `imitationlab/envs/isaaclab/tasks/manager_based/__init__.py`
+- `imitationlab/envs/isaaclab/tasks/manager_based/imitation/_resolve.py`
+- `imitationlab/envs/isaaclab/tasks/manager_based/imitation/command_components.py`
+- `imitationlab/envs/isaaclab/tasks/manager_based/imitation/command_interface.py`
+- `imitationlab/envs/isaaclab/tasks/manager_based/imitation/config/g1/common/actions.py`
+- `imitationlab/envs/isaaclab/tasks/manager_based/imitation/config/g1/common/constants.py`
+- `imitationlab/envs/isaaclab/tasks/manager_based/imitation/mdp/commands/actor.py`
+- `imitationlab/envs/isaaclab/tasks/manager_based/imitation/mdp/commands/reference.py`
+- `imitationlab/envs/isaaclab/tasks/manager_based/imitation/motion_data.py`
+- `imitationlab/evaluation/tests/test_backend_determinism.py`
+- `imitationlab/evaluation/validation/backend_determinism.py`
+- `imitationlab/runners/zero_agent.py`
+- `scripts/list_envs.py`
+- `scripts/random_agent.py`

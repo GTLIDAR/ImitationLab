@@ -18,8 +18,18 @@ from imitationlab.runners.artifacts import (
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, prog="imitationlab export")
-    parser.add_argument("--checkpoint", required=True, type=Path)
-    parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument(
+        "--checkpoint",
+        required=True,
+        type=Path,
+        help="Checkpoint file or run directory to export.",
+    )
+    parser.add_argument(
+        "--output",
+        required=True,
+        type=Path,
+        help="Bundle directory to create; must not already exist.",
+    )
     args, rest = parser.parse_known_args(argv)
     if rest:
         parser.error(f"Unrecognized arguments: {' '.join(rest)}")

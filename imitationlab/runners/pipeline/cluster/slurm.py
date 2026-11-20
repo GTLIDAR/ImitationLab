@@ -1,7 +1,7 @@
 """Typed Slurm directives and deterministic batch-script rendering.
 
-One adapter serves every profile. The rendered script reproduces the proven
-PACE job body (docker/cluster/submit_job_slurm_pace.sh): extract the uploaded
+One adapter serves every profile. The rendered script reproduces the job body
+of the earlier shell submitter: extract the uploaded
 workspace archive into compute-local storage, install the per-stage frozen env
 file, and hand off to run_singularity.sh. The dependency spec is deliberately
 NOT a directive: job IDs are unknown at plan time, so ``submit`` passes

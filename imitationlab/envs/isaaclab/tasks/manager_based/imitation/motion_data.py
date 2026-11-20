@@ -214,7 +214,7 @@ class MotionDataCfg:
 
     It is wrong on a shared cluster filesystem. Mapping defers reads to per-step
     page faults, and on Lustre those are random small reads -- the access
-    pattern it is worst at. Measured on cluster 2026-08-05: ~48 fps with three jobs
+    pattern it is worst at. Measured on a Slurm cluster 2026-08-05: ~48 fps with three jobs
     cold-starting on one node, against ~100,000 fps locally. Reading the arrays
     up front is one sequential pass, which is what Lustre is good at, and
     afterwards no filesystem is involved at all. Set this on any cluster whose

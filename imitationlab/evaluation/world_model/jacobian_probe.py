@@ -1,7 +1,7 @@
 """Directional derivatives of the simulator against a learned dynamics model.
 
-Pure tensor helpers behind ``scripts/tracking/probe_model_jacobian.py``. The
-script copies one simulator state into a block of environments and steps each
+Pure tensor helpers for a model-Jacobian probe. The
+probe copies one simulator state into a block of environments and steps each
 copy with a perturbed action. A block holds two unperturbed copies (their
 disagreement is the solver's noise floor) and a +/- pair per direction and
 step size, so a central difference gives the simulator's Jacobian-vector

@@ -634,7 +634,7 @@ class ExpertDataPlane:
             #
             # This is the wrong default on a shared cluster filesystem. Mapping
             # defers reads to per-step page faults, and on Lustre those are
-            # random small reads -- its worst case. Measured 2026-08-05 on cluster:
+            # random small reads -- its worst case. Measured 2026-08-05 on a Slurm cluster:
             # ~48 fps with three jobs cold-starting on one node against ~100,000
             # fps locally. Set env.data.reference_arrays_resident=true there.
             fields = {name: store.array(name) for name in RUNTIME_FIELDS}

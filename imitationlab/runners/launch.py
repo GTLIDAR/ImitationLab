@@ -111,7 +111,10 @@ def main(argv: list[str] | None = None) -> None:
         allow_abbrev=False,
     )
     parser.add_argument(
-        "--interface", type=interface_arg, choices=("explicit", *ENCODERS)
+        "--interface",
+        type=interface_arg,
+        choices=("explicit", *ENCODERS),
+        help="Command interface. Defaults to explicit; spectral and fsq need --encoder.",
     )
     parser.add_argument(
         "--policy",
@@ -119,7 +122,7 @@ def main(argv: list[str] | None = None) -> None:
         help="Policy learner. Defaults to supermimic.",
     )
     parser.add_argument(
-        "--encoder", type=Path, help="Pretrained DiffSR or FSQ checkpoint."
+        "--encoder", type=Path, help="Pretrained spectral or FSQ encoder checkpoint."
     )
     parser.add_argument(
         "--dry-run", action="store_true", help="Print the command and exit."
