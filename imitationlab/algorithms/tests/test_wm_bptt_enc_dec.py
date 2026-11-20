@@ -5,7 +5,7 @@ References are NDM Gym's (``ndm_gym/policies/tracking_policy.py``, its
 (goal 730 -> 2048, 1024, 512, 256 -> 32, tanh; latent and 990 proprio columns ->
 2048, 1024, 512, 256 -> 29, ELU, last layer x 0.01, bias 0) the policy has 9,116,477
 parameters, and Muon updates six matrices, each MLP's hidden ones. The flat default is
-the golden test's.
+unchanged.
 """
 
 from __future__ import annotations

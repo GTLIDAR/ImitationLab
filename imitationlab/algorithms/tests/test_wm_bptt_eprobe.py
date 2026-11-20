@@ -6,7 +6,7 @@ Gym's ``probe.tick(it, ...)``) with the deployed policy, logs its numbers, and k
 its state in full checkpoints (``eprobe_fail``, ``eprobe_focus``,
 ``eprobe_focus_share``). ``deployed_policy`` builds what ``load_policy`` deploys, which
 the probe's worker runs. The probe itself (sweeps, counts, focus, timing) is tested
-in the parent repository (``test_g1_eval_probe.py``); off, the golden test holds.
+in the parent repository (``test_g1_eval_probe.py``); off, the default run is unchanged.
 """
 
 from __future__ import annotations

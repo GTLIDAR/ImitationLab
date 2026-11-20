@@ -5,7 +5,7 @@ joint positions, the default pose and the env's action scale, as NDM Gym's
 ``reference_setpoints`` forms it (``tests/test_action_parameterization.py`` there,
 ``test_supermimic_residual_setpoints``). Every path that turns the actor's output
 into an action is checked: collection, imagination, the deployed policy and
-``predict``. The default path is the golden test's.
+``predict``. The default path is unchanged.
 """
 
 from __future__ import annotations
