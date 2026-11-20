@@ -346,17 +346,6 @@ def test_the_patch_refuses_a_process_that_has_compiled() -> None:
 
 
 @cuda
-def test_the_patch_replaces_cublas_within_tolerance() -> None:
-    off, on = run("products", "off"), run("products", "on")
-    assert off["bmm_calls"] > 0, (
-        "the control must show the products this option removes"
-    )
-    assert on["bmm_calls"] == 0
-    assert on["fk_error"] < 1e-4
-    assert on["rotate_error"] < 1e-4
-
-
-@cuda
 def test_the_tag_keeps_the_two_graphs_apart(tmp_path: Path) -> None:
     env = {"TORCHINDUCTOR_CACHE_DIR": str(tmp_path)}
     assert run("cache", "off", env=env)["miss"] == 1

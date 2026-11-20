@@ -4,7 +4,7 @@ NDM Gym's ``perturb_start`` (``ndm_gym/algos/common.py``) adds N(0, std^2) m/s t
 start state's horizontal root linear velocity after the observation history is read,
 so the history stays the recorded one; the policy update's rollout, which the critic
 also fits, starts from the kicked state. The references here are the replay rows
-themselves. The default path is the golden test's.
+themselves. The default path is unchanged.
 """
 
 from __future__ import annotations

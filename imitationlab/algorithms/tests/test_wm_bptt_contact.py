@@ -5,7 +5,7 @@ NDM Gym adds w * dt * contact_term to SuperMimic's imagined reward only
 unchanged. Here the plain fields reach the agent's task as keywords, never the env's
 own task instance, and the expected rewards are the task's ``reward`` (the simulator
 parity path) plus the term from FK of the imagined states and an independently
-built reference contact. The default path is the golden test's.
+built reference contact. The default path is unchanged.
 """
 
 from __future__ import annotations
