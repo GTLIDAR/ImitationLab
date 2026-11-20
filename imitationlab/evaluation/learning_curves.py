@@ -385,6 +385,7 @@ def plot_overview(summary: dict, output: Path) -> None:
     curves = {metric: overview_curves(summary, metric) for metric, *_ in panels}
     if not curves["success"]:
         return
+    budget = max(float(c["minutes"][-1]) for c in curves["success"].values())
     style = {
         "font.family": ["Lato", "Noto Sans", "DejaVu Sans"],
         "font.size": 11,
@@ -475,7 +476,7 @@ def plot_overview(summary: dict, output: Path) -> None:
             fig.text(
                 0.055,
                 0.915,
-                "Unitree G1 motion tracking in about 10 minutes on one GPU",
+                f"Unitree G1 motion tracking over {budget:.0f} minutes of training on one GPU",
                 color=ink,
                 fontsize=16,
                 fontweight="bold",
