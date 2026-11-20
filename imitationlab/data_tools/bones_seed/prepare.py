@@ -20,9 +20,9 @@ Every stage is resumable: re-running skips CSVs / NPZs that already exist.
 Run from the repo root in the Isaac Lab env for the convert stage:
 
     pixi run -e isaaclab python scripts/data/convert_bones_seed_full.py \
-        --selection ~/Storage/bones_seed_full/selection/g1_bones_seed_sonic_selection.json \
+        --selection data/bones_seed/selection/g1_bones_seed_sonic_selection.json \
         --archive data/bones_seed/raw/g1.tar.gz \
-        --work-root ~/Storage/bones_seed_full \
+        --work-root data/bones_seed/converted \
         --device cuda:0
 
 Stages 1-2 and 4-5 need no Isaac Sim; pass ``--stages extract,normalize`` in the

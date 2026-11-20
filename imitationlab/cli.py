@@ -44,15 +44,29 @@ def _pretrain(argv: list[str]) -> int:
         description="Pretrain an FSQ or spectral skill command encoder.",
     )
     parser.add_argument(
-        "--interface", required=True, type=interface_arg, choices=("fsq", "spectral")
+        "--interface",
+        required=True,
+        type=interface_arg,
+        choices=("fsq", "spectral"),
+        help="Encoder to pretrain.",
     )
-    parser.add_argument("--data", type=Path)
-    parser.add_argument("--output-dir", dest="output_dir", type=Path)
-    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument(
+        "--data", type=Path, help="Motion manifest or packed reference bank."
+    )
+    parser.add_argument(
+        "--output-dir",
+        dest="output_dir",
+        type=Path,
+        help="Directory for the encoder run.",
+    )
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Print the command and exit."
+    )
     parser.add_argument(
         "--hardware",
         choices=("auto", "off", "small", "standard", "large", "xlarge"),
         default="auto",
+        help="Choose execution sizes from local resources (default: auto); off keeps recipe sizes.",
     )
     args, rest = parser.parse_known_args(argv)
     with reported_by(parser):
@@ -105,15 +119,32 @@ def _evaluate(argv: list[str]) -> int:
         prog="imitationlab evaluate",
         description="Evaluate with the checkpoint's saved task and network settings.",
     )
-    parser.add_argument("--checkpoint", required=True, type=Path)
+    parser.add_argument(
+        "--checkpoint",
+        required=True,
+        type=Path,
+        help="Checkpoint file or run directory to evaluate.",
+    )
     parser.add_argument(
         "--data", type=Path, help="Override the saved motion bank with evaluation data."
     )
     parser.add_argument(
-        "--num-envs", "--num_envs", dest="num_envs", type=int, default=4
+        "--num-envs",
+        "--num_envs",
+        dest="num_envs",
+        type=int,
+        default=4,
+        help="Number of parallel environments (default: %(default)s).",
     )
-    parser.add_argument("--steps", type=int, default=500)
-    parser.add_argument("--seed", type=int)
+    parser.add_argument(
+        "--steps",
+        type=int,
+        default=500,
+        help="Control steps to roll out (default: %(default)s).",
+    )
+    parser.add_argument(
+        "--seed", type=int, help="Evaluation seed. Defaults to the saved training seed."
+    )
     parser.add_argument(
         "--output",
         type=Path,
@@ -125,8 +156,14 @@ def _evaluate(argv: list[str]) -> int:
         action="store_true",
         help="Replace an existing result file at --output.",
     )
-    parser.add_argument("--policy", choices=("ppo", "supermimic", "svg", "diffsr"))
-    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument(
+        "--policy",
+        choices=("ppo", "supermimic", "svg", "diffsr"),
+        help="Policy learner of the checkpoint. Needed, with --data, only when the checkpoint has no saved run settings.",
+    )
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Print the command and exit."
+    )
     args, rest = parser.parse_known_args(argv)
     with reported_by(parser):
         return _run_evaluate(args, rest)

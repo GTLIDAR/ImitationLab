@@ -1,6 +1,6 @@
 """Statistics of stochastic gradient estimates and of rollout Jacobians.
 
-Pure tensor helpers behind ``scripts/tracking/probe_actor_gradient.py``: the
+Pure tensor helpers for an actor-gradient probe: the
 signal-to-noise ratio and pairwise agreement of K independent estimates of one
 gradient, and per-sample spectral norms of a batched map's Jacobian.
 """

@@ -73,6 +73,9 @@ pixi run -e isaaclab imitationlab evaluate --checkpoint "$RUN" --data "$BANK" \
   --num-envs 4 --trajectory_ranks 0 1 2 3
 ```
 
+`evaluate` writes `outputs/evaluation/result.json`; pass `--overwrite` or a
+new `--output` when re-running.
+
 Explicit overrides take precedence over automatic sizing, and a resumed run
 keeps its saved sizes. [Training and evaluation](docs/training.md) covers
 encoder pretraining, checkpoints, export and benchmarks.
@@ -107,7 +110,7 @@ the latent is quantized. `--interface diffsr` remains an alias for `spectral`.
 | `imitationlab pretrain` | Pretrain an FSQ or spectral skill command encoder |
 | `imitationlab train` | Train a tracker; `--dry-run` prints the resolved command |
 | `imitationlab evaluate` | Evaluate a checkpoint with its saved task and network settings |
-| `imitationlab export` | Export a checkpoint and its encoder as a portable bundle |
+| `imitationlab export` | Export a checkpoint and its encoder as a native bundle |
 | `imitationlab hardware` / `tune` | Show or measure execution sizes for this machine |
 | `imitationlab benchmark` | Measure tracking quality against training time |
 

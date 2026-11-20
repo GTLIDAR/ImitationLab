@@ -39,7 +39,7 @@ README remains an integration check.
 | Snapshots | First completed iteration after 60, 120, 300, 600 seconds |
 | Encoders | One per bank/interface; 2,000 updates, frozen for policy learning |
 | Settings | Normal networks; shared fast defaults; PPO input normalization; H100 latent SVG/DiffSR capped at standard |
-| Hardware | One NVIDIA H100 per job; 8 CPU cores; 96 GiB host-memory request; `coe-gpu` / `coe-ice` |
+| Hardware | One NVIDIA H100 per job; 8 CPU cores; 96 GiB host-memory request; a Slurm cluster |
 | Seed | 42 |
 | Evaluation | All 40 LAFAN1 clips; deterministic seed-42 sample of 256 BONES-SEED clips |
 | Horizon | First 500 control steps (10 seconds), or natural clip completion if shorter |

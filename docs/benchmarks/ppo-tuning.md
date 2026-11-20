@@ -11,7 +11,7 @@ threshold crossings do not count as an improvement.
 
 ## Protocol
 
-All runs use `imitation-g1-v1`, one ICE NVIDIA H100 80 GB per job, automatic
+All runs use `imitation-g1-v1`, one cluster NVIDIA H100 80 GB per job, automatic
 hardware sizing (the `large` profile, 8,192 environments), and 1,800
 policy-training seconds. Startup, encoder pretraining, and checkpoint
 evaluation are recorded separately. Every run evaluates the same fixed seed-42

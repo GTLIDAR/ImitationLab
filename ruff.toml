@@ -12,15 +12,11 @@ extend-exclude = [
     ".tmp",
     # Untracked scratch space for debugging sessions.
     "scratchpad",
-    # Agent worktree roots.
-    ".agents",
-    ".codex",
 ]
 
-# Vendor-derived Isaac Lab example scripts keep their upstream formatting, so a
-# diff against upstream shows only the real changes. Lint still covers them.
+# The vendor-derived Isaac Lab example script keeps its upstream formatting, so
+# a diff against upstream shows only the real changes. Lint still covers it.
 [format]
 exclude = [
-    "scripts/zero_agent.py",
     "scripts/random_agent.py",
 ]

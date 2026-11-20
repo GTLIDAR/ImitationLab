@@ -373,8 +373,8 @@ class TrainerConfig:
     """Add ``perf/gpu_*`` readings (SM clock, temperature, power, slowdown flags)
     to every training row, read through NVML on the host (opt-in).
 
-    A speed number is only interpretable beside the clocks it ran at: three ICE
-    H200s ran throttled on 2026-10-24. A distributed run reports rank zero's GPU.
+    A speed number is only interpretable beside the clocks it ran at: three
+    cluster H200s ran throttled on 2026-10-24. A distributed run reports rank zero's GPU.
     See ``common/gpu_telemetry.py``."""
 
 
@@ -410,7 +410,7 @@ class AlgorithmConfig:
     """Value network configuration."""
 
     q_function: NetworkConfig | None = None
-    """Action-value network configuration (used by off-policy agents such as SAC)."""
+    """Action-value network configuration (used by off-policy learners)."""
 
     feature_extractor: FeatureExtractorNetworkConfig | None = None
     """Feature extractor configuration."""

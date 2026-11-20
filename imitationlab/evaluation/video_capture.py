@@ -5,8 +5,8 @@ itself from ``env_cfg.video_recorders``, inside its ``step`` call. A clip file
 exists only when the env stepped its recorder. This module attaches the
 recorder to the env config and checks, after the run, that a clip exists.
 
-The entrypoint rule in ``scripts/CONTEXT.md`` requires that an evaluation which
-produces a video prints the absolute retained path to stdout.
+An evaluation which produces a video must print the absolute retained path to
+stdout.
 :meth:`VideoCapture.report` does that, and it fails when no new clip exists. A
 silent run without video is a defect.
 

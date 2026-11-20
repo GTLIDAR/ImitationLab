@@ -25,7 +25,7 @@ is given the same exponential-family shape in ``z`` as the affine DiffSR head::
   of the endpoint given the interpolant under a unit-Gaussian endpoint prior,
   divided by ``(1-u)``. The centering makes the drift vanish once the sample
   is already classified as ``l``; dropping it (a constant drift ``b``) pushes
-  codes off-manifold without bound (ICE job 5999809: sample norm x8 and the
+  codes off-manifold without bound (a cluster run: sample norm x8 and the
   prediction loss x600 at ``beta = 4``). For a Gaussian base and a fixed
   drift the schedule ``w(u)`` is exact (``tests/test_language_tilt_planner.py``);
   with the learned base it is the usual classifier-guidance approximation.

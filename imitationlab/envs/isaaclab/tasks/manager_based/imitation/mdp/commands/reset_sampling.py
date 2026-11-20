@@ -299,8 +299,8 @@ class ReturnBasedResetSampler:
 
         A non-finite reward (a physics blow-up in one environment) counts as
         zero: a single NaN would otherwise reach the bin estimates, the softmax
-        and ``torch.multinomial``, whose device assert kills the run (job
-        6478126, 2026-10-22).
+        and ``torch.multinomial``, whose device assert kills the run
+        (seen 2026-10-22).
         """
         rewards = torch.nan_to_num(
             rewards.reshape(-1).to(torch.float32), nan=0.0, posinf=0.0, neginf=0.0

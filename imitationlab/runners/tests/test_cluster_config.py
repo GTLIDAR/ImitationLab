@@ -1,9 +1,8 @@
-"""Gate: cluster profiles and campaign specs resolve deterministically and cover the legacy env.
+"""Gate: cluster profiles and campaign specs resolve deterministically.
 
-The frozen-env design only removes the allow-list failure class if (a) every
-key in a profile reaches the rendered env file, and (b) the example profile never
-silently drops a key the legacy ``.env.ice_runtime`` still carries. The packaged
-example profile stands in for site profiles, which live outside the package.
+The frozen-env design only removes the allow-list failure class if every key
+in a profile reaches the rendered env file. The packaged example profile stands
+in for site profiles, which live outside the package.
 """
 
 from __future__ import annotations
@@ -14,7 +13,6 @@ from pathlib import Path
 import pytest
 
 from imitationlab.runners.pipeline.cluster.common import PipelineError
-from imitationlab.paths import REPO_ROOT
 from imitationlab.runners.pipeline.cluster.config import (
     EXAMPLE_PROFILE_NAME,
     PROFILE_DIR_ENV,
@@ -25,30 +23,8 @@ from imitationlab.runners.pipeline.cluster.config import (
     resolved_env,
 )
 from imitationlab.runners.pipeline.cluster.envfile import (
-    parse_env_file,
     render_job_env,
 )
-
-LEGACY_ICE_ENV = REPO_ROOT / "docker/cluster/.env.ice_runtime"
-
-# Legacy keys that are deliberately NOT part of the frozen job env: they steer
-# the submission side (scheduler choice, ssh, Slurm resources, sync mode),
-# which the control plane owns through typed fields instead.
-SUBMISSION_SIDE_KEYS = {
-    "CLUSTER_JOB_SCHEDULER",
-    "CLUSTER_LOGIN",
-    "CLUSTER_REMOTE_LOGIN_SHELL",
-    "CLUSTER_ARCHIVE_SYNC",
-    "CLUSTER_SKIP_SINGULARITY_IMAGE_CHECK",
-    "CLUSTER_SLURM_SUBMIT_SCRIPT",
-    "CLUSTER_SLURM_GPU_GRES",
-    "CLUSTER_SLURM_CPUS_PER_TASK",
-    "CLUSTER_SLURM_MEM",
-    "CLUSTER_SLURM_TIME_LIMIT",
-    "CLUSTER_SLURM_JOB_NAME_PREFIX",
-    "CLUSTER_SLURM_OUTPUT_DIR",
-    "CLUSTER_SLURM_PRINT_JOB_SCRIPT",
-}
 
 CAMPAIGN_YAML = """\
 name: demo
@@ -238,17 +214,3 @@ def test_render_job_env_round_trips_through_bash(tmp_path: Path) -> None:
 def test_render_job_env_rejects_bad_key() -> None:
     with pytest.raises(PipelineError, match="invalid environment variable name"):
         render_job_env({"BAD-KEY": "x"}, plan_sha="s", stage="pretrain")
-
-
-def test_example_profile_covers_env_ice_runtime(tmp_path: Path) -> None:
-    if not LEGACY_ICE_ENV.is_file():
-        pytest.skip("legacy .env.ice_runtime is not part of this tree")
-    legacy_keys = set(parse_env_file(LEGACY_ICE_ENV))
-    profile = _load_example_profile()
-    jobset = load_campaign(_campaign_file(tmp_path), arm="a1", seed=0)
-    resolved_keys = set(resolved_env(profile, jobset, jobset.stages[0]))
-    missing = legacy_keys - resolved_keys - SUBMISSION_SIDE_KEYS
-    assert not missing, (
-        f"legacy .env.ice_runtime keys absent from the frozen env: {sorted(missing)}; "
-        "add them to profile_example.yaml env or to SUBMISSION_SIDE_KEYS with a reason"
-    )

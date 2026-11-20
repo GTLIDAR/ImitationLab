@@ -114,7 +114,7 @@ def ssh_run(
 
 
 def ssh_upload(login: str, local: Path, remote: str) -> None:
-    """Atomic upload: write to ``.partial`` then rename (cluster_interface.sh:325)."""
+    """Atomic upload: write to ``.partial`` then rename."""
     quoted_dir = shlex.quote(str(Path(remote).parent))
     quoted_partial = shlex.quote(f"{remote}.partial")
     quoted_final = shlex.quote(remote)

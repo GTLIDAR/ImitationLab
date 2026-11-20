@@ -1,7 +1,7 @@
 """GPU clock, temperature and power read through NVML (ctypes, no pynvml).
 
 A throttled GPU slows every phase of an iteration, so a speed number is only
-interpretable beside the clocks it ran at (2026-10-24: three ICE H200s ran at
+interpretable beside the clocks it ran at (2026-10-24: three cluster H200s ran at
 SM 345-1260 MHz with the thermal-slowdown flag set). The reader is fail-soft:
 without the driver library, or for a device NVML cannot resolve, it returns
 no metrics.

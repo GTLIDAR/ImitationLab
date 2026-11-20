@@ -1,8 +1,22 @@
 # Migrating to the release layout
 
+This guide maps the task IDs, module names, settings, and tools of the
+pre-release internal codebase to the current release. It is for users of that
+codebase who have scripts, configurations, or checkpoints from before the
+release layout. The earlier names listed here were never part of a public
+release. New users do not need this guide; start with [setup](setup.md).
+
 ImitationLab installs one package and one command. Use `imitationlab train`,
 `pretrain`, `evaluate`, `export`, and `data` through the documented Pixi
 environment. `python -m imitationlab` invokes the same CLI.
+
+| If you have | See |
+| --- | --- |
+| A script or configuration that names an old task ID | [One task](#one-task-imitation-g1-v1) |
+| Code that imports old modules or classes, or sets old settings | [Renamed modules, classes, and settings](#renamed-modules-classes-and-settings) and [Imports and entry points](#imports-and-entry-points) |
+| A workflow that used a removed tool or flag | [Removed tools](#removed-tools) |
+| A pretrained encoder or an encoder seed to reproduce | [Encoder pretraining](#encoder-pretraining) |
+| An existing checkpoint or run directory | [Checkpoints and data](#checkpoints-and-data) |
 
 ## One task: `imitation-g1-v1`
 
@@ -20,12 +34,15 @@ evaluation are settings of this one task:
 | `Isaac-Imitation-G1-Graph-v3` | `imitation-g1-v1` with `env.step_mode=graph` (or `masked`) |
 | `Isaac-Imitation-G1-RootBoard-v3`, `Spectra-G1-Board-v1` | `imitationlab evaluate`: `env.pinned_reset=true`, no reset or observation noise, no context randomization |
 
-The earlier designs are not registered and have no alias: the `-v0`, old
-`-v1`, and `-v2` task families, the SONIC baseline tasks, the SONIC failure-rule
-boards (`Board-v3`), and the NDM Gym recipe tasks (`BlinkMimic-v3`,
-`FastSuperMimic-v3`). Their configurations and environment classes remain in
-the history of this repository at
-[`fbe5b63`](https://github.com/fei-yang-wu/ImitationLab/commit/fbe5b63).
+The earlier designs are not registered and have no alias:
+
+- the `-v0`, old `-v1`, and `-v2` task families,
+- the SONIC baseline tasks,
+- the SONIC failure-rule boards (`Board-v3`),
+- the NDM Gym recipe tasks (`BlinkMimic-v3`, `FastSuperMimic-v3`).
+
+Their configurations and environment classes were last present at revision
+`fbe5b63` of the pre-release ImitationLab repository, which is not public.
 
 ## Renamed modules, classes, and settings
 
@@ -51,6 +68,8 @@ Module paths are relative to `imitationlab.envs.isaaclab` (configs under
 current setting names. The world-model goal bindings recorded in checkpoints
 (`g1-v3`, `g1-v3-latent`) keep their values, so existing checkpoints still bind.
 
+### Removed settings
+
 These environment settings did nothing on `imitation-g1-v1` and were removed:
 `static_collector`, `replay_reference`, `replay_only`,
 `enable_termination_curriculum`, `termination_curriculum_start_frames`,
@@ -60,18 +79,24 @@ These environment settings did nothing on `imitation-g1-v1` and were removed:
 
 ## Removed tools
 
-The ONNX exporter (`imitationlab export --format onnx`) supported only
-observation layouts of earlier task designs; `imitationlab export` writes the
-native bundle. The trainer flags `--termination_window*`,
-`--match-sonic-release-overrides`, and `--train_anchor_override`, the
-reference-replay visualizer, and the world-model dataset and dynamics-comparison
-tools of the `-v2` world-model task are removed with the designs they served.
+These tools were removed with the task designs they served:
+
+- The ONNX exporter (`imitationlab export --format onnx`). It supported only
+  observation layouts of earlier task designs; `imitationlab export` writes
+  the native bundle.
+- The trainer flags `--termination_window*`,
+  `--match-sonic-release-overrides`, and `--train_anchor_override`.
+- The reference-replay visualizer.
+- The world-model dataset and dynamics-comparison tools of the `-v2`
+  world-model task.
 
 ## Encoder pretraining
 
 `imitationlab pretrain` samples reference windows on `imitation-g1-v1`. The
 windows are the same as before (the same clips, frames, and 38-wide macro
-frames). The environment's construction draws a different number of random
+frames).
+
+**Note.** The environment's construction draws a different number of random
 values first, so a pretraining run with a given seed produces a different
 encoder than earlier releases did.
 
@@ -112,14 +137,22 @@ pixi run -e isaaclab imitationlab evaluate \
   --checkpoint /path/to/run --data /path/to/evaluation-bank
 ```
 
-Runs without `run.json` recover their launch settings from `command.txt` and
-their seed from `params/agent.yaml`; keep those files with the checkpoints. A
-standalone checkpoint without a run description needs explicit learner, data,
-and architecture settings. Native export bundles preserve checkpoint tensors
-and package the encoder with verified identity. Motion banks remain separate,
-including proprietary BONES-SEED assets.
+How settings are recovered depends on what the checkpoint carries:
 
-Evaluation uses pinned starts and eager stepping, and disables adaptive training
-reset sampling. Training keeps its captured execution defaults. Data replacement
-clears the previous source and cache selection so a new manifest cannot silently
-reuse the prior bank.
+| Checkpoint | Settings come from |
+| --- | --- |
+| Run with `run.json` | The run description in `run.json` and the checkpoint |
+| Run without `run.json` | `command.txt` for the launch settings and `params/agent.yaml` for the seed; keep those files with the checkpoints |
+| Standalone checkpoint without a run description | Explicit learner, data, and architecture settings on the command line |
+
+Native export bundles preserve checkpoint tensors and package the encoder with
+verified identity. Motion banks remain separate, including proprietary
+BONES-SEED assets.
+
+Evaluation uses pinned starts and eager stepping, and disables adaptive
+training reset sampling. Training keeps its captured execution defaults. Data
+replacement clears the previous source and cache selection so a new manifest
+cannot silently reuse the prior bank.
+
+See [training and evaluation](training.md#evaluate-a-checkpoint) for the
+current commands.

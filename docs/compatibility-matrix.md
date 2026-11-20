@@ -1,5 +1,9 @@
 # Learner and interface compatibility
 
+**Note.** This report predates the rename of the continuous command interface:
+"DiffSR commands" and the `diffsr` interface below are now
+`--interface spectral`.
+
 This check covers the native ImitationLab learners on `imitation-g1-v1`:
 PPO, SuperMimic, SVG, and DiffSR, each with explicit, FSQ, and DiffSR command
 interfaces. Each combination is run on LAFAN1 and BONES-SEED separately.
@@ -9,7 +13,7 @@ outside this matrix.
 ## Results
 
 All **24/24** learner/interface/dataset combinations passed, as did all four
-encoder pretraining jobs. See the [README matrix](../README.md#tested-combinations).
+encoder pretraining jobs. See the [README results](../README.md#results).
 All checkpoint hashes were rechecked after the run; the saved learner classes,
 task and data identities, execution modes, and optimizer step counters matched
 the requested configuration. Evaluation metrics with nonzero sample counts

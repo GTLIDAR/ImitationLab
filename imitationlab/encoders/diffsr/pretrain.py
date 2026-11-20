@@ -4953,7 +4953,7 @@ class HighLevelSkillDiffSRTrainer:
         # fails on some network filesystems with "[enforce fail at
         # inline_container.cc] . unexpected pos N vs N-48" / "basic_ios::clear:
         # iostream error" when writing a multi-GB checkpoint directly to shared
-        # scratch (ICE job 5577507, 2026-08-15). The same errors appear when a
+        # scratch (seen on a Slurm cluster). The same errors appear when a
         # small RAM-backed /tmp fills up, so the staging directory falls back
         # to the target's when the temporary directory lacks space.
         from imitationlab.encoders._checkpoint_io import save_staged  # noqa: PLC0415

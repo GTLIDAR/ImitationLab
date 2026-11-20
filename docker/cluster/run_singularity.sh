@@ -2,7 +2,7 @@
 
 set -e
 
-echo "(run_singularity.py): Called on compute node from current isaaclab directory $1 with container profile $2 and arguments ${@:3}"
+echo "(run_singularity.sh): Called on compute node from current isaaclab directory $1 with container profile $2 and arguments ${@:3}"
 
 #==
 # Helper functions
@@ -281,7 +281,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 # carries a frozen, fully-resolved env file; source ONLY that. The legacy
 # .env.cluster re-source plus its capture/restore allow-lists (which silently
 # reverted any variable not registered in every list) was retired 2026-08-15
-# along with cluster_interface.sh, so a workspace without the frozen file is a
+# along with the old submission script, so a workspace without the frozen file is a
 # legacy invocation and gets a loud, immediate error instead of that fallback.
 if [ -f "$SCRIPT_DIR/job_env.resolved.sh" ]; then
     echo "[INFO] Using frozen job environment: $SCRIPT_DIR/job_env.resolved.sh"
@@ -321,10 +321,10 @@ trap cleanup_job_tmpdir EXIT
 export TMPDIR="$job_tmpdir"
 echo "[INFO] Using per-job TMPDIR: $TMPDIR"
 
-# Paths in .env.cluster are relative to $HOME; prepend it to make them absolute.
+# Paths in the job environment are relative to $HOME; prepend it to make them absolute.
 CLUSTER_ISAAC_SIM_CACHE_DIR="$(prefix_home_if_relative "$HOME" "$CLUSTER_ISAAC_SIM_CACHE_DIR")"
 CLUSTER_ISAACLAB_DIR="$(prefix_home_if_relative "$HOME" "$CLUSTER_ISAACLAB_DIR")"
-# Direct invocations that bypass cluster_interface.sh still get a durable
+# Direct invocations that bypass the submission tool still get a durable
 # per-workspace logs directory.  Normal submissions pass the stable base
 # workspace's logs directory so every run retains the usual centralized tree.
 CLUSTER_PROJECT_LOGS_DIR="${CLUSTER_PROJECT_LOGS_DIR:-${CLUSTER_ISAACLAB_DIR}/logs}"
@@ -497,7 +497,7 @@ seed_shared_project_logs_from_submission
 # CLUSTER_DATA_DIR (e.g. a shared project allocation mount). Without an
 # explicit bind these are invisible inside the container even though the
 # compute node mounts them, and a dataset there fails as "manifest missing"
-# (diagnosed 2026-08-15, ICE job 5577484). Colon-separated list of host paths.
+# (seen in an earlier cluster run). Colon-separated list of host paths.
 cluster_extra_bind_args=()
 if [[ -n "${CLUSTER_EXTRA_BIND_PATHS:-}" ]]; then
     IFS=':' read -r -a _extra_bind_paths <<< "${CLUSTER_EXTRA_BIND_PATHS}"
@@ -508,7 +508,7 @@ if [[ -n "${CLUSTER_EXTRA_BIND_PATHS:-}" ]]; then
         [[ -d "$_p" ]] || { echo "[INFO] extra bind skipped (absent): $_p"; continue; }
         # rw, not ro: the reference-array loader opens .memmap files in
         # read-write mode even for pure reads, so a read-only bind fails with
-        # "Read-only file system (30)" (ICE job 5577498, 2026-08-15).
+        # "Read-only file system (30)" (seen in an earlier cluster run).
         echo "[INFO] extra bind: $_p (rw)"
         cluster_extra_bind_args+=(-B "${_p}:${_p}:rw")
     done
@@ -619,7 +619,7 @@ fi
 # `train.py` and `train_hl_skill_pipeline.py`, so any other rlopt entrypoint
 # fell through to /isaac-sim/python.sh and died on `No module named 'torch'`
 # several seconds in, with a traceback that pointed at Isaac Lab rather than at
-# the interpreter (ICE job 5558033). Match the whole class instead.
+# the interpreter (seen in an earlier cluster run). Match the whole class instead.
 #
 # `rlopt_pipeline=1` means "this entrypoint runs its own stages, never rewrite
 # it"; only `train.py` is rewritten to `train_physx.py` under the PhysX backend.
@@ -639,7 +639,7 @@ case "${CLUSTER_PYTHON_EXECUTABLE}" in
     # class too: they build the same environment, load the same torch
     # checkpoint, and construct `AppLauncher` at import. Without this they
     # fell through to the bare `/isaac-sim/python.sh` branch and died on
-    # `No module named 'torch'` (the same failure as ICE job 5558033).
+    # `No module named 'torch'` (the same failure as above).
     scripts/viz/*.py) rlopt_pipeline=1; rlopt_eval=1 ;;
     # Offline probes under `scripts/audit/` import torch, algorithms, and the
     # experiment library, but never build an environment. They only need the
@@ -651,7 +651,7 @@ case "${CLUSTER_PYTHON_EXECUTABLE}" in
     # builds `AppLauncher` and loads torch checkpoints exactly like the script
     # evaluators, so it belongs in the same class. Without this it fell through
     # to the bare `/isaac-sim/python.sh` branch and died on
-    # `No module named 'torch'` (ICE job 5868258).
+    # `No module named 'torch'` (seen in an earlier cluster run).
     -m) rlopt_pipeline=1; rlopt_eval=1 ;;
 esac
 case "${CLUSTER_PYTHON_EXECUTABLE}" in
@@ -667,7 +667,7 @@ if [ "$rlopt_eval" = "1" ]; then
     # configuration the PhysX training branch uses, and the same one a local
     # `pixi run -e isaaclab` gives. The CU130 runtime Python alone has no Kit
     # extension cache, and `AppLauncher` dies on a missing `EXP_PATH`
-    # (ICE job 5593231).
+    # (seen in an earlier cluster run).
     #
     # `--assert-kitless` is a TRAINING flag: only the train entrypoints define
     # it, and an evaluator would pass it through argparse into Hydra and die on
@@ -751,5 +751,5 @@ if $REMOVE_OVERLAY_AFTER_JOB && [ "${CLUSTER_USE_OVERLAY:-0}" = "1" ]; then
     rm -f "$overlay_path"
 fi
 
-echo "(run_singularity.py): Return"
+echo "(run_singularity.sh): Return"
 exit "$workload_status"

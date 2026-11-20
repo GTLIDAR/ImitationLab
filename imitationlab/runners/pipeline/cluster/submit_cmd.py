@@ -165,7 +165,7 @@ def _submission_record(
 ) -> dict[str, Any]:
     sealed = plan_record["sealed"]
     # Field names align with the legacy schema_version-1 records written by
-    # docker/cluster/submit_job_slurm_bones_pipeline.sh.
+    # the earlier shell submitter.
     return {
         "schema_version": PLAN_SCHEMA_VERSION,
         "kind": "cluster_submission",

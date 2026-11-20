@@ -1,7 +1,6 @@
 """Gate: the Slurm adapter renders valid, deterministic batch scripts and rejects bad specs.
 
-Semantics mirror the legacy submitters (docker/cluster/submit_job_slurm_pace.sh
-and submit_job_slurm.sh): dependency/array regexes, gres normalization, and the
+Semantics mirror the earlier shell submitters: dependency/array regexes, gres normalization, and the
 extract-archive-then-run_singularity job body.
 """
 

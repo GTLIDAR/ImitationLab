@@ -26,7 +26,7 @@ BONES-SEED explicit improvement did not repeat at seed 43. The four BONES-SEED
 latent SVG runs also had lower success and survival. No default changed.
 
 The initial screen uses explicit commands on both LAFAN1 and BONES-SEED,
-seed 42, one ICE H100 80 GB per job, and 1,800 policy-training seconds.
+seed 42, one cluster H100 80 GB per job, and 1,800 policy-training seconds.
 Compilation after the first collected batch counts against this budget.
 Startup, checkpoint evaluation, and any encoder pretraining are recorded
 separately. Each job starts with its own compiler cache.
