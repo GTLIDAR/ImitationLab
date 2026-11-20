@@ -192,6 +192,8 @@ target at earlier checkpoints in several cases.
   final metrics, checkpoint curves, frames, resolved sizes, full-bank results
   and training-source fingerprints.
 - [H100 cases in the learning-speed report format](g1-release-check/h100-summary.json):
-  the input to the overview figure in the repository README.
+  the input to the overview figure in the repository README. Its BONES-SEED
+  points are the full-bank evaluation of each checkpoint; the 256-clip board
+  values are kept beside them as `board_256`.
 
 Raw motions, per-clip evaluations and model weights stay outside Git.

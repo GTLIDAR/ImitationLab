@@ -67,16 +67,16 @@ Run `imitationlab <command> --help` for the options of a command.
 ## Results
 
 30-minute runs on one NVIDIA H100 80 GB, seed 42, with the current defaults.
-Each case trains on its motion bank and is evaluated on fixed boards: all 40
-LAFAN1 clips and 256 fixed BONES-SEED clips, each for up to 10 seconds. The
+Each case trains on its motion bank and is evaluated on that whole bank: all 40
+LAFAN1 clips or all 129,785 BONES-SEED clips, each for up to 10 seconds. The
 ranges cover both banks and all three interfaces.
 
 | Learner | Final success | Final MPJPE-L | First ≥90% success with MPJPE-L ≤40 mm |
 | --- | ---: | ---: | --- |
-| SuperMimic (BPTT) | 99.2–100% | 13.1–17.8 mm | About 10 minutes in all six cases |
-| SVG | 98.0–100% | 14.9–23.8 mm | 10–15 minutes |
-| DiffSR dynamics | 97.5–99.6% | 16.3–24.8 mm | 10–15 minutes |
-| PPO | 87.5–94.1% | 48.2–64.8 mm | Not reached in 30 minutes |
+| SuperMimic (BPTT) | 99.7–100% | 13.1–17.3 mm | About 10 minutes in all six cases |
+| SVG | 97.7–100% | 14.9–23.6 mm | 10–15 minutes |
+| DiffSR dynamics | 97.5–99.7% | 16.3–25.4 mm | 10–15 minutes |
+| PPO | 87.5–93.9% | 48.2–64.6 mm | Not reached in 30 minutes |
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/benchmarks/g1-release-check/overview-dark.svg">
@@ -89,9 +89,8 @@ acquisition, not held-out generalization. Encoder pretraining and startup add
 2.8–12.5 minutes. FSQ and spectral policies read a window of the reference
 motion only, so they need an IMU but no position estimate on the robot.
 
-The same 24 cases were run on four GPUs, from a 16 GB RTX 4080 to an H200, and
-every BONES-SEED policy was evaluated on all 129,785 clips. SuperMimic reaches
-99.4–99.9% full-bank success on every tier. See the
+The same 24 cases were run on four GPUs, from a 16 GB RTX 4080 to an H200.
+SuperMimic reaches 99.4–99.9% success on the full BONES-SEED bank on every tier. See the
 [four-tier release check](docs/benchmarks/g1-release-check.md).
 
 Two earlier studies tried to close the gaps:
