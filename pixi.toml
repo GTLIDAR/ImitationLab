@@ -123,7 +123,23 @@ format-owned = "ruff format --check ."
 compile-owned = "python -m compileall -q imitationlab scripts"
 ci-static = { depends-on = ["lint-owned", "format-owned", "compile-owned"] }
 
+[feature.docs]
+platforms = ["linux-64"]
+
+[feature.docs.dependencies]
+python = "3.13.*"
+sphinx = ">=9.1,<10"
+furo = ">=2025.9"
+myst-parser = ">=5,<6"
+sphinx-copybutton = ">=0.5.2"
+sphinx-design = ">=0.7"
+
+[feature.docs.tasks]
+docs-build = "python docs/_site/build.py"
+docs-serve = "python -m http.server --directory docs/_build/html 8000"
+
 [environments]
 default = ["base-platform"]
 isaaclab = ["isaaclab"]
 static = { features = ["static"], no-default-feature = true }
+docs = { features = ["docs"], no-default-feature = true }

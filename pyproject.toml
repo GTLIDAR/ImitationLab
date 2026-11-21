@@ -59,13 +59,13 @@ imitationlab = "imitationlab.cli:main"
 where = ["."]
 include = ["imitationlab*"]
 exclude = ["*.tests", "*.tests.*"]
-namespaces = false
+namespaces = true
 
 [tool.setuptools.package-data]
 "imitationlab.algorithms" = ["LICENSE", "THIRD_PARTY_NOTICES.md"]
 "imitationlab.data_tools" = ["LICENSE"]
 "imitationlab.runners.pipeline.cluster" = ["conf/*.yaml"]
-"imitationlab.envs.isaaclab" = ["manifests/*.json", "assets/unitree/g1_description/LICENSE", "assets/unitree/g1_description/*.md", "assets/unitree/g1_description/*.urdf", "assets/unitree/g1_description/*.xml", "assets/unitree/g1_description/*.usd", "assets/unitree/g1_description/meshes/*"]
+"imitationlab.envs.isaaclab" = ["manifests/*.json", "assets/unitree/g1_description/LICENSE", "assets/unitree/g1_description/*.md", "assets/unitree/g1_description/*.urdf", "assets/unitree/g1_description/*.xml", "assets/unitree/g1_description/*.usd", "assets/unitree/g1_description/configuration/*", "assets/unitree/g1_description/meshes/*"]
 
 [tool.setuptools.data-files]
 "share/imitationlab/recipes/g1" = ["experiments/recipes/g1/packed.args", "experiments/recipes/g1/world_model.args", "experiments/recipes/g1/supermimic.args", "experiments/recipes/g1/ppo.args"]

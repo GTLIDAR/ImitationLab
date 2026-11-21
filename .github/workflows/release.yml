@@ -1,0 +1,50 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use absolute links in the package description
+        run: python3 .github/scripts/pypi_readme.py --ref "$GITHUB_REF_NAME"
+      - name: Build the distributions
+        run: pipx run build
+      - name: Check the distributions
+        run: pipx run twine check --strict dist/*
+      - name: Upload the distributions
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          if-no-files-found: error
+
+  # Publishes with PyPI trusted publishing, so no token is stored. PyPI must
+  # list this workflow and the `pypi` environment as a trusted publisher of
+  # the `imitationlab` project. A manual run builds and checks only.
+  publish:
+    if: github.event_name == 'release' && github.repository == 'GTLIDAR/ImitationLab'
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: pypi
+      url: https://pypi.org/project/imitationlab/
+    permissions:
+      id-token: write
+    steps:
+      - name: Download the distributions
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1

@@ -38,9 +38,10 @@ pixi run -e static ci-static
 | `pixi run test-default` | Every change | CPU test suites |
 | `pixi run -e static ci-static` | Every change | `ruff check` and `ruff format --check` over the whole repository, and a compile check |
 | `pixi run -e isaaclab test-isaaclab` | Simulator or environment changes | Isaac Lab suite on a local GPU |
+| `pixi run -e docs docs-build` | Documentation changes | Builds the documentation site and fails on a broken link |
 | `BANK=<bank> pixi run -e isaaclab smoke-g1` | Trainer or simulator wiring changes | The [local Isaac Lab smoke](docs/setup.md#isaac-lab) on a packed reference bank |
 
-CI runs the first two commands. Run `pixi run -e static ruff format .` before
+CI runs the first two commands and the documentation build. Run `pixi run -e static ruff format .` before
 committing. To run the ruff and file checks on every commit, run
 `pixi run pre-commit install` once; the default environment provides
 `pre-commit`.
@@ -86,3 +87,8 @@ Update the corresponding setup or training guide when changing an entry point
 or recipe. Write command-line options in kebab-case (`--num-envs`); the
 snake-case spellings recorded by earlier runs remain accepted. The
 [documentation index](docs/README.md) lists every guide.
+
+The guides are also built into a site. `docs/_site/` holds its landing page,
+navigation, and build script; add a new guide to a table of contents in
+`docs/_site/index.md`. After `pixi run -e docs docs-build`,
+`pixi run -e docs docs-serve` serves the result at `http://localhost:8000`.

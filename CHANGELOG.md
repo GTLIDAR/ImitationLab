@@ -3,6 +3,24 @@
 Notable changes to ImitationLab are recorded in this file. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [Unreleased]
+
+### Added
+
+- A documentation site built from the Markdown guides with Sphinx:
+  `pixi run -e docs docs-build`. The `Docs` workflow builds it on every pull
+  request and deploys it to GitHub Pages from the public repository.
+- A `Release` workflow that builds the source distribution and wheel when a
+  GitHub release is published and uploads them to PyPI through trusted
+  publishing.
+
+### Fixed
+
+- The wheel now contains the three USD layers under
+  `g1_description/configuration/` that the G1 robot file references. They were
+  missing from the package data, so only an editable install could load the
+  robot. A test now checks that every tracked data file is package data.
+
 ## [0.1.0] - 2026-11-20
 
 First public release.
