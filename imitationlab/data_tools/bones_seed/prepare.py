@@ -50,7 +50,6 @@ import numpy as np
 from filelock import FileLock
 
 from imitationlab.data_tools.common.anchor_npz import anchor_one
-from imitationlab.data_tools.common.cli_args import hide_legacy_aliases
 from imitationlab.data_tools.common.manifest_io import sanitize_motion_name, write_json
 from imitationlab.data_tools.bones_seed.csv import normalize_bones_csv
 from imitationlab.data_tools.common.isaac_process import run_isaac
@@ -358,11 +357,11 @@ def stage_convert(
             cmd = [
                 python_exe,
                 str(batch_converter),
-                "--jobs_json",
+                "--jobs-json",
                 str(jobs_json),
-                "--input_fps",
+                "--input-fps",
                 str(input_fps),
-                "--output_fps",
+                "--output-fps",
                 str(output_fps),
                 "--device",
                 device,
@@ -631,11 +630,10 @@ def add_arguments(
         )
         source.add_argument(
             "--metadata-csv",
-            "--metadata_csv",
             type=Path,
             help="Authorized local BONES-SEED metadata CSV.",
         )
-    parser.add_argument("--work-root", "--work_root", type=Path, required=True)
+    parser.add_argument("--work-root", type=Path, required=True)
     parser.add_argument(
         "--archive",
         type=Path,
@@ -647,19 +645,17 @@ def add_arguments(
         default="all",
         help=f"Comma list of stages to run, or 'all'. Choices: {','.join(ALL_STAGES)}",
     )
-    parser.add_argument("--input-fps", "--input_fps", type=float, default=120.0)
-    parser.add_argument("--output-fps", "--output_fps", type=float, default=50.0)
-    parser.add_argument("--max-envs", "--max_envs", type=int, default=512)
+    parser.add_argument("--input-fps", type=float, default=120.0)
+    parser.add_argument("--output-fps", type=float, default=50.0)
+    parser.add_argument("--max-envs", type=int, default=512)
     parser.add_argument(
         "--cell-budget",
-        "--cell_budget",
         type=int,
         default=500_000,
         help="Max envs*max_frames per Isaac batch (bounds host/GPU memory).",
     )
     parser.add_argument(
         "--normalize-workers",
-        "--normalize_workers",
         type=int,
         default=min(8, os.cpu_count() or 1),
     )
@@ -670,11 +666,10 @@ def add_arguments(
         default=False,
         help="Deprecated no-op. Isaac Lab develop runs headless by default.",
     )
-    parser.add_argument("--anchor-tol", "--anchor_tol", type=float, default=1e-5)
-    parser.add_argument("--anchor-workers", "--anchor_workers", type=int, default=4)
+    parser.add_argument("--anchor-tol", type=float, default=1e-5)
+    parser.add_argument("--anchor-workers", type=int, default=4)
     parser.add_argument(
         "--audit-sample",
-        "--audit_sample",
         type=int,
         default=2000,
         help="Audit this many NPZs (evenly sampled). 0 audits all.",
@@ -831,7 +826,6 @@ def _run_stages(
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     add_arguments(parser)
-    hide_legacy_aliases(parser)
     return run(parser.parse_args(argv), parser)
 
 

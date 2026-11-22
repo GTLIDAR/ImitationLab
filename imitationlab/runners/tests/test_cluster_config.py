@@ -42,11 +42,11 @@ arms:
   a1:
     stages:
       - name: pretrain
-        executable: scripts/tracking/train_hl_skill_diffsr.py
+        executable: imitationlab.runners.pretrain
         args: ["--seed", "${vars.seed}", "cap=${vars.frame_cap}"]
         env: {STAGE_ONLY: pre}
       - name: lowlevel
-        executable: scripts/tracking/train.py
+        executable: imitationlab.runners.train
         args: ["cap=${vars.frame_cap}"]
         depends_on: pretrain
   a2:
@@ -167,9 +167,7 @@ def test_resolved_env_merge_order_and_determinism(tmp_path: Path) -> None:
     env = resolved_env(profile, jobset, jobset.stages[0])
     # campaign shared_env beats profile.env; stage executable always wins.
     assert env["CLUSTER_WANDB_TAGS"] == "demo,a1"
-    assert (
-        env["CLUSTER_PYTHON_EXECUTABLE"] == "scripts/tracking/train_hl_skill_diffsr.py"
-    )
+    assert env["CLUSTER_PYTHON_EXECUTABLE"] == "imitationlab.runners.pretrain"
     assert env["STAGE_ONLY"] == "pre"
     assert env["CLUSTER_EXTRA_BIND_PATHS"] == ":".join(profile.extra_bind_paths)
     again = resolved_env(profile, jobset, jobset.stages[0])

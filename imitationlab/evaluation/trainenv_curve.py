@@ -2,7 +2,7 @@
 
 Each row pairs one checkpoint (its ``cumulative_train_seconds`` and
 ``cumulative_env_frames``) with the ``reset_logs`` of its
-``evaluate_checkpoint --record_reset_logs`` JSON, read as a training run would
+``evaluate_checkpoint --record-reset-logs`` JSON, read as a training run would
 log them and averaged over the settled half of the rollout:
 
 * ``mpjpe_l_mm`` / ``mpjpe_g_mm``: ``Metrics/reference/mpjpe_{l,g}_mm``;
@@ -49,7 +49,7 @@ def row_from_eval(
         or {}
     )
     if not keys:
-        msg = "evaluation JSON has no reset_logs; rerun with --record_reset_logs."
+        msg = "evaluation JSON has no reset_logs; rerun with --record-reset-logs."
         raise ValueError(msg)
     row: dict[str, Any] = {
         "arm": arm,

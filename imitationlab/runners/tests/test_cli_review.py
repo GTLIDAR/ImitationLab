@@ -80,10 +80,11 @@ def test_legacy_resume_restores_recipe_environment_before_exec(tmp_path, monkeyp
         shlex.join(
             [
                 "python",
-                "scripts/tracking/train.py",
+                "-m",
+                "imitationlab.runners.train",
                 "--task",
                 "imitation-g1-v1",
-                "--args_file",
+                "--args-file",
                 str(recipe),
             ]
         )
@@ -248,7 +249,7 @@ def test_repeating_resume_selectors_preserves_saved_architecture(
             "imitation-g1-v1",
             "--algorithm=PPO",
             "agent.policy.num_cells=[96,48]",
-            "--max_iterations=25",
+            "--max-iterations=25",
         ],
     }
     if embedded_selection:
@@ -280,7 +281,7 @@ def test_repeating_resume_selectors_preserves_saved_architecture(
         "normalize_input" in item or item.endswith("/ppo.args") for item in argv
     )
     assert "--algorithm=PPO" in argv
-    assert argv[-2:] == ["--max_iterations", "30"]
+    assert argv[-2:] == ["--max-iterations", "30"]
 
 
 @pytest.mark.parametrize(

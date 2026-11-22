@@ -121,9 +121,9 @@ def test_merge_refuses_name_collisions_and_missing_files(
     assert (tmp_path / "out" / "manifest.json").is_file()
 
 
-def test_merge_cli_accepts_and_hides_legacy_spellings() -> None:
+def test_merge_cli_options_are_kebab_case() -> None:
     parser = build_parser()
-    args = parser.parse_args(["--output_manifest", "m.json", "--no_prefix_names"])
+    args = parser.parse_args(["--output-manifest", "m.json", "--no-prefix-names"])
     assert args.output_manifest == "m.json" and args.no_prefix_names
     help_text = parser.format_help()
     assert "--output-manifest" in help_text

@@ -264,13 +264,13 @@ def pretrain(args, rest: list[str]) -> int:
         str(args.data),
         "--output-dir",
         str(output),
-        "--num_updates",
+        "--num-updates",
         str(args.updates),
         "--seed",
         str(args.seed),
-        "--wandb_mode",
+        "--wandb-mode",
         "disabled",
-        "--log_interval",
+        "--log-interval",
         "100",
         *rest,
     ]
@@ -490,7 +490,7 @@ def run(args, rest: list[str]) -> int:
                 str(board["seed"]),
                 "--output",
                 str(destination),
-                "--trajectory_ranks",
+                "--trajectory-ranks",
                 *map(str, board["ranks"]),
             ]
             process = child(

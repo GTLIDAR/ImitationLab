@@ -3,18 +3,14 @@
 from __future__ import annotations
 
 import argparse
-import importlib.util
+import importlib
 import sys
 import types
 from pathlib import Path
 
 import pytest
 
-SCRIPT_DIR = Path(__file__).resolve().parents[4] / "scripts" / "tracking"
-if str(SCRIPT_DIR) not in sys.path:
-    sys.path.insert(0, str(SCRIPT_DIR))
-
-from runtime_bootstrap import (  # noqa: E402
+from imitationlab.runners.runtime_bootstrap import (  # noqa: E402
     _KitImportGuard,
     assert_kit_not_loaded,
     config_contains_type_name,
@@ -24,12 +20,8 @@ from runtime_bootstrap import (  # noqa: E402
 
 
 def _load_script(module_name: str, filename: str):
-    spec = importlib.util.spec_from_file_location(module_name, SCRIPT_DIR / filename)
-    assert spec is not None and spec.loader is not None
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[module_name] = module
-    spec.loader.exec_module(module)
-    return module
+    module = importlib.import_module(f"imitationlab.runners.{Path(filename).stem}")
+    return importlib.reload(module)
 
 
 def test_backend_selection_is_explicit_and_conflict_checked(monkeypatch):
@@ -156,7 +148,7 @@ def test_physx_bootstrap_owns_exactly_one_app(monkeypatch):
     fake_train.run = fake_run
     monkeypatch.setitem(sys.modules, "isaaclab", fake_isaaclab)
     monkeypatch.setitem(sys.modules, "isaaclab.app", fake_isaaclab_app)
-    monkeypatch.setitem(sys.modules, "train", fake_train)
+    monkeypatch.setitem(sys.modules, "imitationlab.runners.train", fake_train)
     monkeypatch.setattr(module, "detect_gpu_names", lambda: ("NVIDIA L40S",))
     monkeypatch.setattr(module, "configure_cu130_bridge", lambda required: None)
 

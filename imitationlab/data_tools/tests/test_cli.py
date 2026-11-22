@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+
+import pytest
 import subprocess
 import sys
 import tarfile
@@ -131,7 +133,7 @@ from pathlib import Path
 import numpy as np
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--jobs_json", type=Path)
+parser.add_argument("--jobs-json", type=Path)
 args, _ = parser.parse_known_args()
 for job in json.loads(args.jobs_json.read_text()):
     motion = Path(job["input_file"]).stem
@@ -153,9 +155,9 @@ for job in json.loads(args.jobs_json.read_text()):
         str(manifest),
         "--batch-size",
         "1",
-        "--batch_converter_script",
+        "--batch-converter-script",
         str(converter),
-        "--frame_range",
+        "--frame-range",
         "2",
         "3",
     ]
@@ -166,7 +168,7 @@ for job in json.loads(args.jobs_json.read_text()):
     assert main(cmd) == 0
     assert log.read_text().splitlines() == ["first", "second", "second"]
     assert main(["validate", str(manifest), "--for-pack"]) == 0
-    assert main([*cmd, "--output_fps", "60"]) == 1
+    assert main([*cmd, "--output-fps", "60"]) == 1
     assert "conversion settings changed" in capsys.readouterr().err
 
 
@@ -196,7 +198,7 @@ def test_prepare_bones_from_local_metadata(tmp_path):
         str(work),
         "--stages",
         "extract,normalize",
-        "--normalize_workers",
+        "--normalize-workers",
         "2",
     ]
     assert main(cmd) == 0
@@ -207,12 +209,12 @@ def test_prepare_bones_from_local_metadata(tmp_path):
     assert record["normalize"]["normalized"] == 0
 
 
-def test_kebab_case_is_canonical_and_snake_case_still_parses():
+def test_options_are_kebab_case_only():
     from imitationlab.data_tools.cli import _build_parser
 
     parser = _build_parser()
-    argv = ["prepare", "bones_seed", "--metadata_csv", "m.csv", "--work_root", "w"]
-    args = parser.parse_args([*argv, "--input_fps", "60", "--anchor_tol", "0.1"])
+    argv = ["prepare", "bones_seed", "--metadata-csv", "m.csv", "--work-root", "w"]
+    args = parser.parse_args([*argv, "--input-fps", "60", "--anchor-tol", "0.1"])
     assert (args.metadata_csv, args.work_root) == (Path("m.csv"), Path("w"))
     assert (args.input_fps, args.anchor_tol) == (60.0, 0.1)
 
@@ -220,6 +222,8 @@ def test_kebab_case_is_canonical_and_snake_case_still_parses():
     help_text = bones._subparsers._group_actions[0].choices["bones_seed"].format_help()
     assert "--input-fps" in help_text and "--metadata-csv" in help_text
     assert "--input_fps" not in help_text and "--work_root" not in help_text
+    with pytest.raises(SystemExit):
+        parser.parse_args([*argv, "--input_fps", "60"])
 
 
 def test_fingerprint_ignores_where_and_under_which_name_a_bank_was_packed(

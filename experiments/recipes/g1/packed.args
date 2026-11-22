@@ -1,5 +1,5 @@
 # Shared simulator defaults for explicit commands and packed G1 motions.
---num_envs 4096
+--num-envs 4096
 env.library_host_mapped=true
 env.library_env_window=64
 %env IMITATIONLAB_ENV_COLLECT_FASTPATH=1

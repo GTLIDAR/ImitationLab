@@ -11,7 +11,6 @@ import random
 import sys
 
 from isaaclab.app import AppLauncher
-from imitationlab.cli_args import add_kebab_aliases
 from imitationlab.runners.launch_compat import add_launcher_args
 
 
@@ -28,21 +27,21 @@ parser.add_argument(
     ],
 )
 parser.add_argument("--checkpoint", type=Path, required=True)
-parser.add_argument("--output_npz", type=Path, required=True)
+parser.add_argument("--output-npz", type=Path, required=True)
 parser.add_argument(
-    "--output_manifest",
+    "--output-manifest",
     type=Path,
     default=None,
     help="Optional manifest path to write for the generated rollout NPZ files.",
 )
 parser.add_argument(
-    "--motion_manifest",
+    "--motion-manifest",
     type=Path,
     default=None,
     help="Optional manifest used to condition the rollout env on a specific motion set.",
 )
 parser.add_argument(
-    "--schema_reference_npz",
+    "--schema-reference-npz",
     type=Path,
     default=None,
     help=(
@@ -52,7 +51,7 @@ parser.add_argument(
 )
 parser.add_argument("--steps", type=int, default=600)
 parser.add_argument(
-    "--num_envs",
+    "--num-envs",
     type=int,
     default=1,
     help=(
@@ -69,28 +68,27 @@ parser.add_argument(
     help="Output fps. When <= 0, infer it from the env step dt.",
 )
 parser.add_argument(
-    "--refresh_zarr_dataset",
+    "--refresh-zarr-dataset",
     action="store_true",
     default=False,
     help="Rebuild the manifest-derived Zarr cache before rollout.",
 )
 parser.add_argument(
-    "--keep_after_done",
+    "--keep-after-done",
     action="store_true",
     default=False,
     help="Continue/appended stepped states even if the env reports done or truncated.",
 )
 parser.add_argument(
-    "--preserve_episode_length",
+    "--preserve-episode-length",
     action="store_true",
     default=False,
     help="Do not extend env.episode_length_s to cover the requested rollout steps.",
 )
 parser.add_argument("--video", action="store_true", default=False)
-parser.add_argument("--video_folder", type=Path, default=None)
-parser.add_argument("--video_length", type=int, default=None)
+parser.add_argument("--video-folder", type=Path, default=None)
+parser.add_argument("--video-length", type=int, default=None)
 add_launcher_args(parser)
-add_kebab_aliases(parser)
 args_cli, hydra_args = parser.parse_known_args()
 
 sys.argv = [sys.argv[0]] + hydra_args
@@ -513,7 +511,7 @@ agent_entry_point = resolve_agent_cfg_entry_point(args_cli.task, args_cli.algori
 @hydra_task_config(args_cli.task, agent_entry_point)
 def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agent_cfg):
     if args_cli.num_envs <= 0:
-        raise ValueError("--num_envs must be positive.")
+        raise ValueError("--num-envs must be positive.")
     if args_cli.steps <= 0:
         raise ValueError("--steps must be positive.")
     steps = int(args_cli.steps)

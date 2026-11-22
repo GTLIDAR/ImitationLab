@@ -27,7 +27,6 @@ from pathlib import Path
 
 import numpy as np
 
-from imitationlab.data_tools.common.cli_args import hide_legacy_aliases
 from imitationlab.data_tools.common.manifest_io import (
     motion_manifest_schema,
     sanitize_motion_name,
@@ -112,14 +111,12 @@ def main() -> None:
     )
     parser.add_argument(
         "--npz-dir",
-        "--npz_dir",
         type=str,
         required=True,
         help="Input folder containing NPZ motion files.",
     )
     parser.add_argument(
         "--manifest-path",
-        "--manifest_path",
         type=str,
         required=True,
         help="Output manifest JSON path.",
@@ -132,21 +129,18 @@ def main() -> None:
     )
     parser.add_argument(
         "--dataset-name",
-        "--dataset_name",
         type=str,
         default="lafan1",
         help="Dataset name written to the manifest.",
     )
     parser.add_argument(
         "--motion-name-prefix",
-        "--motion_name_prefix",
         type=str,
         default="",
         help="Optional prefix for generated motion names in the manifest.",
     )
     parser.add_argument(
         "--fallback-input-fps",
-        "--fallback_input_fps",
         type=float,
         default=50.0,
         help="Fallback FPS when an NPZ file does not include fps metadata.",
@@ -162,13 +156,11 @@ def main() -> None:
     )
     parser.add_argument(
         "--path-mode",
-        "--path_mode",
         type=str,
         choices=("relative", "absolute"),
         default="relative",
         help="Write manifest motion paths relative to the manifest file or as absolute paths.",
     )
-    hide_legacy_aliases(parser)
     args = parser.parse_args()
 
     npz_dir = Path(args.npz_dir).expanduser().resolve()

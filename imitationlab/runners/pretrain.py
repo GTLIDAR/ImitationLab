@@ -27,7 +27,6 @@ if strict_kitless:
     install_kit_import_guard()
 
 from imitationlab.runners.launch_compat import add_launcher_args
-from imitationlab.cli_args import add_kebab_aliases
 
 parser = argparse.ArgumentParser(
     description="Train an offline high-level skill encoder."
@@ -38,10 +37,10 @@ parser.add_argument(
     default="imitation-g1-v1",
     help="Isaac Lab task used only for expert trajectory sampling.",
 )
-parser.add_argument("--num_envs", type=int, default=None, help="Number of envs.")
+parser.add_argument("--num-envs", type=int, default=None, help="Number of envs.")
 parser.add_argument("--seed", type=int, default=None, help="Random seed.")
 parser.add_argument(
-    "--output_dir",
+    "--output-dir",
     type=str,
     default=None,
     help="Output directory. Defaults to outputs/encoders/<latent_mode>/<timestamp>.",
@@ -53,14 +52,14 @@ parser.add_argument(
     help="Optional checkpoint to load before training or eval-only diagnostics.",
 )
 parser.add_argument(
-    "--eval_only",
+    "--eval-only",
     action="store_true",
     default=False,
     help="Load --checkpoint and run held-out diagnostics without updates.",
 )
-parser.add_argument("--horizon_steps", type=int, default=25, help="Macro horizon W.")
+parser.add_argument("--horizon-steps", type=int, default=25, help="Macro horizon W.")
 parser.add_argument(
-    "--encoder_window_mode",
+    "--encoder-window-mode",
     type=str,
     default="full",
     help=(
@@ -72,7 +71,7 @@ parser.add_argument(
     ),
 )
 parser.add_argument(
-    "--source_history_steps",
+    "--source-history-steps",
     type=int,
     default=0,
     help=(
@@ -84,12 +83,12 @@ parser.add_argument(
     ),
 )
 parser.add_argument(
-    "--source_anchor",
+    "--source-anchor",
     type=str,
     default="current",
     choices=("current", "past_start"),
     help=(
-        "Heading frame of the sampled window when --source_history_steps > 0. "
+        "Heading frame of the sampled window when --source-history-steps > 0. "
         "'current' anchors on s_t, so the past reads as negative displacement "
         "and the encoder input is unchanged from a history-free run. "
         "'past_start' anchors on the OLDEST past frame, making one long macro "
@@ -99,7 +98,7 @@ parser.add_argument(
     ),
 )
 parser.add_argument(
-    "--transition_objective",
+    "--transition-objective",
     type=str,
     default="endpoint",
     choices=(
@@ -121,7 +120,7 @@ parser.add_argument(
     ),
 )
 parser.add_argument(
-    "--reconstruction_target",
+    "--reconstruction-target",
     type=str,
     default="input_window",
     choices=("input_window", "endpoint", "full_window"),
@@ -133,7 +132,7 @@ parser.add_argument(
     ),
 )
 parser.add_argument(
-    "--jepa_loss",
+    "--jepa-loss",
     type=str,
     default="sigreg",
     choices=("sigreg", "sigreg_ebm", "infonce"),
@@ -143,10 +142,10 @@ parser.add_argument(
         "'infonce' (bilinear spectral energy over in-batch negatives)."
     ),
 )
-parser.add_argument("--jepa_sigreg_coeff", type=float, default=1.0)
-parser.add_argument("--jepa_ntp_coeff", type=float, default=1.0)
+parser.add_argument("--jepa-sigreg-coeff", type=float, default=1.0)
+parser.add_argument("--jepa-ntp-coeff", type=float, default=1.0)
 parser.add_argument(
-    "--jepa_ntp_chunk_anchor",
+    "--jepa-ntp-chunk-anchor",
     type=str,
     default="executed",
     choices=("executed", "next"),
@@ -157,7 +156,7 @@ parser.add_argument(
     ),
 )
 parser.add_argument(
-    "--jepa_ntp_chunk_span",
+    "--jepa-ntp-chunk-span",
     type=str,
     default="next",
     choices=("next", "boundary_next"),
@@ -165,22 +164,22 @@ parser.add_argument(
         "Frames the diff_chunk head denoises: 'next' is the next chunk's H "
         "frames s[t+H+1..t+2H] (the round-4 recipe); 'boundary_next' widens "
         "the target to s[t+H..t+2H] (H+1 frames) so ONE head covers the "
-        "endpoint and the next chunk — pair with --jepa_endpoint_coeff 0 for "
-        "the merged-head cell. Requires --jepa_ntp_chunk_anchor executed."
+        "endpoint and the next chunk — pair with --jepa-endpoint-coeff 0 for "
+        "the merged-head cell. Requires --jepa-ntp-chunk-anchor executed."
     ),
 )
 parser.add_argument(
-    "--jepa_token_pred_coeff",
+    "--jepa-token-pred-coeff",
     type=float,
     default=0.0,
     help=(
         "Weight of the mlp token-prediction MSE ||P(z1) - z2||^2 ADDED "
         "alongside a diffusion NTP head. 0 (default) reproduces every "
-        "existing arm; positive requires a diffusion --jepa_ntp_head."
+        "existing arm; positive requires a diffusion --jepa-ntp-head."
     ),
 )
 parser.add_argument(
-    "--jepa_endpoint_coeff",
+    "--jepa-endpoint-coeff",
     type=float,
     default=1.0,
     help=(
@@ -190,7 +189,7 @@ parser.add_argument(
     ),
 )
 parser.add_argument(
-    "--jepa_ntp_head",
+    "--jepa-ntp-head",
     type=str,
     default="mlp",
     choices=("mlp", "diff_token", "diff_chunk", "diff_pair"),
@@ -202,9 +201,9 @@ parser.add_argument(
         "chunk's heading frame."
     ),
 )
-parser.add_argument("--jepa_sigreg_sketches", type=int, default=64)
+parser.add_argument("--jepa-sigreg-sketches", type=int, default=64)
 parser.add_argument(
-    "--jepa_context_chunks",
+    "--jepa-context-chunks",
     type=int,
     default=0,
     choices=(0, 1),
@@ -215,7 +214,7 @@ parser.add_argument(
     ),
 )
 parser.add_argument(
-    "--jepa_target_encoder_mode",
+    "--jepa-target-encoder-mode",
     type=str,
     default="ema",
     choices=("ema", "online", "stopgrad"),
@@ -226,18 +225,18 @@ parser.add_argument(
     ),
 )
 parser.add_argument(
-    "--transition_offsets",
+    "--transition-offsets",
     type=int,
     nargs="*",
     default=None,
     help=(
-        "Strictly increasing h_k checkpoints ending at --horizon_steps. Empty uses "
+        "Strictly increasing h_k checkpoints ending at --horizon-steps. Empty uses "
         "only H for endpoint objectives and every step for occupancy/chain."
     ),
 )
-parser.add_argument("--z_dim", type=int, default=256, help="Skill latent dimension.")
+parser.add_argument("--z-dim", type=int, default=256, help="Skill latent dimension.")
 parser.add_argument(
-    "--latent_mode",
+    "--latent-mode",
     type=str,
     default="deterministic",
     choices=(
@@ -257,128 +256,128 @@ parser.add_argument(
     ),
 )
 parser.add_argument(
-    "--reg_coeff",
+    "--reg-coeff",
     type=float,
     default=1.0e-3,
     help="Latent regularizer weight: L2 on z for 'deterministic', KL bottleneck "
     "for 'gaussian'/'categorical'.",
 )
 parser.add_argument(
-    "--categorical_groups",
+    "--categorical-groups",
     type=int,
     default=8,
-    help="Number of categorical groups G for --latent_mode categorical (must divide "
+    help="Number of categorical groups G for --latent-mode categorical (must divide "
     "z_dim; per-group code dim = z_dim // G).",
 )
 parser.add_argument(
-    "--categorical_categories",
+    "--categorical-categories",
     type=int,
     default=32,
-    help="Categories per group (vocab size) for --latent_mode categorical. Independent "
+    help="Categories per group (vocab size) for --latent-mode categorical. Independent "
     "of z_dim; larger = more capacity per group.",
 )
 parser.add_argument(
-    "--gumbel_codebook_size", type=int, default=512, help="Codebook size for gumbel/."
+    "--gumbel-codebook-size", type=int, default=512, help="Codebook size for gumbel/."
 )
-parser.add_argument("--gumbel_tau_start", type=float, default=2.0)
-parser.add_argument("--gumbel_tau_end", type=float, default=0.5)
-parser.add_argument("--gumbel_tau_anneal_iters", type=int, default=2000)
+parser.add_argument("--gumbel-tau-start", type=float, default=2.0)
+parser.add_argument("--gumbel-tau-end", type=float, default=0.5)
+parser.add_argument("--gumbel-tau-anneal-iters", type=int, default=2000)
 parser.add_argument(
-    "--gumbel_hard", action=argparse.BooleanOptionalAction, default=True
+    "--gumbel-hard", action=argparse.BooleanOptionalAction, default=True
 )
 parser.add_argument(
-    "--fsq_levels",
+    "--fsq-levels",
     type=int,
     nargs="+",
     default=[8, 8, 8, 5, 5],
-    help="Per-dim levels for --latent_mode fsq (codebook size = product).",
+    help="Per-dim levels for --latent-mode fsq (codebook size = product).",
 )
 parser.add_argument(
-    "--sonic_fsq_levels",
+    "--sonic-fsq-levels",
     type=int,
     nargs="+",
     default=[32] * 64,
     help=(
-        "Per-dim levels for --latent_mode sonic_fsq. Default is the SONIC-matched "
+        "Per-dim levels for --latent-mode sonic_fsq. Default is the SONIC-matched "
         "token space (64 dims x 32 levels ~= 320 bits per command, i.e. gear_sonic "
         "tokens of shape (2, 32) at num_fsq_levels=32). This mode publishes the "
-        "quantizer output directly as the command, so --z_dim must equal the "
+        "quantizer output directly as the command, so --z-dim must equal the "
         "number of levels given here."
     ),
 )
 parser.add_argument(
-    "--encoder_hidden_dims",
+    "--encoder-hidden-dims",
     type=int,
     nargs="+",
     default=None,
     help="Skill-encoder trunk MLP hidden widths (default: config default).",
 )
 parser.add_argument(
-    "--encoder_activation",
+    "--encoder-activation",
     type=str,
     choices=("elu", "mish", "relu", "silu"),
     default="mish",
     help="Skill-encoder trunk activation.",
 )
 parser.add_argument(
-    "--encoder_layer_norm",
+    "--encoder-layer-norm",
     dest="encoder_layer_norm",
     action="store_true",
     default=True,
     help="Apply LayerNorm after every skill-encoder hidden linear layer.",
 )
 parser.add_argument(
-    "--no_encoder_layer_norm",
+    "--no-encoder-layer-norm",
     dest="encoder_layer_norm",
     action="store_false",
     help="Disable skill-encoder hidden LayerNorm, matching SONIC's MLP recipe.",
 )
-parser.add_argument("--vq_codebook_size", type=int, default=512)
-parser.add_argument("--vq_ema_decay", type=float, default=0.99)
+parser.add_argument("--vq-codebook-size", type=int, default=512)
+parser.add_argument("--vq-ema-decay", type=float, default=0.99)
 parser.add_argument(
-    "--vq_dead_code_reset_iters",
+    "--vq-dead-code-reset-iters",
     type=int,
     default=0,
     help="Revive unused VQ codes every N updates (0 disables).",
 )
 parser.add_argument(
-    "--diffsr_feature_dim",
+    "--diffsr-feature-dim",
     type=int,
     default=128,
     help="DiffSR spectral feature dimension.",
 )
 parser.add_argument(
-    "--diffsr_embed_dim",
+    "--diffsr-embed-dim",
     type=int,
     default=512,
     help="DiffSR bilinear embedding dimension.",
 )
 parser.add_argument(
-    "--diffsr_f_hidden_dims",
+    "--diffsr-f-hidden-dims",
     type=int,
     nargs="+",
     default=None,
     help="DiffSR legacy bilinear state-encoder hidden widths.",
 )
 parser.add_argument(
-    "--diffsr_g_hidden_dims",
+    "--diffsr-g-hidden-dims",
     type=int,
     nargs="+",
     default=None,
     help=(
         "DiffSR concat state, skill, and phi encoder hidden widths. This is the "
-        "active state-encoder knob under --diffsr_phi_parameterization concat."
+        "active state-encoder knob under --diffsr-phi-parameterization concat."
     ),
 )
 parser.add_argument(
-    "--diffsr_mu_hidden_dims",
+    "--diffsr-mu-hidden-dims",
     type=int,
     nargs="+",
     default=None,
     help="DiffSR next-state diffusion encoder hidden widths.",
 )
 parser.add_argument(
-    "--diffsr_phi_parameterization",
+    "--diffsr-phi-parameterization",
     type=str,
     default="concat",
     choices=(
@@ -401,18 +400,18 @@ parser.add_argument(
         "'affine_poe' reassociates the affine model as <[1; z], E>. "
         "Field affinity alone does not guarantee exact clean PoE sampling. "
         "'identity' sets phi(s, z) = z (requires "
-        "--diffsr_feature_dim == --z_dim); with --diffsr_mu_conditioning pair "
+        "--diffsr-feature-dim == --z-dim); with --diffsr-mu-conditioning pair "
         "the denoiser becomes <z, E(s, s', t)>, the product-of-experts form. "
         "'identity_bias' sets phi = [1; z] (requires feature_dim = z_dim + 1), "
         "adding a command-independent base denoiser. 'linear' sets phi = A z "
-        "with a bias-free linear A into --diffsr_feature_dim, which may be "
+        "with a bias-free linear A into --diffsr-feature-dim, which may be "
         "wider than z, so the expert count is untied from the latent width; "
         "'linear_bias' is [1; A z], the same projection with the base "
         "denoiser channel."
     ),
 )
 parser.add_argument(
-    "--diffsr_mu_conditioning",
+    "--diffsr-mu-conditioning",
     type=str,
     default="next",
     choices=("next", "pair", "film"),
@@ -423,75 +422,75 @@ parser.add_argument(
         "noisy-target hidden features before the expert readout; never uses z."
     ),
 )
-parser.add_argument("--batch_size", type=int, default=8192, help="Training batch size.")
+parser.add_argument("--batch-size", type=int, default=8192, help="Training batch size.")
 parser.add_argument(
-    "--encoder_lr",
+    "--encoder-lr",
     type=float,
     default=3.0e-4,
     help="Learning rate for the skill encoder and JEPA next-chunk head.",
 )
-parser.add_argument("--num_updates", type=int, default=2000, help="Training updates.")
-parser.add_argument("--log_interval", type=int, default=100, help="Log cadence.")
+parser.add_argument("--num-updates", type=int, default=2000, help="Training updates.")
+parser.add_argument("--log-interval", type=int, default=100, help="Log cadence.")
 parser.add_argument(
-    "--dynamics_probe",
+    "--dynamics-probe",
     action="store_true",
     help="After training or eval-only, run matched-noise raw-chunk diagnostics.",
 )
-parser.add_argument("--dynamics_probe_batch_size", type=int, default=256)
-parser.add_argument("--dynamics_probe_batches", type=int, default=4)
-parser.add_argument("--dynamics_probe_seed", type=int, default=1729)
+parser.add_argument("--dynamics-probe-batch-size", type=int, default=256)
+parser.add_argument("--dynamics-probe-batches", type=int, default=4)
+parser.add_argument("--dynamics-probe-seed", type=int, default=1729)
 parser.add_argument(
-    "--eval_batches",
+    "--eval-batches",
     type=int,
     default=4,
     help="Held-out batches per diagnostic evaluation.",
 )
 parser.add_argument(
-    "--eval_batch_size",
+    "--eval-batch-size",
     type=int,
     default=None,
-    help="Held-out diagnostic batch size. Defaults to --batch_size.",
+    help="Held-out diagnostic batch size. Defaults to --batch-size.",
 )
 parser.add_argument(
-    "--train_split",
+    "--train-split",
     type=str,
     default="train",
     choices=("all", "train", "eval"),
     help="Expert trajectory split used for optimizer updates.",
 )
 parser.add_argument(
-    "--eval_split",
+    "--eval-split",
     type=str,
     default="eval",
     choices=("all", "train", "eval"),
     help="Expert trajectory split used for diagnostics.",
 )
 parser.add_argument(
-    "--eval_trajectory_fraction",
+    "--eval-trajectory-fraction",
     type=float,
     default=0.1,
     help="Fraction of nonempty expert trajectories reserved for eval split.",
 )
 parser.add_argument(
-    "--trajectory_split_seed",
+    "--trajectory-split-seed",
     type=int,
     default=0,
     help="Deterministic seed for train/eval trajectory split.",
 )
 parser.add_argument(
-    "--grad_clip_norm",
+    "--grad-clip-norm",
     type=float,
     default=1.0,
     help="Global gradient max norm. Use <=0 to disable.",
 )
 parser.add_argument(
-    "--reconstruction_norm_eps",
+    "--reconstruction-norm-eps",
     type=float,
     default=1.0e-6,
     help="Variance floor for normalized reconstruction diagnostics.",
 )
 parser.add_argument(
-    "--weight_decay",
+    "--weight-decay",
     type=float,
     default=None,
     help=(
@@ -500,65 +499,65 @@ parser.add_argument(
     ),
 )
 parser.add_argument(
-    "--reconstruction_eval",
+    "--reconstruction-eval",
     action="store_true",
     default=False,
     help="Include stochastic DiffSR sampled reconstruction errors in eval metrics.",
 )
 parser.add_argument(
-    "--window_probe_eval",
+    "--window-probe-eval",
     action="store_true",
     default=False,
     help="Fit eval-only linear probes from frozen z/state to held-out future windows.",
 )
 parser.add_argument(
-    "--window_probe_train_batches",
+    "--window-probe-train-batches",
     type=int,
     default=4,
     help="Train batches for eval-only closed-form window probes.",
 )
 parser.add_argument(
-    "--window_probe_eval_batches",
+    "--window-probe-eval-batches",
     type=int,
     default=None,
-    help="Held-out batches for eval-only window probes. Defaults to --eval_batches.",
+    help="Held-out batches for eval-only window probes. Defaults to --eval-batches.",
 )
 parser.add_argument(
-    "--window_probe_ridge",
+    "--window-probe-ridge",
     type=float,
     default=1.0e-3,
     help="Ridge coefficient for eval-only window probes.",
 )
 parser.add_argument(
-    "--cotrain_commander",
+    "--cotrain-commander",
     action="store_true",
     default=False,
     help="Co-train a skill commander (BC to encoder z from state + language goal).",
 )
 parser.add_argument(
-    "--commander_language_embeddings",
+    "--commander-language-embeddings",
     type=str,
     default=None,
-    help="Language-goal embedding table (.pt); required with --cotrain_commander.",
+    help="Language-goal embedding table (.pt); required with --cotrain-commander.",
 )
 parser.add_argument(
-    "--commander_lr", type=float, default=3.0e-4, help="Commander BC learning rate."
+    "--commander-lr", type=float, default=3.0e-4, help="Commander BC learning rate."
 )
 parser.add_argument(
-    "--commander_hidden_dims",
+    "--commander-hidden-dims",
     type=int,
     nargs="+",
     default=[1024, 512, 512],
     help="Commander MLP hidden widths.",
 )
 parser.add_argument(
-    "--commander_cosine_loss_coeff",
+    "--commander-cosine-loss-coeff",
     type=float,
     default=1.0,
     help="Weight on the (1 - cosine) commander BC term.",
 )
 parser.add_argument(
-    "--cotrain_language_planner",
+    "--cotrain-language-planner",
     action="store_true",
     default=False,
     help=(
@@ -568,117 +567,117 @@ parser.add_argument(
     ),
 )
 parser.add_argument(
-    "--planner_language_embeddings",
+    "--planner-language-embeddings",
     type=str,
     default=None,
-    help="Language-goal embedding table (.pt); required with --cotrain_language_planner.",
+    help="Language-goal embedding table (.pt); required with --cotrain-language-planner.",
 )
 parser.add_argument(
-    "--planner_lr", type=float, default=3.0e-4, help="Planner AdamW lr."
+    "--planner-lr", type=float, default=3.0e-4, help="Planner AdamW lr."
 )
 parser.add_argument(
-    "--planner_weight_decay",
+    "--planner-weight-decay",
     type=float,
     default=0.0,
     help="Planner AdamW weight decay.",
 )
 parser.add_argument(
-    "--planner_flow_hidden_dims",
+    "--planner-flow-hidden-dims",
     type=int,
     nargs="+",
     default=[1024, 512, 512],
     help="Base-flow velocity MLP widths.",
 )
 parser.add_argument(
-    "--planner_expert_hidden_dims",
+    "--planner-expert-hidden-dims",
     type=int,
     nargs="+",
     default=[512, 512],
     help="Language-expert state-matrix MLP widths.",
 )
 parser.add_argument(
-    "--planner_lang_proj_dim",
+    "--planner-lang-proj-dim",
     type=int,
     default=64,
     help="Width of the projected language embedding inside the log-linear expert.",
 )
 parser.add_argument(
-    "--planner_flow_noise_std",
+    "--planner-flow-noise-std",
     type=float,
     default=1.0,
     help="Std of the base flow's Gaussian source (train and inference).",
 )
 parser.add_argument(
-    "--planner_flow_num_inference_steps",
+    "--planner-flow-num-inference-steps",
     type=int,
     default=16,
     help="Euler steps when sampling the planner.",
 )
 parser.add_argument(
-    "--planner_state_noise_std",
+    "--planner-state-noise-std",
     type=float,
     default=0.0,
     help="Per-dim Gaussian noise on the planner state input during training.",
 )
 parser.add_argument(
-    "--planner_eval_betas",
+    "--planner-eval-betas",
     type=float,
     nargs="+",
     default=[0.0, 1.0, 2.0],
     help="Guidance strengths swept in the held-out planner diagnostics.",
 )
 parser.add_argument(
-    "--planner_eval_num_samples",
+    "--planner-eval-num-samples",
     type=int,
     default=8,
     help="Samples per row in the held-out planner diagnostics.",
 )
 parser.add_argument(
-    "--jepa_reconstruction_coeff",
+    "--jepa-reconstruction-coeff",
     type=float,
     default=0.0,
     help=(
         "Weight of an autoencoder term added to jepa_ntp: a decoder z -> "
-        "--reconstruction_target (default the exact encoder input) scored on a "
+        "--reconstruction-target (default the exact encoder input) scored on a "
         "running per-dimension z-score, summed over dims, inside the encoder's "
         "optimizer step. 0 (default) reproduces every existing arm."
     ),
 )
 parser.add_argument(
-    "--cotrain_regression_planner",
+    "--cotrain-regression-planner",
     action="store_true",
     default=False,
     help=(
         "Co-train a deterministic planner z_hat = P(X, l) from phi's source (the "
         "causal macro history) and the caption embedding, with the Gaussian NLL "
         "0.5||z - z_hat||^2 in the encoder's own optimizer step. Joint (gradient "
-        "into the encoder) unless --regression_planner_detach_target. Language "
-        "table: --planner_language_embeddings."
+        "into the encoder) unless --regression-planner-detach-target. Language "
+        "table: --planner-language-embeddings."
     ),
 )
-parser.add_argument("--regression_planner_coeff", type=float, default=1.0)
+parser.add_argument("--regression-planner-coeff", type=float, default=1.0)
 parser.add_argument(
-    "--regression_planner_detach_target",
+    "--regression-planner-detach-target",
     action="store_true",
     default=False,
     help="Detach the planner's target code (no planner gradient into the encoder).",
 )
 parser.add_argument(
-    "--no_regression_planner_language",
+    "--no-regression-planner-language",
     dest="regression_planner_use_language",
     action="store_false",
     default=True,
     help="Condition the regression planner on the causal history only.",
 )
 parser.add_argument(
-    "--regression_planner_hidden_dims",
+    "--regression-planner-hidden-dims",
     type=int,
     nargs="+",
     default=[1024, 1024, 512],
 )
-parser.add_argument("--regression_planner_lr", type=float, default=3.0e-4)
+parser.add_argument("--regression-planner-lr", type=float, default=3.0e-4)
 parser.add_argument(
-    "--heads_drop_qvel",
+    "--heads-drop-qvel",
     action="store_true",
     default=False,
     help=(
@@ -688,7 +687,7 @@ parser.add_argument(
     ),
 )
 parser.add_argument(
-    "--macro_qvel_scale",
+    "--macro-qvel-scale",
     type=float,
     default=1.0,
     help=(
@@ -698,7 +697,7 @@ parser.add_argument(
     ),
 )
 parser.add_argument(
-    "--macro_offset_aug",
+    "--macro-offset-aug",
     type=str,
     default="none",
     choices=("none", "lognormal"),
@@ -708,53 +707,53 @@ parser.add_argument(
         "anchored at a live robot that is off the reference (robot_pos_heading rollout)."
     ),
 )
-parser.add_argument("--macro_offset_xy_median", type=float, default=0.05)
-parser.add_argument("--macro_offset_xy_log_sigma", type=float, default=1.448)
-parser.add_argument("--macro_offset_yaw_median_deg", type=float, default=1.1)
-parser.add_argument("--macro_offset_yaw_log_sigma", type=float, default=1.10)
+parser.add_argument("--macro-offset-xy-median", type=float, default=0.05)
+parser.add_argument("--macro-offset-xy-log-sigma", type=float, default=1.448)
+parser.add_argument("--macro-offset-yaw-median-deg", type=float, default=1.1)
+parser.add_argument("--macro-offset-yaw-log-sigma", type=float, default=1.10)
 parser.add_argument(
-    "--commander_state_noise_std",
+    "--commander-state-noise-std",
     type=float,
     default=0.0,
     help="Per-dim Gaussian noise on the commander state input (M3 robustness).",
 )
 parser.add_argument(
-    "--logger_backend",
+    "--logger-backend",
     type=str,
     default="none",
     help="Metrics backend for pretraining. Use 'wandb' to log to Weights & Biases, "
     "or 'none' to keep local JSONL/stdout logging only.",
 )
 parser.add_argument(
-    "--wandb_project",
+    "--wandb-project",
     type=str,
     default="G1-Imitation-HL-Skill-DiffSR",
-    help="W&B project name when --logger_backend=wandb.",
+    help="W&B project name when --logger-backend=wandb.",
 )
 parser.add_argument(
-    "--wandb_entity",
+    "--wandb-entity",
     type=str,
     default=None,
-    help="Optional W&B entity (team/user) when --logger_backend=wandb.",
+    help="Optional W&B entity (team/user) when --logger-backend=wandb.",
 )
 parser.add_argument(
-    "--wandb_group",
+    "--wandb-group",
     type=str,
     default=None,
-    help="Optional W&B group when --logger_backend=wandb.",
+    help="Optional W&B group when --logger-backend=wandb.",
 )
 parser.add_argument(
-    "--wandb_run_name",
+    "--wandb-run-name",
     type=str,
     default=None,
     help="Optional W&B run name. Defaults to the run output directory name.",
 )
 parser.add_argument(
-    "--wandb_mode",
+    "--wandb-mode",
     type=str,
     default="online",
     choices=("online", "offline", "disabled"),
-    help="W&B mode passed to wandb.init when --logger_backend=wandb.",
+    help="W&B mode passed to wandb.init when --logger-backend=wandb.",
 )
 parser.add_argument(
     "--assert-kitless",
@@ -762,7 +761,6 @@ parser.add_argument(
     help="Require a Newton configuration that never imports or starts Kit.",
 )
 add_launcher_args(parser)
-add_kebab_aliases(parser)
 args_cli, hydra_args = parser.parse_known_args()
 
 sys.argv = [sys.argv[0]] + hydra_args
@@ -1060,7 +1058,7 @@ def _run_training(
 
         if args_cli.eval_only:
             if args_cli.checkpoint is None:
-                raise ValueError("--eval_only requires --checkpoint.")
+                raise ValueError("--eval-only requires --checkpoint.")
             # load_checkpoint restored the run's training config, so the
             # eval-only knobs come from the CLI, not from the checkpoint:
             # the eval batch (the affine head's [B, feature, embed] matrix

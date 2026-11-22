@@ -15,12 +15,6 @@ import subprocess
 import sys
 import threading
 
-from imitationlab.cli_args import (
-    PRETRAIN_MODULES,
-    TRAIN_MODULES,
-    canonical_argv,
-    snake_case_options,
-)
 from imitationlab.runners.registry import (
     INTERFACES,
 )
@@ -61,7 +55,7 @@ def context_signature(
     plan: HardwarePlan, argv: list[str], encoder: Path | None
 ) -> dict:
     # Logging destination, seed, and stopping budgets do not define the workload.
-    excluded_flags = {"--seed", "--device", "--max_iterations", "--max_train_seconds"}
+    excluded_flags = {"--seed", "--device", "--max-iterations", "--max-train-seconds"}
     normalized, skip = [], False
     environment = dict(os.environ)
     for item in expand_args_files(argv, environ=environment):
@@ -339,9 +333,6 @@ def main(argv: list[str] | None = None, *, calibrate: bool = False) -> int:
             help="Profiles to measure (default: every profile that fits this machine).",
         )
     args, rest = parser.parse_known_args(argv)
-    # Workload options are the trainer's or the pretrainer's, declared in snake
-    # case; accept kebab case too.
-    rest = canonical_argv(rest, snake_case_options(*TRAIN_MODULES, *PRETRAIN_MODULES))
     with reported_by(parser):
         return _run(parser, args, rest, calibrate=calibrate)
 
@@ -399,8 +390,8 @@ def _run(
                 "--task",
                 "--hardware",
                 "--tuning",
-                "--max_iterations",
-                "--max_train_seconds",
+                "--max-iterations",
+                "--max-train-seconds",
             )
         )
         for x in expanded

@@ -8,7 +8,6 @@ import argparse
 import sys
 
 from isaaclab.app import AppLauncher
-from imitationlab.cli_args import add_kebab_aliases
 from imitationlab.runners.launch_compat import add_launcher_args
 
 # add argparse arguments
@@ -19,19 +18,19 @@ parser.add_argument(
     "--video", action="store_true", default=False, help="Record videos during play."
 )
 parser.add_argument(
-    "--video_length",
+    "--video-length",
     type=int,
     default=200,
     help="Length of the recorded video (in steps).",
 )
 parser.add_argument(
-    "--disable_fabric",
+    "--disable-fabric",
     action="store_true",
     default=False,
     help="Disable fabric and use USD I/O operations.",
 )
 parser.add_argument(
-    "--num_envs", type=int, default=None, help="Number of environments to simulate."
+    "--num-envs", type=int, default=None, help="Number of environments to simulate."
 )
 parser.add_argument("--task", type=str, default=None, help="Name of the task.")
 parser.add_argument(
@@ -53,7 +52,7 @@ parser.add_argument(
     "--checkpoint", type=str, default=None, help="Path to model checkpoint (.pt)."
 )
 parser.add_argument(
-    "--output_dir",
+    "--output-dir",
     type=str,
     default=None,
     help="Optional log/video output directory for this play run.",
@@ -69,7 +68,6 @@ parser.add_argument(
 )
 # append launcher cli args
 add_launcher_args(parser)
-add_kebab_aliases(parser)
 # parse the arguments
 args_cli, hydra_args = parser.parse_known_args()
 

@@ -10,13 +10,6 @@ import sys
 from pathlib import Path
 
 from imitationlab import __version__
-from imitationlab.cli_args import (
-    EVALUATE_MODULES,
-    PRETRAIN_MODULES,
-    add_kebab_aliases,
-    canonical_argv,
-    snake_case_options,
-)
 from imitationlab.runners.errors import UserError, reported_by
 from imitationlab.runners.registry import (
     DEFAULT_TASK,
@@ -74,8 +67,6 @@ def _pretrain(argv: list[str]) -> int:
         help="Choose execution sizes from local resources (default: auto); off keeps recipe sizes.",
     )
     args, rest = parser.parse_known_args(argv)
-    # The pretrainer declares its options in snake case; accept kebab case too.
-    rest = canonical_argv(rest, snake_case_options(*PRETRAIN_MODULES))
     with reported_by(parser):
         return _run_pretrain(parser, args, rest)
 
@@ -110,11 +101,11 @@ def _run_pretrain(parser: argparse.ArgumentParser, args, rest: list[str]) -> int
                     plan.to_dict()
                 )
     command = [
-        "--args_file",
+        "--args-file",
         str(recipes_root() / "encoders" / f"{args.interface}.args"),
     ]
     if args.output_dir:
-        command.extend(("--output_dir", str(args.output_dir)))
+        command.extend(("--output-dir", str(args.output_dir)))
     command.extend(data_overrides(args.data))
     return _execute(
         "imitationlab.runners.pretrain", [*command, *hardware_args, *rest], args.dry_run
@@ -137,7 +128,6 @@ def _evaluate(argv: list[str]) -> int:
     )
     parser.add_argument(
         "--num-envs",
-        "--num_envs",
         dest="num_envs",
         type=int,
         default=4,
@@ -171,10 +161,7 @@ def _evaluate(argv: list[str]) -> int:
     parser.add_argument(
         "--dry-run", action="store_true", help="Print the command and exit."
     )
-    add_kebab_aliases(parser)
     args, rest = parser.parse_known_args(argv)
-    # The evaluator declares its options in snake case; accept kebab case too.
-    rest = canonical_argv(rest, snake_case_options(*EVALUATE_MODULES))
     with reported_by(parser):
         return _run_evaluate(args, rest)
 
@@ -258,7 +245,7 @@ def _run_evaluate(args, rest: list[str]) -> int:
         ]
     entry = flag_value(previous, "--agent")
     if entry:
-        extra_flags = ["--agent_entry_point", entry, *extra_flags]
+        extra_flags = ["--agent-entry-point", entry, *extra_flags]
     command = [
         "--checkpoint",
         str(checkpoint),
@@ -267,13 +254,13 @@ def _run_evaluate(args, rest: list[str]) -> int:
         "--algo",
         algo,
         "--headless",
-        "--num_envs",
+        "--num-envs",
         str(args.num_envs),
         "--steps",
         str(args.steps),
         "--seed",
         str(seed),
-        "--output_json",
+        "--output-json",
         str(args.output),
         "physics=newton_mjwarp",
         *overrides,

@@ -2,7 +2,7 @@
 
 The env-level contract (analytic reward == the env's reward terms, history
 rebuild == Isaac's buffer) is checked against the live env by
-``scripts/tracking/validate_world_model_task.py``.
+``imitationlab.evaluation.world_model.validate_task``.
 """
 
 from __future__ import annotations

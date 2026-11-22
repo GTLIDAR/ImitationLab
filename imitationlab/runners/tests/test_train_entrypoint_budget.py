@@ -70,7 +70,7 @@ def test_cli_declares_max_train_seconds_as_float():
         and getattr(node.func, "attr", "") == "add_argument"
         and node.args
         and isinstance(node.args[0], ast.Constant)
-        and node.args[0].value == "--max_train_seconds"
+        and node.args[0].value == "--max-train-seconds"
     ]
     assert len(found) == 1
     kwargs = {kw.arg: kw.value for kw in found[0].keywords}

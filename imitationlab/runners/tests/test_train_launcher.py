@@ -34,7 +34,7 @@ def test_select_interface_and_policy(interface, policy, tmp_path):
     encoder = tmp_path / "encoder with space.pt"
     if interface != "explicit":
         command.extend(("--encoder", str(encoder)))
-    command.extend(("--num_envs", "4"))
+    command.extend(("--num-envs", "4"))
     resolved = shlex.split(subprocess.check_output(command, text=True))
 
     assert resolved[resolved.index("--task") + 1] == "imitation-g1-v1"
@@ -49,10 +49,10 @@ def test_select_interface_and_policy(interface, policy, tmp_path):
         source = "real" if policy == "svg" else "imagined"
         assert f"agent.wm.actor_source={source}" in resolved
     assert ("agent.wm.dynamics_model=diffsr" in resolved) == (policy == "diffsr")
-    assert "--args_file" in resolved
+    assert "--args-file" in resolved
     if policy == "ppo":
         assert any(arg.endswith("/g1/ppo.args") for arg in resolved)
-    assert resolved[-2:] == ["--num_envs", "4"]
+    assert resolved[-2:] == ["--num-envs", "4"]
 
 
 def test_latent_interface_requires_encoder():
@@ -68,18 +68,18 @@ def test_latent_interface_requires_encoder():
 @pytest.mark.parametrize("policy", [None, "ppo", "supermimic", "svg", "diffsr"])
 def test_packed_motions_enable_the_compatible_training_defaults(policy, tmp_path):
     user_args = tmp_path / "train.args"
-    user_args.write_text("env.data.reference_arrays_dir=/motions\n--num_envs 16\n")
+    user_args.write_text("env.data.reference_arrays_dir=/motions\n--num-envs 16\n")
     command = [sys.executable, str(LAUNCHER), "--dry-run"]
     if policy is not None:
         command.extend(("--policy", policy))
-    command.extend(("--args_file", str(user_args)))
+    command.extend(("--args-file", str(user_args)))
 
     resolved = shlex.split(subprocess.check_output(command, text=True))
     environ = {}
     expanded = expand_args_files(resolved[2:], environ=environ)
     assert environ["IMITATIONLAB_ENV_COLLECT_FASTPATH"] == "1"
     assert "env.step_mode=graph" in expanded
-    assert expanded[-2:] == ["--num_envs", "16"]
+    assert expanded[-2:] == ["--num-envs", "16"]
     imagined_defaults = policy in (None, "supermimic")
     assert ("agent.wm.update_graphs=true" in expanded) == imagined_defaults
     assert ("env.wm_only_observations=true" in expanded) == (policy != "ppo")

@@ -1,17 +1,17 @@
-"""Argument files for the launchers: ``--args_file PATH`` expands in place to the file's tokens.
+"""Argument files for the launchers: ``--args-file PATH`` expands in place to the file's tokens.
 
 A file holds one command-line token per line, exactly as it would be typed: an argparse flag
-and its value on two lines or on one (``--num_envs 4096``), a Hydra override on one line
+and its value on two lines or on one (``--num-envs 4096``), a Hydra override on one line
 (``agent.wm.gamma=0.97``). Blank lines and lines that start with ``#`` are skipped. Two more
 line forms exist:
 
-* ``--args_file other.args`` includes another file, resolved against the including file's
+* ``--args-file other.args`` includes another file, resolved against the including file's
   directory first;
 * ``%env NAME=VALUE`` sets a process environment variable unless the caller already set it
   (some switches are read at import time and have no config field).
 
 Expansion is positional, so precedence is the command line's own: argparse and Hydra both keep
-the last value of a repeated option, hence a token typed after ``--args_file`` overrides the
+the last value of a repeated option, hence a token typed after ``--args-file`` overrides the
 file, and a tier file that includes the shared recipe first overrides the recipe.
 """
 
@@ -23,9 +23,7 @@ from pathlib import Path
 
 from imitationlab.paths import REPO_ROOT
 
-FLAG = "--args_file"
-# The documented kebab-case spelling; both are expanded.
-FLAGS = (FLAG, "--args-file")
+FLAG = "--args-file"
 ENV_PREFIX = "%env "
 
 
@@ -84,11 +82,11 @@ def _expand(
         if token == "--":  # everything after a bare "--" belongs to another program
             out += tokens[i:]
             break
-        if token in FLAGS:
+        if token == FLAG:
             if i + 1 >= len(tokens):
                 raise ValueError(f"{FLAG} needs a path")
             raw, i = tokens[i + 1], i + 2
-        elif token.startswith(tuple(flag + "=" for flag in FLAGS)):
+        elif token.startswith(FLAG + "="):
             raw, i = token.partition("=")[2], i + 1
         else:
             out.append(token)
@@ -101,7 +99,7 @@ def _expand(
 def expand_args_files(
     argv: Sequence[str], environ: MutableMapping[str, str] | None = None
 ) -> list[str]:
-    """Return ``argv`` with every ``--args_file PATH`` replaced by the file's tokens."""
+    """Return ``argv`` with every ``--args-file PATH`` replaced by the file's tokens."""
     return _expand(
         list(argv), os.environ if environ is None else environ, base=None, stack=()
     )

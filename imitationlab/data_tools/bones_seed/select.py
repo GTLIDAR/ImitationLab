@@ -21,7 +21,6 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from imitationlab.data_tools.common.cli_args import hide_legacy_aliases
 from imitationlab.data_tools.bones_seed.sonic import (
     SONIC_RELEASE_FILTER_KEYWORDS,
     matched_keywords,
@@ -35,18 +34,14 @@ DEFAULT_METADATA_CSV = (
 
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
-        "--metadata-csv", "--metadata_csv", type=Path, default=DEFAULT_METADATA_CSV
-    )
+    parser.add_argument("--metadata-csv", type=Path, default=DEFAULT_METADATA_CSV)
     parser.add_argument("--output", type=Path, default=None)
     parser.add_argument(
         "--report-only",
-        "--report_only",
         action="store_true",
         default=False,
         help="Print counts and the selection hash without writing the JSON.",
     )
-    hide_legacy_aliases(parser)
     args = parser.parse_args(argv)
     if not args.report_only and args.output is None:
         parser.error("--output is required unless --report-only is set.")

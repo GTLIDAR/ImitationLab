@@ -49,7 +49,7 @@ the env's random streams are the env's alone.
 Usage (repository root, isaaclab env)::
 
     python -m imitationlab.evaluation.validation.graph_step_statistics run --out eager.json \\
-        --task imitation-g1-v1 --num_envs 4096 --steps 600 -- <overrides>
+        --task imitation-g1-v1 --num-envs 4096 --steps 600 -- <overrides>
     python -m imitationlab.evaluation.validation.graph_step_statistics compare eager.json masked.json
 """
 
@@ -63,7 +63,6 @@ import time
 from pathlib import Path
 from typing import Any
 
-from imitationlab.cli_args import add_kebab_aliases
 from imitationlab.evaluation.validation.step_statistics import (
     LENGTH_BIN_EDGES,
     START_BINS,
@@ -658,7 +657,7 @@ def main(argv: list[str] | None = None) -> int:
         mode = sub.add_parser(name, help=f"{name} mode (hydra overrides after --)")
         mode.add_argument("--out", required=True)
         mode.add_argument("--task", default="imitation-g1-v1")
-        mode.add_argument("--num_envs", type=int, default=4096)
+        mode.add_argument("--num-envs", type=int, default=4096)
         mode.add_argument("--steps", type=int, default=600)
         mode.add_argument("--seed", type=int, default=0)
         mode.add_argument("--noise", type=float, default=0.3)
@@ -677,7 +676,7 @@ def main(argv: list[str] | None = None) -> int:
     cmp.add_argument("--skip-blocks", type=int, default=1)
     cmp.add_argument("--z", type=float, default=4.0)
     cmp.add_argument("--p", type=float, default=1e-3)
-    args = add_kebab_aliases(parser).parse_args(argv)
+    args = parser.parse_args(argv)
     modes = {
         "run": _run,
         "sync": _sync,

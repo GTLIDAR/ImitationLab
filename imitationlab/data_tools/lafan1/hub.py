@@ -24,7 +24,6 @@ import shlex
 import sys
 from pathlib import Path, PurePosixPath
 
-from imitationlab.data_tools.common.cli_args import hide_legacy_aliases
 
 try:
     from huggingface_hub import HfApi, snapshot_download
@@ -95,21 +94,18 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--repo-id",
-        "--repo_id",
         type=str,
         default=DEFAULT_REPO_ID,
         help="Hugging Face dataset repo id.",
     )
     parser.add_argument(
         "--repo-subdir",
-        "--repo_subdir",
         type=str,
         default=DEFAULT_REPO_SUBDIR,
         help="Dataset repo subdirectory to sync.",
     )
     parser.add_argument(
         "--data-root",
-        "--data_root",
         type=str,
         default=str(_default_data_root()),
         help=(
@@ -278,7 +274,6 @@ def _upload_dataset(
 
 def main() -> None:
     parser = _build_parser()
-    hide_legacy_aliases(parser)
     args = parser.parse_args()
 
     repo_subdir = _normalize_repo_subdir(args.repo_subdir)

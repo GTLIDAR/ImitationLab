@@ -38,5 +38,5 @@ def test_the_spectral_encoder_recipe_is_the_only_spectral_recipe() -> None:
     from imitationlab.paths import recipes_root
 
     encoders = recipes_root() / "encoders"
-    assert "--latent_mode deterministic" in (encoders / "spectral.args").read_text()
+    assert "--latent-mode deterministic" in (encoders / "spectral.args").read_text()
     assert not (encoders / "diffsr.args").exists()

@@ -156,15 +156,15 @@ echo "[INFO] Checking G1 dataset under '\${cluster_g1_data_root}' (npz_count=\${
 if [ "\${cluster_g1_force_download}" = "1" ]; then
     echo "[INFO] Force-refreshing G1 dataset from Hugging Face repo '\${cluster_g1_repo_id}' at revision '\${cluster_g1_repo_revision}'."
     /isaac-sim/python.sh scripts/data/setup_g1_lafan1_npz_dataset.py \\
-        --data_root "\${cluster_g1_data_root}" \\
-        --repo_id "\${cluster_g1_repo_id}" \\
+        --data-root "\${cluster_g1_data_root}" \\
+        --repo-id "\${cluster_g1_repo_id}" \\
         --revision "\${cluster_g1_repo_revision}" \\
         --force-download
 elif [ "\${cluster_g1_npz_count}" -lt "\${cluster_g1_expected_motion_count}" ]; then
     echo "[INFO] G1 dataset incomplete. Downloading from Hugging Face repo '\${cluster_g1_repo_id}' at revision '\${cluster_g1_repo_revision}'."
     /isaac-sim/python.sh scripts/data/setup_g1_lafan1_npz_dataset.py \\
-        --data_root "\${cluster_g1_data_root}" \\
-        --repo_id "\${cluster_g1_repo_id}" \\
+        --data-root "\${cluster_g1_data_root}" \\
+        --repo-id "\${cluster_g1_repo_id}" \\
         --revision "\${cluster_g1_repo_revision}"
 fi
 
@@ -207,8 +207,8 @@ fi
 
 if [ "\${cluster_g1_refresh_manifest}" = "1" ]; then
     /isaac-sim/python.sh scripts/data/write_lafan1_npz_manifest.py \\
-        --npz_dir "\${cluster_g1_npz_dir}" \\
-        --manifest_path "\${cluster_g1_manifest_path}" \\
+        --npz-dir "\${cluster_g1_npz_dir}" \\
+        --manifest-path "\${cluster_g1_manifest_path}" \\
         --recursive
 fi
 
@@ -611,14 +611,17 @@ if [ "${g1_usd_path}" = "repo" ] || [ "${g1_usd_path}" = "none" ]; then
 fi
 # Which interpreter the workload gets. Training entry points need the CU130
 # runtime Python (it has torch); everything else -- data prep, agents, viz --
-# runs under Kit's Python. This used to be an exact-name allow-list of
-# `train.py` and `train_hl_skill_pipeline.py`, so any other training entrypoint
-# fell through to /isaac-sim/python.sh and died on `No module named 'torch'`
-# several seconds in, with a traceback that pointed at Isaac Lab rather than at
-# the interpreter (seen in an earlier cluster run). Match the whole class instead.
+# runs under Kit's Python. A training entry point that falls through to
+# /isaac-sim/python.sh dies on `No module named 'torch'` several seconds in,
+# with a traceback that points at Isaac Lab rather than at the interpreter, so
+# match the whole class.
 #
 # `workload_pipeline=1` means "this entrypoint runs its own stages, never rewrite
-# it"; only `train.py` is rewritten to `train_physx.py` under the PhysX backend.
+# it"; only `imitationlab.runners.train` is rewritten to
+# `imitationlab.runners.train_physx` under the PhysX backend.
+#
+# CLUSTER_PYTHON_EXECUTABLE is a module name (run with `python -m`) or a
+# script path ending in `.py`.
 #
 # The EVALUATION entrypoints belong to the same class: they build the same
 # environment and load the same torch checkpoints, so they need the CU130
@@ -628,9 +631,9 @@ workload_backend=""
 workload_pipeline=0
 workload_eval=0
 case "${CLUSTER_PYTHON_EXECUTABLE}" in
-    scripts/tracking/train.py) ;;
-    scripts/tracking/train*.py) workload_pipeline=1 ;;
-    scripts/tracking/eval*.py) workload_pipeline=1; workload_eval=1 ;;
+    imitationlab.runners.train) ;;
+    imitationlab.runners.train_*|imitationlab.runners.pretrain) workload_pipeline=1 ;;
+    imitationlab.evaluation.*|imitationlab.runners.evaluate_*) workload_pipeline=1; workload_eval=1 ;;
     # The rendering entrypoints under `scripts/viz/` are in the evaluator
     # class too: they build the same environment, load the same torch
     # checkpoint, and construct `AppLauncher` at import. Without this they
@@ -651,9 +654,13 @@ case "${CLUSTER_PYTHON_EXECUTABLE}" in
     -m) workload_pipeline=1; workload_eval=1 ;;
 esac
 case "${CLUSTER_PYTHON_EXECUTABLE}" in
-    scripts/tracking/train*.py|scripts/tracking/eval*.py)
+    imitationlab.runners.train|imitationlab.runners.train_*|imitationlab.runners.pretrain|imitationlab.evaluation.*|imitationlab.runners.evaluate_*)
         workload_backend="$(resolve_workload_backend "${@:3}")"
         ;;
+esac
+case "${CLUSTER_PYTHON_EXECUTABLE}" in
+    *.py|-m) workload_entry=("${CLUSTER_PYTHON_EXECUTABLE}") ;;
+    *) workload_entry=(-m "${CLUSTER_PYTHON_EXECUTABLE}") ;;
 esac
 
 if [ "$workload_eval" = "1" ]; then
@@ -669,20 +676,20 @@ if [ "$workload_eval" = "1" ]; then
     # it, and an evaluator would pass it through argparse into Hydra and die on
     # an unknown override. There is no workload success marker either: that is
     # the PhysX trainer's contract, not an evaluator's.
-    printf -v workload_args '%q ' "${CLUSTER_PYTHON_EXECUTABLE}" "${@:3}"
+    printf -v workload_args '%q ' "${workload_entry[@]}" "${@:3}"
     workload_cmd='runtime_site=""; for candidate in "${ISAACLAB_CU130_RUNTIME_ROOT}"/lib/python*/site-packages /opt/imitationlab-runtime-spec/.pixi/envs/container-runtime/lib/python*/site-packages; do if [ -d "$candidate/torch" ]; then runtime_site="$candidate"; break; fi; done; if [ -z "$runtime_site" ]; then echo "[ERROR] CU130 runtime site-packages not found." >&2; exit 1; fi; export ISAACLAB_CU130_SITE_PACKAGES="$runtime_site"; runtime_nvidia_libs="$(find "$runtime_site/nvidia" -mindepth 2 -maxdepth 3 -type d -name lib -print 2>/dev/null | paste -sd: -)"; if [ -n "$runtime_nvidia_libs" ]; then export LD_LIBRARY_PATH="$runtime_nvidia_libs:${LD_LIBRARY_PATH:-}"; fi; runtime_nccl="$runtime_site/nvidia/nccl/lib/libnccl.so.2"; if [ ! -f "$runtime_nccl" ]; then echo "[ERROR] CU130 runtime NCCL not found: $runtime_nccl" >&2; exit 1; fi; export LD_PRELOAD="$runtime_nccl${LD_PRELOAD:+:$LD_PRELOAD}"; /isaac-sim/python.sh '"${workload_args}"
 elif [ "$workload_backend" = "newton" ]; then
-    printf -v workload_args '%q ' "${CLUSTER_PYTHON_EXECUTABLE}" "${@:3}" --assert-kitless
+    printf -v workload_args '%q ' "${workload_entry[@]}" "${@:3}" --assert-kitless
     workload_cmd='runtime_python=""; for candidate in "${ISAACLAB_CU130_RUNTIME_ROOT}/bin/python" /opt/imitationlab-runtime-spec/.pixi/envs/container-runtime/bin/python; do if [ -x "$candidate" ]; then runtime_python="$candidate"; break; fi; done; if [ -z "$runtime_python" ]; then echo "[ERROR] CU130 runtime Python not found." >&2; exit 1; fi; exec "$runtime_python" '"${workload_args}"
 elif [ "$workload_backend" = "physx" ]; then
     if [ "$workload_pipeline" = "1" ]; then
-        printf -v workload_args '%q ' "${CLUSTER_PYTHON_EXECUTABLE}" "${@:3}"
+        printf -v workload_args '%q ' "${workload_entry[@]}" "${@:3}"
     else
-        printf -v workload_args '%q ' scripts/tracking/train_physx.py "${@:3}"
+        printf -v workload_args '%q ' -m imitationlab.runners.train_physx "${@:3}"
     fi
     workload_cmd='runtime_site=""; for candidate in "${ISAACLAB_CU130_RUNTIME_ROOT}"/lib/python*/site-packages /opt/imitationlab-runtime-spec/.pixi/envs/container-runtime/lib/python*/site-packages; do if [ -d "$candidate/torch" ]; then runtime_site="$candidate"; break; fi; done; if [ -z "$runtime_site" ]; then echo "[ERROR] CU130 runtime site-packages not found." >&2; exit 1; fi; export ISAACLAB_CU130_SITE_PACKAGES="$runtime_site"; runtime_nvidia_libs="$(find "$runtime_site/nvidia" -mindepth 2 -maxdepth 3 -type d -name lib -print 2>/dev/null | paste -sd: -)"; if [ -n "$runtime_nvidia_libs" ]; then export LD_LIBRARY_PATH="$runtime_nvidia_libs:${LD_LIBRARY_PATH:-}"; fi; runtime_nccl="$runtime_site/nvidia/nccl/lib/libnccl.so.2"; if [ ! -f "$runtime_nccl" ]; then echo "[ERROR] CU130 runtime NCCL not found: $runtime_nccl" >&2; exit 1; fi; export LD_PRELOAD="$runtime_nccl${LD_PRELOAD:+:$LD_PRELOAD}"; success_marker="${TMPDIR}/rlopt-physx-success"; rm -f "$success_marker"; export ISAACLAB_WORKLOAD_SUCCESS_MARKER="$success_marker"; /isaac-sim/python.sh '"${workload_args}"'; python_status=$?; if [ "$python_status" -ne 0 ]; then exit "$python_status"; fi; if [ ! -f "$success_marker" ]; then echo "[ERROR] PhysX process returned without its workload success marker." >&2; exit 1; fi'
 else
-    printf -v workload_cmd '%q ' /isaac-sim/python.sh "${CLUSTER_PYTHON_EXECUTABLE}" "${@:3}"
+    printf -v workload_cmd '%q ' /isaac-sim/python.sh "${workload_entry[@]}" "${@:3}"
 fi
 container_entry_cmd="export ACCEPT_EULA=${ACCEPT_EULA:-Y} && export PRIVACY_CONSENT=${PRIVACY_CONSENT:-Y} && export OMNI_KIT_ACCEPT_EULA=YES && export HOME=${container_home} && export TMPDIR=/tmp && export XDG_CACHE_HOME=${container_home}/.cache && export XDG_DATA_HOME=${container_home}/.local/share && export ISAACLAB_WORKSPACE_PATH=/workspace/isaaclab/project && export ISAACLAB_PATH=/workspace/isaaclab/project/IsaacLab && export ISAACSIM_PATH=/isaac-sim && export ISAACLAB_DATA_DIR=/data && export CLUSTER_DATA_DIR=${CLUSTER_DATA_DIR} && export PYTHONPATH=${container_pythonpath} && export ISAACLAB_SPLIT_RUNTIME=1 && export ISAACLAB_REQUIRE_CU130_RUNTIME=1 && export ISAACLAB_REQUIRE_GPU_IDENTIFICATION=1 && export ISAACLAB_CU130_RUNTIME_ROOT=${runtime_root} && ${g1_usd_env_exports}export TRITON_CACHE_DIR=${container_triton_cache_dir} && export TORCHINDUCTOR_CACHE_DIR=${container_torchinductor_cache_dir} && export RL_WARNINGS=${RL_WARNINGS:-False} && if [ \"${allow_torch_compile_debug}\" != \"1\" ]; then unset TORCH_LOGS; export TORCHDYNAMO_VERBOSE=0; export TORCH_COMPILE_DEBUG=0; fi && cd /workspace/isaaclab/project"
 if [ -n "${SLURM_ARRAY_TASK_ID:-}" ]; then

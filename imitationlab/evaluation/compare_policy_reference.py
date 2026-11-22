@@ -7,7 +7,6 @@ import argparse
 import sys
 
 from isaaclab.app import AppLauncher
-from imitationlab.cli_args import add_kebab_aliases
 from imitationlab.runners.launch_compat import add_launcher_args
 
 parser = argparse.ArgumentParser(
@@ -17,7 +16,7 @@ parser.add_argument(
     "--video", action="store_true", default=False, help="Record videos during play."
 )
 parser.add_argument(
-    "--video_length",
+    "--video-length",
     type=int,
     default=None,
     help=(
@@ -26,13 +25,13 @@ parser.add_argument(
     ),
 )
 parser.add_argument(
-    "--video_seconds",
+    "--video-seconds",
     type=float,
     default=None,
     help="Optional rollout/video duration in seconds; converted to env steps after env creation.",
 )
 parser.add_argument(
-    "--disable_fabric",
+    "--disable-fabric",
     action="store_true",
     default=False,
     help="Disable fabric and use USD I/O operations.",
@@ -53,7 +52,7 @@ parser.add_argument(
     "--checkpoint", type=str, default=None, help="Path to model checkpoint (.pt)."
 )
 parser.add_argument(
-    "--agent_entry_point",
+    "--agent-entry-point",
     type=str,
     default=None,
     help=(
@@ -62,7 +61,7 @@ parser.add_argument(
     ),
 )
 parser.add_argument(
-    "--output_dir",
+    "--output-dir",
     type=str,
     default=None,
     help="Optional exact output directory for this comparison run.",
@@ -77,19 +76,19 @@ parser.add_argument(
     help="Run in real-time, if possible.",
 )
 parser.add_argument(
-    "--enable_wandb",
+    "--enable-wandb",
     action="store_true",
     default=False,
     help="Enable learner W&B logging during comparison eval. Disabled by default.",
 )
 parser.add_argument(
-    "--max_steps",
+    "--max-steps",
     type=int,
     default=None,
     help="Optional rollout step limit. Default is to stop when the reference ends.",
 )
 parser.add_argument(
-    "--keep_terminations",
+    "--keep-terminations",
     action="store_true",
     default=False,
     help=(
@@ -98,42 +97,42 @@ parser.add_argument(
     ),
 )
 parser.add_argument(
-    "--keep_rewards",
+    "--keep-rewards",
     action="store_true",
     default=False,
     help="Keep env reward terms enabled. By default comparison playback disables them.",
 )
 parser.add_argument(
-    "--keep_domain_randomization",
+    "--keep-domain-randomization",
     action="store_true",
     default=False,
     help=(
         "Keep interval pushes and domain randomization enabled. By default "
         "comparison playback disables them (matching the trusted evaluator's "
-        "--deterministic_tracking pass) so the policy env's rollout is "
+        "--deterministic-tracking pass) so the policy env's rollout is "
         "deterministic and independent of the reference-replay lane; otherwise "
         "the two envs share one RNG stream and the policy robot gets different "
         "random pushes than a single-env eval, diverging the closed loop."
     ),
 )
 parser.add_argument(
-    "--disable_push_event",
+    "--disable-push-event",
     action="store_true",
     default=False,
     help=(
         "Disable only the interval push event. Pair with "
-        "--keep_domain_randomization to retain startup/reset randomization "
+        "--keep-domain-randomization to retain startup/reset randomization "
         "while removing pushes."
     ),
 )
 parser.add_argument(
-    "--policy_trajectory_rank",
+    "--policy-trajectory-rank",
     type=int,
     default=None,
     help="Trajectory rank used by the policy env and therefore the language planner.",
 )
 parser.add_argument(
-    "--policy_trajectory_ranks",
+    "--policy-trajectory-ranks",
     type=str,
     default=None,
     help=(
@@ -144,37 +143,37 @@ parser.add_argument(
     ),
 )
 parser.add_argument(
-    "--policy_motion",
+    "--policy-motion",
     type=str,
     default=None,
     help="Motion name used by the policy env and language planner, e.g. dance1_subject1.",
 )
 parser.add_argument(
-    "--policy_dataset",
+    "--policy-dataset",
     type=str,
     default=None,
-    help="Optional dataset filter when resolving --policy_motion.",
+    help="Optional dataset filter when resolving --policy-motion.",
 )
 parser.add_argument(
-    "--policy_trajectory",
+    "--policy-trajectory",
     type=str,
     default=None,
-    help="Optional trajectory-name filter when resolving --policy_motion.",
+    help="Optional trajectory-name filter when resolving --policy-motion.",
 )
 parser.add_argument(
-    "--policy_start_step",
+    "--policy-start-step",
     type=int,
     default=0,
     help="Local trajectory step used when resetting the policy/reference envs.",
 )
 parser.add_argument(
-    "--list_trajectories",
+    "--list-trajectories",
     action="store_true",
     default=False,
     help="Print rank, dataset, motion, and trajectory names, then exit.",
 )
 parser.add_argument(
-    "--reference_visualization",
+    "--reference-visualization",
     type=str,
     default="body_markers",
     choices=["body_markers", "robot", "both"],
@@ -184,7 +183,7 @@ parser.add_argument(
     ),
 )
 parser.add_argument(
-    "--metrics_json",
+    "--metrics-json",
     type=str,
     default=None,
     help=(
@@ -194,13 +193,12 @@ parser.add_argument(
     ),
 )
 parser.add_argument(
-    "--fall_height",
+    "--fall-height",
     type=float,
     default=0.4,
     help="Pelvis height (m) below which the policy env counts as fallen.",
 )
 add_launcher_args(parser)
-add_kebab_aliases(parser)
 args_cli, hydra_args = parser.parse_known_args()
 
 sys.argv = [sys.argv[0]] + hydra_args
@@ -247,7 +245,7 @@ import imitationlab.envs.isaaclab.tasks  # noqa: F401
 
 # Reuse the trusted evaluator's exact domain-randomization disabling so the
 # comparison rollout is deterministic and independent of the reference-replay
-# lane (see --keep_domain_randomization).
+# lane (see --keep-domain-randomization).
 from imitationlab.runners.provenance.evaluation_metadata import (
     disable_domain_randomization,
 )
@@ -514,7 +512,7 @@ def _resolve_policy_trajectory_rank(base_env: ImitationEnv) -> int | None:
         num_trajectories = len(_ordered_trajectories(base_env))
         if not 0 <= rank < num_trajectories:
             raise ValueError(
-                f"--policy_trajectory_rank must be in [0, {num_trajectories - 1}], "
+                f"--policy-trajectory-rank must be in [0, {num_trajectories - 1}], "
                 f"got {rank}."
             )
         return rank
@@ -542,15 +540,15 @@ def _resolve_policy_trajectory_rank(base_env: ImitationEnv) -> int | None:
             "motion": args_cli.policy_motion,
             "trajectory": args_cli.policy_trajectory,
         }
-        raise ValueError(f"No trajectory matched {filters}. Use --list_trajectories.")
+        raise ValueError(f"No trajectory matched {filters}. Use --list-trajectories.")
     if len(matches) > 1:
         options = ", ".join(
             f"{rank}:{dataset}/{motion}/{trajectory}"
             for rank, (dataset, motion, trajectory) in matches
         )
         raise ValueError(
-            "Motion selection is ambiguous; add --policy_dataset, "
-            f"--policy_trajectory, or use --policy_trajectory_rank. Matches: {options}"
+            "Motion selection is ambiguous; add --policy-dataset, "
+            f"--policy-trajectory, or use --policy-trajectory-rank. Matches: {options}"
         )
     return matches[0][0]
 
@@ -561,32 +559,32 @@ def _resolve_policy_trajectory_playlist(base_env: ImitationEnv) -> list[int | No
         return [_resolve_policy_trajectory_rank(base_env)]
 
     singular_selectors = {
-        "--policy_trajectory_rank": args_cli.policy_trajectory_rank,
-        "--policy_motion": args_cli.policy_motion,
-        "--policy_dataset": args_cli.policy_dataset,
-        "--policy_trajectory": args_cli.policy_trajectory,
+        "--policy-trajectory-rank": args_cli.policy_trajectory_rank,
+        "--policy-motion": args_cli.policy_motion,
+        "--policy-dataset": args_cli.policy_dataset,
+        "--policy-trajectory": args_cli.policy_trajectory,
     }
     active = [
         name for name, selector in singular_selectors.items() if selector is not None
     ]
     if active:
         raise ValueError(
-            "--policy_trajectory_ranks is mutually exclusive with " + ", ".join(active)
+            "--policy-trajectory-ranks is mutually exclusive with " + ", ".join(active)
         )
 
     fields = [field.strip() for field in str(value).split(",")]
     if not fields or any(not field for field in fields):
         raise ValueError(
-            "--policy_trajectory_ranks must be a nonempty comma-separated list."
+            "--policy-trajectory-ranks must be a nonempty comma-separated list."
         )
     try:
         ranks = [int(field) for field in fields]
     except ValueError as exc:
         raise ValueError(
-            "--policy_trajectory_ranks must contain only integers."
+            "--policy-trajectory-ranks must contain only integers."
         ) from exc
     if len(ranks) != len(set(ranks)):
-        raise ValueError("--policy_trajectory_ranks contains duplicate ranks.")
+        raise ValueError("--policy-trajectory-ranks contains duplicate ranks.")
 
     num_trajectories = len(_ordered_trajectories(base_env))
     invalid = [rank for rank in ranks if not 0 <= rank < num_trajectories]
@@ -612,7 +610,7 @@ def _force_policy_trajectory_on_reset(
     start_step: int,
 ) -> None:
     if start_step < 0:
-        raise ValueError("--policy_start_step must be >= 0.")
+        raise ValueError("--policy-start-step must be >= 0.")
     tm = base_env.trajectory_manager
 
     def _custom_reset_fn(env_ids: torch.Tensor, _num_trajectories: int) -> torch.Tensor:
@@ -769,11 +767,11 @@ def main(
         args_cli.seed = random.randint(0, 10000)
 
     if args_cli.max_steps is not None and int(args_cli.max_steps) <= 0:
-        raise ValueError("--max_steps must be > 0 when provided.")
+        raise ValueError("--max-steps must be > 0 when provided.")
     if args_cli.video_length is not None and int(args_cli.video_length) <= 0:
-        raise ValueError("--video_length must be > 0 when provided.")
+        raise ValueError("--video-length must be > 0 when provided.")
     if args_cli.video_seconds is not None and float(args_cli.video_seconds) <= 0.0:
-        raise ValueError("--video_seconds must be > 0 when provided.")
+        raise ValueError("--video-seconds must be > 0 when provided.")
 
     env_cfg.scene.num_envs = 2
     agent_cfg.env.num_envs = 2
@@ -884,7 +882,7 @@ def main(
     if args_cli.video_seconds is not None:
         step_dt = float(getattr(raw_base_env, "step_dt", 0.0) or 0.0)
         if step_dt <= 0.0:
-            raise ValueError("Could not infer env step_dt for --video_seconds.")
+            raise ValueError("Could not infer env step_dt for --video-seconds.")
         step_limits.append(max(1, int(round(float(args_cli.video_seconds) / step_dt))))
     rollout_step_limit = min(step_limits) if len(step_limits) > 0 else None
 

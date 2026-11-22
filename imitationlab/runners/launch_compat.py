@@ -3,7 +3,7 @@
 ``develop`` removed or moved four launcher tools that scripts in this repo use:
 
 - ``isaaclab_tasks.utils.add_launcher_args`` is now ``isaaclab.app.add_launcher_args``.
-  The new parser has no ``--headless`` and no ``--enable_cameras`` flag.
+  The new parser has no ``--headless`` and no ``--enable-cameras`` flag.
   ``--headless`` is gone for good. ``enable_cameras`` is still a launcher key
   that Kit reads (see :func:`add_launcher_args`).
 - ``isaaclab_tasks.utils.compute_kit_requirements`` is gone. Use ``scan``.
@@ -46,6 +46,8 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
+from imitationlab.cli_args import kebab_options
+
 __all__ = [
     "add_launcher_args",
     "attach_video_recorder",
@@ -68,14 +70,14 @@ def add_launcher_args(parser: argparse.ArgumentParser) -> None:
     """Add the Isaac Lab launcher arguments, and keep the old launcher flags.
 
     Calls ``isaaclab.app.add_launcher_args``. Then registers ``--headless`` and
-    ``--enable_cameras`` as hidden flags. ``develop`` removed both flags. About
+    ``--enable-cameras`` as hidden flags. ``develop`` removed both flags. About
     60 launcher lines (pixi tasks, campaign scripts, subprocess commands) still
     pass them, and an unknown flag would otherwise reach Hydra and stop the run.
     The two flags are not equal:
 
     - ``--headless`` is ignored. ``develop`` chooses headless mode from
       ``--visualizer`` and the ``HEADLESS`` environment variable.
-    - ``--enable_cameras`` is still honored when Kit starts. The flag sets the
+    - ``--enable-cameras`` is still honored when Kit starts. The flag sets the
       ``enable_cameras`` launcher key, and the Kit launcher reads that key to
       choose the rendering experience and the offscreen render path. This costs
       startup time and GPU memory. It has no effect when Kit does not start (for
@@ -89,7 +91,9 @@ def add_launcher_args(parser: argparse.ArgumentParser) -> None:
     from isaaclab.app import add_launcher_args as _add_launcher_args
 
     _add_launcher_args(parser)
-    for flag, default in (("--headless", True), ("--enable_cameras", False)):
+    # Isaac Lab declares ``--kit_args`` in snake case.
+    kebab_options(parser)
+    for flag, default in (("--headless", True), ("--enable-cameras", False)):
         try:
             parser.add_argument(
                 flag, action="store_true", default=default, help=argparse.SUPPRESS

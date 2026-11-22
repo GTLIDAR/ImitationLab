@@ -297,7 +297,7 @@ class G1RLEnv(ImitationRLEnv):
         selection = self.cfg.command_interface.reference.selection
         if selection.custom_fn is None:
             raise ValueError(
-                "pinned_reset needs selection.custom_fn; pass --trajectory_ranks."
+                "pinned_reset needs selection.custom_fn; pass --trajectory-ranks."
             )
         ranks = selection.custom_fn(env_ids, int(self.g1_library.length.numel()))
         ranks = ranks.to(device=self.device, dtype=torch.long)

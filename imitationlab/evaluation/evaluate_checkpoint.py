@@ -15,7 +15,6 @@ import random
 import sys
 from typing import Any
 
-from imitationlab.cli_args import add_kebab_aliases
 from imitationlab.runners.runtime_bootstrap import (
     assert_kit_not_loaded,
     config_contains_type_name,
@@ -72,37 +71,37 @@ parser.add_argument(
     ],
 )
 parser.add_argument("--checkpoint", type=Path, default=None)
-parser.add_argument("--output_json", type=Path, default=None)
+parser.add_argument("--output-json", type=Path, default=None)
 # Score several checkpoints of ONE arm in a single process. The interface is
 # fixed by the arm, so only the policy weights change between cells, and one
 # Isaac Sim start then serves the whole budget axis instead of one start per
-# checkpoint. `--trajectory_ranks` pins env i to rank_table[i], a pure function
+# checkpoint. `--trajectory-ranks` pins env i to rank_table[i], a pure function
 # of env id, so every cell resets onto the same clips and the rows stay
-# comparable; the loop asserts that. `--checkpoints` and `--output_jsons` are
+# comparable; the loop asserts that. `--checkpoints` and `--output-jsons` are
 # parallel lists of equal length.
 parser.add_argument("--checkpoints", type=Path, nargs="+", default=None)
-parser.add_argument("--output_jsons", type=Path, nargs="+", default=None)
-# Off by default. Every (--checkpoints[b], --output_jsons[b]) pair is one block
-# of len(--trajectory_ranks) envs, all in one simulator: env b * C + c plays
+parser.add_argument("--output-jsons", type=Path, nargs="+", default=None)
+# Off by default. Every (--checkpoints[b], --output-jsons[b]) pair is one block
+# of len(--trajectory-ranks) envs, all in one simulator: env b * C + c plays
 # rank c under block b's checkpoint (evaluation/grouped_eval.py, NDM Gym's
 # evaluate_group). A checkpoint listed twice is two repeats. WMBPTT only;
-# --num_envs must be C times the number of blocks.
+# --num-envs must be C times the number of blocks.
 parser.add_argument("--grouped", action="store_true", default=False)
 # With --grouped only: the seed index of every block, parallel to --checkpoints,
 # recorded as metadata.grouped.seed_index (eval_checkpoint_tree passes the index
 # that names each row's folder and file).
-parser.add_argument("--grouped_seed_indices", type=int, nargs="+", default=None)
-parser.add_argument("--output_csv", type=Path, default=None)
+parser.add_argument("--grouped-seed-indices", type=int, nargs="+", default=None)
+parser.add_argument("--output-csv", type=Path, default=None)
 parser.add_argument(
-    "--append_csv",
+    "--append-csv",
     action="store_true",
     default=False,
-    help="Append to --output_csv instead of replacing it.",
+    help="Append to --output-csv instead of replacing it.",
 )
 parser.add_argument("--label", type=str, default="")
-parser.add_argument("--command_space", type=str, default=None)
+parser.add_argument("--command-space", type=str, default=None)
 parser.add_argument(
-    "--skill_encoder_source",
+    "--skill-encoder-source",
     type=str,
     default="auto",
     choices=("auto", "checkpoint", "pretrained"),
@@ -117,19 +116,19 @@ parser.add_argument(
     ),
 )
 parser.add_argument(
-    "--untrained_policy",
+    "--untrained-policy",
     action="store_true",
     default=False,
     help=(
         "Score the freshly initialized agent instead of a checkpoint: the "
         "actor weights are the training start (seeded by --seed), while the "
         "command interface, including a pretrained skill encoder, is built "
-        "exactly as for a trained cell. Requires --output_json and no "
+        "exactly as for a trained cell. Requires --output-json and no "
         "--checkpoint. Gives the frame-0 point of a convergence curve."
     ),
 )
 parser.add_argument(
-    "--policy_only_checkpoint",
+    "--policy-only-checkpoint",
     action="store_true",
     default=False,
     help=(
@@ -138,23 +137,23 @@ parser.add_argument(
     ),
 )
 parser.add_argument(
-    "--low_level_command_mode",
+    "--low-level-command-mode",
     choices=("native", "streamed_vanilla"),
     default="native",
     help=(
-        "streamed_vanilla treats --command_space as a full-body planner target "
+        "streamed_vanilla treats --command-space as a full-body planner target "
         "but executes its current slot with the unchanged vanilla tracker."
     ),
 )
-parser.add_argument("--command_past_steps", type=int, default=None)
-parser.add_argument("--command_future_steps", type=int, default=None)
+parser.add_argument("--command-past-steps", type=int, default=None)
+parser.add_argument("--command-future-steps", type=int, default=None)
 parser.add_argument(
-    "--command_observation_source",
+    "--command-observation-source",
     choices=["reference", "planner_oracle", "planner"],
     default=None,
 )
 parser.add_argument(
-    "--planner_mode",
+    "--planner-mode",
     choices=["none", "reference", "hold_current", "noisy_reference", "zero"],
     default="none",
     help=(
@@ -166,41 +165,41 @@ parser.add_argument(
     ),
 )
 parser.add_argument(
-    "--planner_update_interval",
+    "--planner-update-interval",
     type=int,
     default=1,
     help="Publish a new planner command every N policy steps; larger values hold the previous command.",
 )
 parser.add_argument(
-    "--planner_noise_std",
+    "--planner-noise-std",
     type=float,
     default=0.0,
-    help="Gaussian noise std for --planner_mode noisy_reference.",
+    help="Gaussian noise std for --planner-mode noisy_reference.",
 )
 parser.add_argument(
-    "--motion_manifest",
+    "--motion-manifest",
     type=Path,
     default=None,
     help="Optional manifest used to condition evaluation on a motion set.",
 )
 parser.add_argument(
-    "--motion_name",
+    "--motion-name",
     type=str,
     default=None,
     help="Optional single motion name to evaluate from the manifest.",
 )
 parser.add_argument(
-    "--trajectory_rank",
+    "--trajectory-rank",
     type=int,
     default=None,
     help=(
         "Optional exact trajectory rank in the loaded dataset. Unlike "
-        "--motion_name, this preserves the full-store data path and is useful "
+        "--motion-name, this preserves the full-store data path and is useful "
         "for reproducing one row from a large parallel evaluation."
     ),
 )
 parser.add_argument(
-    "--trajectory_ranks",
+    "--trajectory-ranks",
     type=int,
     nargs="+",
     default=None,
@@ -211,7 +210,7 @@ parser.add_argument(
     ),
 )
 parser.add_argument(
-    "--keep_obs_noise",
+    "--keep-obs-noise",
     action="store_true",
     help=(
         "Keep the environment's observation corruption (the training-time "
@@ -222,7 +221,7 @@ parser.add_argument(
     ),
 )
 parser.add_argument(
-    "--dump_trace",
+    "--dump-trace",
     type=Path,
     default=None,
     help=(
@@ -234,22 +233,22 @@ parser.add_argument(
     ),
 )
 parser.add_argument(
-    "--dump_trace_env",
+    "--dump-trace-env",
     type=int,
     default=0,
-    help="Environment index recorded by --dump_trace.",
+    help="Environment index recorded by --dump-trace.",
 )
 parser.add_argument(
-    "--dump_trace_horizon",
+    "--dump-trace-horizon",
     type=int,
     default=10,
     help=(
-        "Macro horizon used to rebuild the encoder window for --dump_trace; "
+        "Macro horizon used to rebuild the encoder window for --dump-trace; "
         "must match the tracker encoder horizon."
     ),
 )
 parser.add_argument(
-    "--root_trace",
+    "--root-trace",
     type=Path,
     default=None,
     help=(
@@ -259,30 +258,30 @@ parser.add_argument(
     ),
 )
 parser.add_argument(
-    "--root_trace_joints",
+    "--root-trace-joints",
     action="store_true",
     default=False,
-    help="Also store robot and reference joint positions in --root_trace.",
+    help="Also store robot and reference joint positions in --root-trace.",
 )
 parser.add_argument(
-    "--dataset_path",
+    "--dataset-path",
     type=Path,
     default=None,
     help="Optional zarr dataset/cache path. Useful on clusters where /tmp is small.",
 )
-parser.add_argument("--num_envs", type=int, default=128)
+parser.add_argument("--num-envs", type=int, default=128)
 parser.add_argument("--steps", type=int, default=1000)
 parser.add_argument("--seed", type=int, default=None)
-parser.add_argument("--reset_schedule", type=str, default="sequential")
-parser.add_argument("--reference_start_frame", type=int, default=0)
+parser.add_argument("--reset-schedule", type=str, default="sequential")
+parser.add_argument("--reference-start-frame", type=int, default=0)
 parser.add_argument(
-    "--debug_compare_command_sources",
+    "--debug-compare-command-sources",
     action="store_true",
     default=False,
     help="Compare reference, planner_oracle, and planner observation tensors, then exit.",
 )
 parser.add_argument(
-    "--certify_streamed_vanilla_equivalence",
+    "--certify-streamed-vanilla-equivalence",
     action="store_true",
     default=False,
     help=(
@@ -290,34 +289,34 @@ parser.add_argument(
         "direct vanilla commands across every held-command phase, then exit."
     ),
 )
-parser.add_argument("--equivalence_steps", type=int, default=20)
-parser.add_argument("--equivalence_atol", type=float, default=5.0e-5)
-parser.add_argument("--refresh_zarr_dataset", action="store_true", default=False)
+parser.add_argument("--equivalence-steps", type=int, default=20)
+parser.add_argument("--equivalence-atol", type=float, default=5.0e-5)
+parser.add_argument("--refresh-zarr-dataset", action="store_true", default=False)
 parser.add_argument(
-    "--keep_after_done",
+    "--keep-after-done",
     action="store_true",
     default=False,
     help="Keep collecting after envs report done/truncated; otherwise ignore later steps.",
 )
 parser.add_argument(
-    "--enable_observation_corruption",
+    "--enable-observation-corruption",
     action="store_true",
     default=False,
     help="Leave policy observation corruption enabled during evaluation.",
 )
 parser.add_argument(
-    "--task_reset_selection",
+    "--task-reset-selection",
     action="store_true",
     default=False,
     help=(
         "Keep the task's own reference reset selection (sampler, schedule and "
         "start frames) instead of pinning a start frame and schedule. With "
-        "--keep_after_done, --keep_obs_noise, --preserve_episode_length and "
+        "--keep-after-done, --keep-obs-noise, --preserve-episode-length and "
         "--randomization all this runs the checkpoint in its training env."
     ),
 )
 parser.add_argument(
-    "--record_reset_logs",
+    "--record-reset-logs",
     action="store_true",
     default=False,
     help=(
@@ -327,13 +326,13 @@ parser.add_argument(
     ),
 )
 parser.add_argument(
-    "--preserve_episode_length",
+    "--preserve-episode-length",
     action="store_true",
     default=False,
     help="Do not extend env.episode_length_s to cover --steps.",
 )
 parser.add_argument(
-    "--agent_entry_point",
+    "--agent-entry-point",
     type=str,
     default=None,
     help=(
@@ -360,7 +359,7 @@ parser.add_argument(
     ),
 )
 parser.add_argument(
-    "--action_sampling",
+    "--action-sampling",
     type=str,
     default="mode",
     choices=("mode", "stochastic"),
@@ -375,7 +374,7 @@ parser.add_argument(
     ),
 )
 parser.add_argument(
-    "--disable_early_terminations",
+    "--disable-early-terminations",
     action="store_true",
     default=False,
     help=(
@@ -386,7 +385,7 @@ parser.add_argument(
     ),
 )
 parser.add_argument(
-    "--fall_termination_height",
+    "--fall-termination-height",
     type=float,
     default=None,
     help=(
@@ -404,13 +403,13 @@ parser.add_argument(
     help=(
         "Record the rollout to MP4 from a headless Newton GL visualizer. "
         "Recording is far slower than headless evaluation, so pair it with a "
-        "small --num_envs and pinned --trajectory_ranks; the metrics it writes "
+        "small --num-envs and pinned --trajectory-ranks; the metrics it writes "
         "are still the protocol's, so a recorded run stays comparable. The "
         "absolute clip path is printed when the run ends."
     ),
 )
 parser.add_argument(
-    "--action_lowpass_alpha",
+    "--action-lowpass-alpha",
     type=float,
     default=1.0,
     help=(
@@ -421,9 +420,9 @@ parser.add_argument(
         "state is re-seeded on reset so no filter memory crosses an episode."
     ),
 )
-parser.add_argument("--command_stats_width", type=int, default=66)
+parser.add_argument("--command-stats-width", type=int, default=66)
 parser.add_argument(
-    "--command_stats_json",
+    "--command-stats-json",
     type=Path,
     default=None,
     help=(
@@ -434,10 +433,10 @@ parser.add_argument(
         "it."
     ),
 )
-parser.add_argument("--video_dir", type=Path, default=None)
-parser.add_argument("--video_length", type=int, default=600)
+parser.add_argument("--video-dir", type=Path, default=None)
+parser.add_argument("--video-length", type=int, default=600)
 parser.add_argument(
-    "--video_follow_env",
+    "--video-follow-env",
     type=int,
     default=None,
     help=(
@@ -447,7 +446,6 @@ parser.add_argument(
     ),
 )
 add_launcher_args(parser)
-add_kebab_aliases(parser)
 args_cli, hydra_args = parser.parse_known_args()
 
 sys.argv = [sys.argv[0]] + hydra_args
@@ -506,7 +504,7 @@ from imitationlab.envs.isaaclab.tasks.manager_based.imitation.motion_data import
 
 
 #: Input keys of a frozen low-level tracker driven by ``streamed_vanilla``
-#: commands (``--low_level_command_mode streamed_vanilla``).
+#: commands (``--low-level-command-mode streamed_vanilla``).
 VANILLA_POLICY_INPUT_KEYS: list[tuple[str, str]] = [
     ("policy", "expert_motion"),
     ("policy", "expert_anchor_pos_b"),
@@ -755,7 +753,7 @@ def _skill_encoder_provenance(
         if embedded is None:
             raise ValueError(
                 f"{checkpoint_path} carries no embedded skill encoder; "
-                "--skill_encoder_source checkpoint cannot be satisfied."
+                "--skill-encoder-source checkpoint cannot be satisfied."
             )
         encoder.load_state_dict(embedded)
         provenance["resolved_source"] = "checkpoint"
@@ -962,9 +960,9 @@ def _certify_streamed_vanilla_equivalence(
             "planner_oracle packet drives the adapter."
         )
     if int(num_steps) <= 0:
-        raise ValueError("--equivalence_steps must be positive.")
+        raise ValueError("--equivalence-steps must be positive.")
     if float(atol) < 0.0:
-        raise ValueError("--equivalence_atol must be non-negative.")
+        raise ValueError("--equivalence-atol must be non-negative.")
 
     command_keys = (
         ("policy", "expert_motion"),
@@ -1455,7 +1453,7 @@ def _debug_compare_command_sources(
     term_names = _planner_command_terms(command_space)
     if len(term_names) == 0:
         raise ValueError(
-            "--debug_compare_command_sources requires a trajectory command space."
+            "--debug-compare-command-sources requires a trajectory command space."
         )
 
     env.reset()
@@ -1669,7 +1667,7 @@ def _write_csv(summary: dict[str, Any], output_csv: Path, *, append: bool) -> No
         if existing_header != fieldnames:
             raise ValueError(
                 f"CSV header mismatch for append: {output_csv}. "
-                "Use a new --output_csv or delete the old file."
+                "Use a new --output-csv or delete the old file."
             )
 
     with output_csv.open(mode, encoding="utf-8", newline="") as file:
@@ -1696,16 +1694,16 @@ def _validate_grouped_args(blocks: int) -> None:
         raise ValueError("--grouped runs WMBPTT policies only.")
     if args_cli.checkpoints is None:
         raise ValueError(
-            "--grouped takes --checkpoints and --output_jsons, one pair per block."
+            "--grouped takes --checkpoints and --output-jsons, one pair per block."
         )
     if args_cli.trajectory_ranks is None:
         raise ValueError(
-            "--grouped needs --trajectory_ranks: they are the clips of every block."
+            "--grouped needs --trajectory-ranks: they are the clips of every block."
         )
     clips = len(args_cli.trajectory_ranks)
     if int(args_cli.num_envs) != clips * blocks:
         raise ValueError(
-            f"--grouped: --num_envs must be {clips} ranks x {blocks} blocks = "
+            f"--grouped: --num-envs must be {clips} ranks x {blocks} blocks = "
             f"{clips * blocks}, got {args_cli.num_envs}."
         )
     from imitationlab.evaluation.grouped_eval import (  # noqa: PLC0415
@@ -1714,21 +1712,21 @@ def _validate_grouped_args(blocks: int) -> None:
 
     block_seed_indices(args_cli.grouped_seed_indices, blocks)  # one per block
     refused = {
-        "--keep_after_done": args_cli.keep_after_done,
-        "--task_reset_selection": args_cli.task_reset_selection,
+        "--keep-after-done": args_cli.keep_after_done,
+        "--task-reset-selection": args_cli.task_reset_selection,
         "--video": args_cli.video,
-        "--root_trace": args_cli.root_trace is not None,
-        "--dump_trace": args_cli.dump_trace is not None,
-        "--planner_mode": args_cli.planner_mode != "none",
-        "--action_lowpass_alpha": float(args_cli.action_lowpass_alpha) != 1.0,
-        "--command_stats_json": args_cli.command_stats_json is not None,
-        "--policy_only_checkpoint": args_cli.policy_only_checkpoint,
-        "--certify_streamed_vanilla_equivalence": args_cli.certify_streamed_vanilla_equivalence,
-        "--debug_compare_command_sources": args_cli.debug_compare_command_sources,
-        "--record_reset_logs": args_cli.record_reset_logs,
-        "--output_csv": args_cli.output_csv is not None,
-        "--action_sampling stochastic": args_cli.action_sampling != "mode",
-        "--low_level_command_mode": args_cli.low_level_command_mode != "native",
+        "--root-trace": args_cli.root_trace is not None,
+        "--dump-trace": args_cli.dump_trace is not None,
+        "--planner-mode": args_cli.planner_mode != "none",
+        "--action-lowpass-alpha": float(args_cli.action_lowpass_alpha) != 1.0,
+        "--command-stats-json": args_cli.command_stats_json is not None,
+        "--policy-only-checkpoint": args_cli.policy_only_checkpoint,
+        "--certify-streamed-vanilla-equivalence": args_cli.certify_streamed_vanilla_equivalence,
+        "--debug-compare-command-sources": args_cli.debug_compare_command_sources,
+        "--record-reset-logs": args_cli.record_reset_logs,
+        "--output-csv": args_cli.output_csv is not None,
+        "--action-sampling stochastic": args_cli.action_sampling != "mode",
+        "--low-level-command-mode": args_cli.low_level_command_mode != "native",
     }
     used = [flag for flag, on in refused.items() if on]
     if used:
@@ -2022,7 +2020,7 @@ agent_entry_point = args_cli.agent_entry_point or resolve_agent_cfg_entry_point(
 @hydra_task_config(args_cli.task, agent_entry_point)
 def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agent_cfg):
     if args_cli.num_envs <= 0:
-        raise ValueError("--num_envs must be positive.")
+        raise ValueError("--num-envs must be positive.")
     if args_cli.steps <= 0:
         raise ValueError("--steps must be positive.")
 
@@ -2034,17 +2032,17 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     # the budget axis in one process.
     if args_cli.untrained_policy:
         if args_cli.checkpoint is not None or args_cli.checkpoints is not None:
-            raise ValueError("--untrained_policy takes no checkpoint.")
+            raise ValueError("--untrained-policy takes no checkpoint.")
         if args_cli.output_json is None:
-            raise ValueError("--untrained_policy requires --output_json.")
+            raise ValueError("--untrained-policy requires --output-json.")
         if args_cli.policy_only_checkpoint:
             raise ValueError(
-                "--untrained_policy cannot be combined with --policy_only_checkpoint."
+                "--untrained-policy cannot be combined with --policy-only-checkpoint."
             )
         if args_cli.certify_streamed_vanilla_equivalence:
             raise ValueError(
-                "--untrained_policy cannot be combined with "
-                "--certify_streamed_vanilla_equivalence."
+                "--untrained-policy cannot be combined with "
+                "--certify-streamed-vanilla-equivalence."
             )
     elif (args_cli.checkpoint is None) == (args_cli.checkpoints is None):
         raise ValueError("Pass exactly one of --checkpoint or --checkpoints.")
@@ -2055,7 +2053,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
             args_cli.checkpoints
         ):
             raise ValueError(
-                "--checkpoints requires --output_jsons of the same length "
+                "--checkpoints requires --output-jsons of the same length "
                 f"({len(args_cli.checkpoints)} checkpoints)."
             )
         cells = [
@@ -2070,18 +2068,18 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     if args_cli.grouped:
         _validate_grouped_args(len(cells))
     elif args_cli.grouped_seed_indices is not None:
-        raise ValueError("--grouped_seed_indices needs --grouped.")
+        raise ValueError("--grouped-seed-indices needs --grouped.")
     if len(cells) > 1:
         # Both paths write one summary and stop, so they have no meaning for a
         # list of checkpoints; fail here rather than silently scoring only the
         # first cell.
         if args_cli.certify_streamed_vanilla_equivalence:
             raise ValueError(
-                "--certify_streamed_vanilla_equivalence takes a single --checkpoint."
+                "--certify-streamed-vanilla-equivalence takes a single --checkpoint."
             )
         if args_cli.debug_compare_command_sources:
             raise ValueError(
-                "--debug_compare_command_sources takes a single --checkpoint."
+                "--debug-compare-command-sources takes a single --checkpoint."
             )
         if args_cli.video:
             raise ValueError("--video takes a single --checkpoint.")
@@ -2114,10 +2112,10 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     if low_level_command_mode == "streamed_vanilla":
         if target_command_space != "full_body_trajectory":
             raise ValueError(
-                "streamed_vanilla requires --command_space full_body_trajectory."
+                "streamed_vanilla requires --command-space full_body_trajectory."
             )
         if int(args_cli.planner_update_interval) <= 0:
-            raise ValueError("--planner_update_interval must be positive.")
+            raise ValueError("--planner-update-interval must be positive.")
         low_level_command_space = "single_frame_full_body"
         env_cfg.policy_command_mode = "full_body_chunk_current_slot"
     else:
@@ -2126,7 +2124,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         low_level_command_space != "single_frame_full_body"
     ):
         raise ValueError(
-            "--policy_only_checkpoint currently requires the vanilla "
+            "--policy-only-checkpoint currently requires the vanilla "
             "single_frame_full_body actor contract."
         )
     agent_cfg.command_space = low_level_command_space
@@ -2168,7 +2166,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     if args_cli.video_follow_env is not None:
         follow = int(args_cli.video_follow_env)
         if not 0 <= follow < int(args_cli.num_envs):
-            raise ValueError("--video_follow_env must index one of --num_envs.")
+            raise ValueError("--video-follow-env must index one of --num-envs.")
     env_cfg.seed = (
         args_cli.seed if args_cli.seed is not None else getattr(agent_cfg, "seed", None)
     )
@@ -2200,8 +2198,8 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
             or args_cli.trajectory_ranks is not None
         ):
             raise ValueError(
-                "--task_reset_selection keeps the task's sampler; it does not "
-                "combine with --trajectory_rank(s)."
+                "--task-reset-selection keeps the task's sampler; it does not "
+                "combine with --trajectory-rank(s)."
             )
         reference_selection_surface = "task"
     else:
@@ -2219,23 +2217,23 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         reference_selection.schedule = str(args_cli.reset_schedule)
     if args_cli.trajectory_rank is not None and args_cli.trajectory_ranks is not None:
         raise ValueError(
-            "--trajectory_rank and --trajectory_ranks are mutually exclusive."
+            "--trajectory-rank and --trajectory-ranks are mutually exclusive."
         )
     if args_cli.trajectory_rank is not None:
         if args_cli.motion_name is not None:
             raise ValueError(
-                "--trajectory_rank and --motion_name are mutually exclusive."
+                "--trajectory-rank and --motion-name are mutually exclusive."
             )
         trajectory_rank = int(args_cli.trajectory_rank)
         if trajectory_rank < 0:
-            raise ValueError("--trajectory_rank must be non-negative.")
+            raise ValueError("--trajectory-rank must be non-negative.")
 
         def _fixed_trajectory_rank(
             env_ids: torch.Tensor, num_trajectories: int
         ) -> torch.Tensor:
             if trajectory_rank >= int(num_trajectories):
                 raise ValueError(
-                    f"--trajectory_rank={trajectory_rank} is outside the loaded "
+                    f"--trajectory-rank={trajectory_rank} is outside the loaded "
                     f"dataset with {num_trajectories} trajectories."
                 )
             return torch.full(
@@ -2256,7 +2254,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     elif args_cli.trajectory_ranks is not None:
         if args_cli.motion_name is not None:
             raise ValueError(
-                "--trajectory_ranks and --motion_name are mutually exclusive."
+                "--trajectory-ranks and --motion-name are mutually exclusive."
             )
         if args_cli.grouped:
             from imitationlab.evaluation.grouped_eval import (  # noqa: PLC0415
@@ -2276,7 +2274,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         ) -> torch.Tensor:
             if max(env_rank_assignment) >= int(num_trajectories):
                 raise ValueError(
-                    "--trajectory_ranks contains a rank outside the loaded dataset "
+                    "--trajectory-ranks contains a rank outside the loaded dataset "
                     f"with {num_trajectories} trajectories."
                 )
             rank_table = torch.as_tensor(
@@ -2373,7 +2371,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
     if hasattr(agent_cfg, "device"):
         agent_cfg.device = env_cfg.sim.device
     if args_cli.planner_mode != "none" and int(args_cli.planner_update_interval) <= 0:
-        raise ValueError("--planner_update_interval must be positive.")
+        raise ValueError("--planner-update-interval must be positive.")
 
     video_capture: VideoCapture | None = None
     if args_cli.video:
@@ -2388,7 +2386,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
             .expanduser()
             .resolve(),
             video_length=int(args_cli.video_length),
-            # Runs with different labels may share one --video_dir. The label
+            # Runs with different labels may share one --video-dir. The label
             # keeps their clips apart: <label>_0000.mp4.
             output_filename_prefix=clip_prefix_for_label(
                 args_cli.label, default="eval"
@@ -2435,7 +2433,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         and len(_planner_command_terms(command_space)) == 0
     ):
         raise ValueError(
-            "--planner_mode requires command_space to be full_body_trajectory or ee_trajectory."
+            "--planner-mode requires command_space to be full_body_trajectory or ee_trajectory."
         )
     tracked_body_names = _resolve_existing_body_names(base_env, G1_TRACKED_BODY_NAMES)
     ee_body_names = _resolve_existing_body_names(
@@ -2617,7 +2615,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         action_lowpass_alpha = float(args_cli.action_lowpass_alpha)
         if not 0.0 < action_lowpass_alpha <= 1.0:
             raise ValueError(
-                f"--action_lowpass_alpha must be in (0, 1]; got {action_lowpass_alpha}."
+                f"--action-lowpass-alpha must be in (0, 1]; got {action_lowpass_alpha}."
             )
         filtered_action: torch.Tensor | None = None
         filter_valid: torch.Tensor | None = None
@@ -2668,7 +2666,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
             ]
         # DETERMINISTIC is the protocol. RANDOM exists only to reproduce the way
         # training draws actions, so the train/eval metric gap can be attributed
-        # rather than argued about; see --action_sampling.
+        # rather than argued about; see --action-sampling.
         action_sampling = str(args_cli.action_sampling)
         rollout_exploration_type = (
             InteractionType.RANDOM
@@ -2688,7 +2686,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
 
             if len(cells) > 1 or bool((trajectory_ranks < 0).any()):
                 raise ValueError(
-                    "--root_trace needs a single checkpoint and a rank-pinned board."
+                    "--root-trace needs a single checkpoint and a rank-pinned board."
                 )
             root_trace = RootTrackingTrace(
                 env_origins=_as_torch(base_env.scene.env_origins),

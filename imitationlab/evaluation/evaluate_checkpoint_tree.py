@@ -9,13 +9,13 @@ policy weights: one start can serve the whole budget axis.
 
 This entrypoint plans the cells with
 `imitationlab.evaluation.score_tree`, then hands the whole list to the
-evaluator through `--checkpoints` / `--output_jsons`. Every argument after `--`
+evaluator through `--checkpoints` / `--output-jsons`. Every argument after `--`
 goes to the evaluator verbatim, so the interface overrides stay exactly the
 ones the campaign launcher would pass for a single cell.
 
-    python scripts/tracking/eval_checkpoint_tree.py \
+    python -m imitationlab.evaluation.evaluate_checkpoint_tree \
         --tree /data/pareto_stack/jepa_h1_ee_wide_seed0 \
-        --output_root /data/eval/pareto_stack --arm jepa_h1_ee_wide --seed 0 \
+        --output-root /data/eval/pareto_stack --arm jepa_h1_ee_wide --seed 0 \
         --row milestone -- --task imitation-g1-v1 --algo PPO ...
 
 It exists as a script rather than a `-m` invocation because a cluster stage
@@ -24,17 +24,17 @@ runs one script path inside the container.
 `--group G --repeats R` (off by default) is NDM Gym's grouped evaluation: up to G
 checkpoints, each R times, in one simulator of C x G x R envs, where C is the
 board's clip count (`evaluation/grouped_eval.py`). Repeat r is evaluation index
-`--seed + r`; its rows land under `--output_root` with `{seed}` or
+`--seed + r`; its rows land under `--output-root` with `{seed}` or
 `{seed_suffix}` filled in (`replica{seed_suffix}` gives `replica`, `replica_s1`,
 ...), named as one-cell runs name them, and the evaluator records `--seed + r` as
 `metadata.grouped.seed_index`. Each group runs in its own process and session,
 which writes its rows and exits without Kit's teardown; the parent also kills a
-group process that outlives its complete rows by `--hang_grace_seconds` (120 s
+group process that outlives its complete rows by `--hang-grace-seconds` (120 s
 unless given), and kills the group's session when the parent itself is stopped
 (SIGTERM, SIGHUP or Ctrl-C).
 
-    python scripts/tracking/eval_checkpoint_tree.py --tree <run> \
-        --output_root '<run>/replica{seed_suffix}' --arm <arm> --seed 0 \
+    python -m imitationlab.evaluation.evaluate_checkpoint_tree --tree <run> \
+        --output-root '<run>/replica{seed_suffix}' --arm <arm> --seed 0 \
         --row replica --board lafan1_all40_v1 --group 12 --repeats 4 -- \
         --task imitation-g1-v1 --algo WMBPTT ...
 """
@@ -59,7 +59,6 @@ from imitationlab.evaluation.score_tree import (
     plan_cells,
     plan_repeat_cells,
 )
-from imitationlab.paths import REPO_ROOT
 from imitationlab.runners.runtime_bootstrap import (
     configure_cu130_bridge,
     verify_cu130_torch,
@@ -73,39 +72,39 @@ GROUP_HANG_GRACE_SECONDS = 120.0
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--tree", type=Path, required=True)
-    parser.add_argument("--output_root", type=Path, required=True)
+    parser.add_argument("--output-root", type=Path, required=True)
     parser.add_argument("--arm", type=str, required=True)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--row", type=str, default="milestone")
     # A board name instead of 256 or 4096 literal ranks in a config file. The
-    # ranks and `--num_envs` are expanded here, so a campaign declares the
+    # ranks and `--num-envs` are expanded here, so a campaign declares the
     # board it scores and cannot drift from the board's definition.
     parser.add_argument("--board", type=str, default=None)
-    parser.add_argument("--final_only", action="store_true", default=False)
+    parser.add_argument("--final-only", action="store_true", default=False)
     # Off by default: an interrupted job resumes instead of repeating cells.
     parser.add_argument("--rescore", action="store_true", default=False)
     # One evaluator process per cell. Needed when the evaluator samples its own
-    # resets (`--task_reset_selection`): each cell then draws a different
+    # resets (`--task-reset-selection`): each cell then draws a different
     # population, which the shared-start path refuses, and a shared env would
     # carry the adaptive reset sampler's state from one checkpoint into the next.
-    parser.add_argument("--isolate_cells", action="store_true", default=False)
+    parser.add_argument("--isolate-cells", action="store_true", default=False)
     # Score only these milestones (frame counts); the isolated path passes one.
-    parser.add_argument("--only_frames", type=int, nargs="+", default=None)
+    parser.add_argument("--only-frames", type=int, nargs="+", default=None)
     # Isolated cells and groups: kill a cell's (group's) process this many
     # seconds after its summary JSON(s) are complete (0 waits forever; unset is 0
     # for isolated cells and 120 for groups). The evaluator can hang after
     # writing it -- one hung 9 h on the workstation, 2026-10-23 -- which would
     # stall every later cell until the job's walltime.
-    parser.add_argument("--hang_grace_seconds", type=float, default=None)
+    parser.add_argument("--hang-grace-seconds", type=float, default=None)
     # Score one milestone per bucket of this many frames (0: all). Buckets come
     # from every milestone, scored or not, so repeat runs pick the same ones.
-    parser.add_argument("--min_frame_gap", type=int, default=0)
+    parser.add_argument("--min-frame-gap", type=int, default=0)
     # Grouped evaluation (off by default): up to this many checkpoints per
     # simulator, each --repeats times, one process per group.
     parser.add_argument("--group", type=int, default=0)
     parser.add_argument("--repeats", type=int, default=1)
     # Internal: a group's own process, which scores its one group in-process.
-    parser.add_argument("--group_child", action="store_true", help=argparse.SUPPRESS)
+    parser.add_argument("--group-child", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument(
         "evaluator_args",
         nargs=argparse.REMAINDER,
@@ -120,7 +119,7 @@ def main() -> int:
         parser.error("pass the evaluator arguments after `--`.")
 
     if args.board is not None:
-        for flag in ("--trajectory_ranks", "--num_envs"):
+        for flag in ("--trajectory-ranks", "--num-envs"):
             if flag in passthrough:
                 parser.error(f"--board already sets {flag}; pass one or the other.")
         from imitationlab.evaluation.protocol import BOARDS
@@ -131,10 +130,10 @@ def main() -> int:
         if not ranks:
             parser.error(f"board {args.board} has no cases.")
         if args.group > 0:
-            # A group sets --num_envs to the clips times its blocks.
-            passthrough += ["--trajectory_ranks", *ranks]
+            # A group sets --num-envs to the clips times its blocks.
+            passthrough += ["--trajectory-ranks", *ranks]
         else:
-            passthrough += ["--num_envs", str(len(ranks)), "--trajectory_ranks", *ranks]
+            passthrough += ["--num-envs", str(len(ranks)), "--trajectory-ranks", *ranks]
         print(f"[INFO] board {args.board}: {len(ranks)} clips")
 
     if args.group > 0 or args.repeats != 1 or args.group_child:
@@ -151,7 +150,7 @@ def main() -> int:
         final_only=args.final_only,
         skip_scored=not args.rescore,
     )
-    # An isolated child's `--only_frames` was thinned by its parent; thinning again
+    # An isolated child's `--only-frames` was thinned by its parent; thinning again
     # would drop it once a live run has saved a newer checkpoint.
     if args.min_frame_gap > 0 and args.only_frames is None:
         every = plan_cells(
@@ -205,7 +204,7 @@ def main() -> int:
         + passthrough
         + ["--checkpoints"]
         + [str(cell.checkpoint) for cell in cells]
-        + ["--output_jsons"]
+        + ["--output-jsons"]
         + [str(cell.output_json) for cell in cells]
     )
     runpy.run_module(EVALUATOR, run_name="__main__")
@@ -213,11 +212,11 @@ def main() -> int:
 
 
 def passthrough_ranks(passthrough: list[str]) -> list[str]:
-    """The values after ``--trajectory_ranks`` in the evaluator arguments."""
-    if "--trajectory_ranks" not in passthrough:
+    """The values after ``--trajectory-ranks`` in the evaluator arguments."""
+    if "--trajectory-ranks" not in passthrough:
         return []
     ranks = []
-    for token in passthrough[passthrough.index("--trajectory_ranks") + 1 :]:
+    for token in passthrough[passthrough.index("--trajectory-ranks") + 1 :]:
         if token.startswith("--"):
             break
         ranks.append(token)
@@ -233,14 +232,14 @@ def grouped_main(
     if args.repeats < 1:
         parser.error("--repeats must be at least 1.")
     if args.isolate_cells:
-        parser.error("--group runs one process per group; drop --isolate_cells.")
-    if "--num_envs" in passthrough:
-        parser.error("--group sets --num_envs (clips x blocks); do not pass it.")
+        parser.error("--group runs one process per group; drop --isolate-cells.")
+    if "--num-envs" in passthrough:
+        parser.error("--group sets --num-envs (clips x blocks); do not pass it.")
     for flag in (
         "--checkpoint",
         "--checkpoints",
-        "--output_json",
-        "--output_jsons",
+        "--output-json",
+        "--output-jsons",
         "--grouped",
     ):
         if flag in passthrough:
@@ -248,7 +247,7 @@ def grouped_main(
     clips = len(passthrough_ranks(passthrough))
     if clips == 0:
         parser.error(
-            "--group needs --board or --trajectory_ranks: the clips of every block."
+            "--group needs --board or --trajectory-ranks: the clips of every block."
         )
 
     cells = plan_repeat_cells(
@@ -290,12 +289,12 @@ def grouped_main(
         # rows, so the evaluator cannot count it from the order of the blocks.
         _run_evaluator(
             passthrough
-            + ["--grouped", "--num_envs", str(clips * len(group))]
-            + ["--grouped_seed_indices"]
+            + ["--grouped", "--num-envs", str(clips * len(group))]
+            + ["--grouped-seed-indices"]
             + [str(cell.seed_index) for cell in group]
             + ["--checkpoints"]
             + [str(cell.checkpoint) for cell in group]
-            + ["--output_jsons"]
+            + ["--output-jsons"]
             + [str(cell.output_json) for cell in group]
         )
         return 0
@@ -326,26 +325,26 @@ def _run_evaluator(evaluator_args: list[str]) -> None:
 
 
 def group_child_argv(argv: list[str], frames: list[int]) -> list[str]:
-    """This script's argv for one group: its frames as ``--only_frames``, and
-    ``--group_child``; a parent's own ``--only_frames`` is replaced."""
+    """This script's argv for one group: its frames as ``--only-frames``, and
+    ``--group-child``; a parent's own ``--only-frames`` is replaced."""
     split = argv.index("--") if "--" in argv else len(argv)
     own: list[str] = []
     skipping = False
     for arg in argv[1:split]:
-        if arg == "--only_frames":
+        if arg == "--only-frames":
             skipping = True
             continue
         if skipping and not arg.startswith("--"):
             continue
         skipping = False
-        if arg.startswith("--only_frames=") or arg == "--group_child":
+        if arg.startswith("--only-frames=") or arg == "--group-child":
             continue
         own.append(arg)
     return [
         argv[0],
         *own,
-        "--group_child",
-        "--only_frames",
+        "--group-child",
+        "--only-frames",
         *(str(f) for f in frames),
         *argv[split:],
     ]
@@ -423,19 +422,16 @@ def select_cells(cells: list, only_frames: list[int] | None) -> list:
 
 
 def single_cell_argv(argv: list[str], frames: int) -> list[str]:
-    """This script's argv for one cell: drop `--isolate_cells`, add `--only_frames`."""
+    """This script's argv for one cell: drop `--isolate-cells`, add `--only-frames`."""
     split = argv.index("--") if "--" in argv else len(argv)
-    own = [arg for arg in argv[1:split] if arg != "--isolate_cells"]
-    if "--only_frames" in own:
-        raise ValueError("--isolate_cells already selects one cell per process.")
-    return [argv[0], *own, "--only_frames", str(frames), *argv[split:]]
+    own = [arg for arg in argv[1:split] if arg != "--isolate-cells"]
+    if "--only-frames" in own:
+        raise ValueError("--isolate-cells already selects one cell per process.")
+    return [argv[0], *own, "--only-frames", str(frames), *argv[split:]]
 
 
 def _child_command(argv: list[str]) -> list[str]:
     """Restart the current implementation in an isolated Python process."""
-    checkout_entrypoint = REPO_ROOT / "scripts/tracking/eval_checkpoint_tree.py"
-    if checkout_entrypoint.is_file():
-        return [sys.executable, str(checkout_entrypoint), *argv[1:]]
     return [sys.executable, "-m", TREE_EVALUATOR, *argv[1:]]
 
 

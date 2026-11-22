@@ -249,9 +249,9 @@ def choose_plan(
     if stage == "pretrain":
         batch = {"small": 32, "standard": 128, "large": 256, "xlarge": 512}[name]
         plan.overrides = [
-            "--num_envs",
+            "--num-envs",
             str(min(4, hardware.cpu_count)),
-            "--batch_size",
+            "--batch-size",
             str(batch),
         ]
         plan.reasons.append(
@@ -281,7 +281,7 @@ def choose_plan(
         plan.reasons.append(
             "Bank size is unknown; existing reference storage settings are retained."
         )
-    plan.overrides.extend(["--num_envs", str(envs)])
+    plan.overrides.extend(["--num-envs", str(envs)])
     if policy != "ppo":
         plan.overrides.extend(
             [f"agent.wm.imagine_batch={batch}", f"agent.wm.wm_batch_size={batch}"]

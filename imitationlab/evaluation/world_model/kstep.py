@@ -20,9 +20,9 @@ outputs are integrated semi-implicitly, its normalized error divides by the
 plain increments' scale (``inc_norm``), and its baseline integrates the mean
 output, which is the semi-implicit drift plus the mean correction.
 
-    pixi run -e isaaclab python scripts/tracking/eval_world_model_kstep.py \
-        --checkpoint <model_step_N.pt> --num_envs 1024 --steps 400 \
-        [--goal_encoder <local encoder .pt>] <env overrides>
+    pixi run -e isaaclab python -m imitationlab.evaluation.world_model.kstep \
+        --checkpoint <model_step_N.pt> --num-envs 1024 --steps 400 \
+        [--goal-encoder <local encoder .pt>] <env overrides>
 
 Launched directly (not through a pixi task) it needs ``TERM=xterm
 OMNI_KIT_ACCEPT_EULA=YES`` in the environment.
@@ -35,27 +35,25 @@ import json
 import math
 import sys
 
-from imitationlab.cli_args import add_kebab_aliases
 from imitationlab.runners.launch_compat import add_launcher_args
 
 parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
 parser.add_argument("--task", default="imitation-g1-v1")
 parser.add_argument("--checkpoint", required=True)
-parser.add_argument("--num_envs", type=int, default=1024)
+parser.add_argument("--num-envs", type=int, default=1024)
 parser.add_argument("--steps", type=int, default=400)
-parser.add_argument("--warmup_steps", type=int, default=100)
-parser.add_argument("--action_noise_std", type=float, default=None)
+parser.add_argument("--warmup-steps", type=int, default=100)
+parser.add_argument("--action-noise-std", type=float, default=None)
 parser.add_argument("--ks", default="1,8,32")
 parser.add_argument("--seed", type=int, default=7)
-parser.add_argument("--output_json", default=None)
+parser.add_argument("--output-json", default=None)
 parser.add_argument(
-    "--goal_encoder",
+    "--goal-encoder",
     default=None,
     help="override the checkpoint's wm.goal_encoder path (a z-goal checkpoint trained on a cluster "
     "records the cluster path)",
 )
 add_launcher_args(parser)
-add_kebab_aliases(parser, hide_snake_case=False)
 
 
 def main() -> int:
@@ -96,7 +94,7 @@ def main() -> int:
         cfg = ck["wm_config"]
         # Same task construction as WMBPTT.__init__: the goal mode and skill
         # encoder set the actor's observation width, so a z-goal checkpoint
-        # needs its encoder (the recorded path, or --goal_encoder).
+        # needs its encoder (the recorded path, or --goal-encoder).
         task_kwargs = dict(cfg.get("task_kwargs") or {})
         goal_encoder = args.goal_encoder or cfg.get("goal_encoder") or None
         if cfg.get("goal", "explicit") != "explicit" or goal_encoder:

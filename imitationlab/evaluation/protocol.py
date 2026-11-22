@@ -4891,26 +4891,26 @@ def evaluate_checkpoint_argv(
     args = [
         "--checkpoint",
         str(checkpoint),
-        "--output_json",
+        "--output-json",
         str(output_json),
-        "--num_envs",
+        "--num-envs",
         str(len(board.cases)),
         "--steps",
         str(protocol.outer_safety_cap_steps),
         "--seed",
         str(seed),
-        "--reference_start_frame",
+        "--reference-start-frame",
         str(start_frame),
         "--randomization",
         protocol.randomization_profile,
-        "--action_sampling",
+        "--action-sampling",
         protocol.action_sampling,
-        "--trajectory_ranks",
+        "--trajectory-ranks",
         *(str(rank) for rank in board.trajectory_ranks),
         f"physics={protocol.backend}",
     ]
     if protocol.termination_profile == "full_horizon":
-        args.append("--disable_early_terminations")
+        args.append("--disable-early-terminations")
     elif protocol.termination_profile == "fall_only":
         args.extend(_FALL_ONLY_OVERRIDES)
     elif protocol.termination_profile == "sonic":
@@ -4945,34 +4945,34 @@ def eval_skill_commander_argv(
     args = [
         "--checkpoint",
         str(checkpoint),
-        "--output_dir",
+        "--output-dir",
         str(output_dir),
-        "--num_envs",
+        "--num-envs",
         str(len(board.cases)),
-        "--max_steps",
+        "--max-steps",
         str(protocol.outer_safety_cap_steps),
-        "--metric_interval",
+        "--metric-interval",
         str(protocol.metric_interval),
         "--seed",
         str(seed),
-        "--trajectory_ranks",
+        "--trajectory-ranks",
         *(str(rank) for rank in board.trajectory_ranks),
         f"physics={protocol.backend}",
     ]
     if protocol.randomization_profile == "none":
-        args.append("--deterministic_tracking")
+        args.append("--deterministic-tracking")
     elif protocol.randomization_profile == "no_push":
-        args.append("--disable_push_event")
+        args.append("--disable-push-event")
     elif protocol.randomization_profile != "all":
         raise ProtocolUnsupported(evaluator, ["randomization_profile"])
     if protocol.termination_profile == "fall_only":
-        args.extend(("--fall_only_success", "--disable_tracking_terminations"))
+        args.extend(("--fall-only-success", "--disable-tracking-terminations"))
     elif protocol.termination_profile == "full_horizon":
         pass
     elif protocol.termination_profile == "sonic":
-        args.append("--sonic_success_terminations")
+        args.append("--sonic-success-terminations")
     elif protocol.termination_profile == "task_strict":
-        args.append("--keep_early_terminations")
+        args.append("--keep-early-terminations")
     else:
         raise ProtocolUnsupported(evaluator, ["termination_profile"])
     return args

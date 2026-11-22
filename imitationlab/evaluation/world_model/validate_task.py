@@ -5,8 +5,8 @@ Uses the selected task's registered ``wm.task_model``. Rewards include terminal
 transitions whenever the environment publishes post-step ``final_obs``. Empty, nonfinite or insufficiently
 correlated comparisons fail rather than silently qualifying a task.
 
-    pixi run -e isaaclab python scripts/tracking/validate_world_model_task.py \
-        --task imitation-g1-v1 --assert-kitless --num_envs 256 --steps 200 \
+    pixi run -e isaaclab python -m imitationlab.evaluation.world_model.validate_task \
+        --task imitation-g1-v1 --assert-kitless --num-envs 256 --steps 200 \
         physics=newton_mjwarp <env.data overrides>
 """
 
@@ -16,7 +16,6 @@ import argparse
 import json
 import sys
 
-from imitationlab.cli_args import add_kebab_aliases
 from imitationlab.evaluation.world_model.validation import (
     comparison_stats,
     qualification_failures,
@@ -28,32 +27,32 @@ def build_parser():
 
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--task", default="imitation-g1-v1")
-    parser.add_argument("--num_envs", type=int, default=256)
+    parser.add_argument("--num-envs", type=int, default=256)
     parser.add_argument("--steps", type=int, default=200)
-    parser.add_argument("--action_std", type=float, default=0.3)
+    parser.add_argument("--action-std", type=float, default=0.3)
     parser.add_argument("--tolerance", type=float, default=0.02)
-    parser.add_argument("--min_correlation", type=float, default=0.9996)
-    parser.add_argument("--min_termination_agreement", type=float, default=0.999)
+    parser.add_argument("--min-correlation", type=float, default=0.9996)
+    parser.add_argument("--min-termination-agreement", type=float, default=0.999)
     parser.add_argument("--seed", type=int, default=0)
-    parser.add_argument("--output_json", default=None)
-    parser.add_argument("--skill_encoder", default=None)
+    parser.add_argument("--output-json", default=None)
+    parser.add_argument("--skill-encoder", default=None)
     parser.add_argument("--assert-kitless", action="store_true")
     parser.add_argument(
-        "--check_noise_inference",
+        "--check-noise-inference",
         action="store_true",
         help="Also qualify frozen collecting-policy replay with a disposable WMBPTT agent.",
     )
     parser.add_argument(
-        "--check_environment_contract",
+        "--check-environment-contract",
         action="store_true",
         help="Also verify live reset, randomization, action and timeout contracts.",
     )
     parser.add_argument(
-        "--replay_checkpoint",
+        "--replay-checkpoint",
         help="Restore this WMBPTT checkpoint before the frozen replay check.",
     )
     add_launcher_args(parser)
-    return add_kebab_aliases(parser, hide_snake_case=False)
+    return parser
 
 
 def main() -> int:
@@ -66,7 +65,7 @@ def main() -> int:
 
     args, hydra_args = setup_preset_cli(build_parser(), sys.argv[1:])
     if args.replay_checkpoint and not args.check_noise_inference:
-        raise ValueError("--replay_checkpoint requires --check_noise_inference.")
+        raise ValueError("--replay-checkpoint requires --check-noise-inference.")
     args.headless = True
     sys.argv = [sys.argv[0], *hydra_args]
     import gymnasium as gym

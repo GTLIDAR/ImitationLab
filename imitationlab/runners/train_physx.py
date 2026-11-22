@@ -6,6 +6,7 @@ import argparse
 import os
 import sys
 
+from imitationlab.cli_args import kebab_options
 from imitationlab.runners.runtime_bootstrap import (
     configure_cu130_bridge,
     detect_gpu_names,
@@ -33,13 +34,14 @@ def _requests_kit_window(argv: list[str]) -> bool:
 
 def _parse_launcher_args(argv: list[str]):
     """Parse only arguments needed to launch Kit; ImitationLab parses the rest later."""
-    # ``parse_known_args`` drops the old ``--headless`` flag here, and
-    # ``train.py`` accepts it later through ``imitationlab.runners.launch_compat``.
+    # ``parse_known_args`` drops ``--headless`` here; the trainer accepts it
+    # later through ``imitationlab.runners.launch_compat``.
     from isaaclab.app import AppLauncher
 
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument("--video", action="store_true", default=False)
     AppLauncher.add_app_launcher_args(parser)
+    kebab_options(parser)
     args_cli, _ = parser.parse_known_args(argv)
     return args_cli
 
@@ -55,8 +57,8 @@ def main(argv: list[str] | None = None) -> int:
     backend = requested_backend(argv)
     if backend != "physx":
         raise RuntimeError(
-            "scripts/tracking/train_physx.py only owns the PhysX/Kit runtime. "
-            "Run Newton through scripts/tracking/train.py with --assert-kitless."
+            "imitationlab.runners.train_physx only owns the PhysX/Kit runtime. "
+            "Run Newton through imitationlab.runners.train with --assert-kitless."
         )
 
     gpu_names = detect_gpu_names()
@@ -98,7 +100,7 @@ def main(argv: list[str] | None = None) -> int:
 
     app_launcher = AppLauncher(_parse_launcher_args(argv))
     try:
-        from train import run
+        from imitationlab.runners.train import run
 
         status = run(argv, require_running_kit=True)
         # The training entry point historically returns None after a clean

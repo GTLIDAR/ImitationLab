@@ -9,7 +9,7 @@ on our evaluator (``lowlevel/evaluate_checkpoint.py --grouped``).
 
 Layout. A group is B blocks of C envs. Env ``e = b * C + c`` plays clip
 ``ranks[c]`` under the checkpoint of block b. The tree planner
-(``scripts/tracking/eval_checkpoint_tree.py --group G --repeats R``) orders blocks
+(``imitationlab.evaluation.evaluate_checkpoint_tree --group G --repeats R``) orders blocks
 checkpoint-major, so the R repeats of checkpoint m are blocks ``m * R + r``: NDM
 Gym's world ``(m * repeats + r) * C + c``.
 
@@ -86,7 +86,7 @@ def block_seed_indices(
 ) -> list[int | None]:
     """The seed index of every block: the evaluation index that names its row.
 
-    The tree planner passes one per block (``--grouped_seed_indices``); a rerun
+    The tree planner passes one per block (``--grouped-seed-indices``); a rerun
     plans only the missing rows, so a block's index is not its order among the
     blocks of its checkpoint. Without the list every block's index is None.
     """

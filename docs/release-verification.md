@@ -77,10 +77,10 @@ pretrained for two updates with small networks:
 ```bash
 pixi run --locked -e isaaclab imitationlab pretrain --hardware off \
   --interface "$INTERFACE" --data "$BANK" --output-dir "outputs/encoders/$INTERFACE" \
-  --num-envs 4 --batch_size 16 --num_updates 2 --eval_batches 1 --seed 42 \
-  --wandb_mode disabled --assert-kitless --encoder_hidden_dims 64 64 \
-  --diffsr_feature_dim 64 --diffsr_embed_dim 64 --diffsr_f_hidden_dims 64 64 \
-  --diffsr_g_hidden_dims 64 64 --diffsr_mu_hidden_dims 64 64
+  --num-envs 4 --batch-size 16 --num-updates 2 --eval-batches 1 --seed 42 \
+  --wandb-mode disabled --assert-kitless --encoder-hidden-dims 64 64 \
+  --diffsr-feature-dim 64 --diffsr-embed-dim 64 --diffsr-f-hidden-dims 64 64 \
+  --diffsr-g-hidden-dims 64 64 --diffsr-mu-hidden-dims 64 64
 ```
 
 Each checkpoint was then exported with `pixi run --locked imitationlab export
@@ -199,5 +199,5 @@ learner and architecture from the recorded settings.
 ```bash
 pixi run --locked -e isaaclab imitationlab evaluate \
   --checkpoint "$RUN" --data "$BANK" --num-envs 4 --steps 20 --seed 42 \
-  --output outputs/evaluation/release-smoke.json --trajectory_ranks 0
+  --output outputs/evaluation/release-smoke.json --trajectory-ranks 0
 ```

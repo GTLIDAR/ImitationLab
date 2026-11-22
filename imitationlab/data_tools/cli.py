@@ -8,8 +8,6 @@ import sys
 from pathlib import Path
 from typing import Sequence
 
-from imitationlab.data_tools.common.cli_args import hide_legacy_aliases
-
 
 def _pack(args: argparse.Namespace) -> int:
     from imitationlab.data_tools.reference_arrays import build
@@ -99,7 +97,7 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Require this content fingerprint (implies --fingerprint).",
     )
     validator.set_defaults(handler=validate.run)
-    return hide_legacy_aliases(parser)
+    return parser
 
 
 def main(argv: Sequence[str] | None = None) -> int:

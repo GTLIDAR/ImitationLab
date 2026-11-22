@@ -388,7 +388,7 @@ def train(
     if max_train_seconds is not None:
         if float(max_train_seconds) <= 0.0:
             raise ValueError(
-                f"--max_train_seconds must be > 0, got {max_train_seconds}."
+                f"--max-train-seconds must be > 0, got {max_train_seconds}."
             )
         agent_cfg.trainer.max_train_seconds = float(max_train_seconds)
     agent_cfg.collector.frames_per_batch *= env_cfg.scene.num_envs
@@ -631,7 +631,7 @@ def train(
         if not getattr(agent, "supports_train_time_budget", False):
             raise ValueError(
                 f"{type(agent).__name__}.train does not honour "
-                "trainer.max_train_seconds (--max_train_seconds). Use PPO for wall-clock-limited training."
+                "trainer.max_train_seconds (--max-train-seconds). Use PPO for wall-clock-limited training."
             )
         print(
             f"[INFO] Training wall-clock budget: {float(budget):.0f} s "

@@ -51,7 +51,8 @@ def main(argv=None):
         "--nnodes=1",
         f"--nproc-per-node={args.workers}",
         "--max-restarts=0",
-        str(REPO_ROOT / "scripts/tracking/train.py"),
+        "--module",
+        "imitationlab.runners.train",
     ]
 
     def run_stage(name, extra):
@@ -95,7 +96,7 @@ for index in range(int(os.environ['QUALIFICATION_WORKERS'])):
             )
     finally:
         print((root / "cuda_probe.log").read_text(), flush=True)
-    smoke = run_stage("smoke", ["--max_iterations", "8"])
+    smoke = run_stage("smoke", ["--max-iterations", "8"])
     frames = smoke[0]["cumulative_env_frames"]
     remaining = args.qualification_seconds - (time.monotonic() - started) - 300
     if remaining < 60:
@@ -104,7 +105,7 @@ for index in range(int(os.environ['QUALIFICATION_WORKERS'])):
         )
     resume = run_stage(
         "resume",
-        ["--checkpoint", str(root / "smoke"), "--max_training_seconds", str(remaining)],
+        ["--checkpoint", str(root / "smoke"), "--max-training-seconds", str(remaining)],
     )
     if any(
         r["initial_frames"] != frames or r["cumulative_env_frames"] <= frames

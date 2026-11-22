@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import argparse
-from imitationlab.cli_args import add_kebab_aliases
 import csv
 import json
 import math
@@ -149,11 +148,11 @@ def _write_csv(path: Path, results: Sequence[dict[str, Any]]) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--evaluation_json", type=Path, required=True)
-    parser.add_argument("--candidates_json", type=Path, required=True)
-    parser.add_argument("--output_json", type=Path, required=True)
-    parser.add_argument("--output_csv", type=Path, required=True)
-    args = add_kebab_aliases(parser).parse_args()
+    parser.add_argument("--evaluation-json", type=Path, required=True)
+    parser.add_argument("--candidates-json", type=Path, required=True)
+    parser.add_argument("--output-json", type=Path, required=True)
+    parser.add_argument("--output-csv", type=Path, required=True)
+    args = parser.parse_args()
 
     evaluation = json.loads(args.evaluation_json.read_text(encoding="utf-8"))
     candidates = json.loads(args.candidates_json.read_text(encoding="utf-8"))

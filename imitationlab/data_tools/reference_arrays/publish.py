@@ -20,7 +20,6 @@ from pathlib import Path
 import sys
 from typing import Any
 
-from imitationlab.data_tools.common.cli_args import hide_legacy_aliases
 from imitationlab.data_tools.reference_arrays.build import validation_errors
 from imitationlab.data_tools.reference_arrays.schema import SIDECAR_NAME
 
@@ -331,22 +330,17 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     sub = parser.add_subparsers(dest="command", required=True)
 
     def common(p: argparse.ArgumentParser) -> None:
-        p.add_argument("--repo-id", "--repo_id", required=True)
-        p.add_argument("--persist-id", "--persist_id", required=True)
-        p.add_argument("--body-names", "--body_names", nargs="+", default=None)
-        p.add_argument("--anchor-body", "--anchor_body", default=None)
-        p.add_argument(
-            "--expected-motions", "--expected_motions", type=int, default=None
-        )
-        p.add_argument(
-            "--expected-transitions", "--expected_transitions", type=int, default=None
-        )
+        p.add_argument("--repo-id", required=True)
+        p.add_argument("--persist-id", required=True)
+        p.add_argument("--body-names", nargs="+", default=None)
+        p.add_argument("--anchor-body", default=None)
+        p.add_argument("--expected-motions", type=int, default=None)
+        p.add_argument("--expected-transitions", type=int, default=None)
 
     p_push = sub.add_parser("push", help="Validate and upload authorized arrays.")
-    p_push.add_argument("--source-dir", "--source_dir", type=Path, required=True)
+    p_push.add_argument("--source-dir", type=Path, required=True)
     p_push.add_argument(
         "--source-repo",
-        "--source_repo",
         default=None,
         help="Source NPZ dataset repo, recorded in the generated card.",
     )
@@ -356,13 +350,12 @@ def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         default=False,
         help="Make the dataset public when the source terms permit public redistribution.",
     )
-    p_push.add_argument("--dry-run", "--dry_run", action="store_true", default=False)
+    p_push.add_argument("--dry-run", action="store_true", default=False)
     common(p_push)
 
     p_fetch = sub.add_parser("fetch", help="Download and validate on a compute node.")
-    p_fetch.add_argument("--dest-dir", "--dest_dir", type=Path, required=True)
+    p_fetch.add_argument("--dest-dir", type=Path, required=True)
     common(p_fetch)
-    hide_legacy_aliases(parser)
     return parser.parse_args(argv)
 
 

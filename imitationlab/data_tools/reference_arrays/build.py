@@ -71,7 +71,6 @@ import zipfile
 import numpy as np
 
 
-from imitationlab.data_tools.common.cli_args import hide_legacy_aliases
 from imitationlab.data_tools.reference_arrays.schema import FORMAT_VERSION, SIDECAR_NAME
 
 
@@ -997,16 +996,14 @@ def add_arguments(
         parser.add_argument("manifest", type=Path)
     else:
         parser.add_argument("--manifest", type=Path, required=True)
-    parser.add_argument("--output-dir", "--output_dir", type=Path, required=True)
+    parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument(
         "--persist-id",
-        "--persist_id",
         required=True,
         help="Stable source-content identity, normally including a manifest hash.",
     )
     parser.add_argument(
         "--traj-info",
-        "--traj_info",
         type=Path,
         default=None,
         help=(
@@ -1017,14 +1014,12 @@ def add_arguments(
     )
     parser.add_argument(
         "--npz-root",
-        "--npz_root",
         type=Path,
         default=None,
         help="Directory holding the NPZ files, overriding the manifest's paths.",
     )
     parser.add_argument(
         "--body-names",
-        "--body_names",
         nargs="+",
         default=None,
         help=(
@@ -1035,7 +1030,6 @@ def add_arguments(
     )
     parser.add_argument(
         "--anchor-body",
-        "--anchor_body",
         default=None,
         help=(
             "Body to extract anchor_pos_w/anchor_quat_w for. Required by the "
@@ -1044,7 +1038,6 @@ def add_arguments(
     )
     parser.add_argument(
         "--dataset-name",
-        "--dataset_name",
         default="lafan1",
         help="Dataset group label recorded in ordered_traj_list.",
     )
@@ -1059,31 +1052,24 @@ def add_arguments(
             "when the source tree is on NVMe."
         ),
     )
-    parser.add_argument(
-        "--expected-motions", "--expected_motions", type=int, default=None
-    )
-    parser.add_argument(
-        "--expected-transitions", "--expected_transitions", type=int, default=None
-    )
+    parser.add_argument("--expected-motions", type=int, default=None)
+    parser.add_argument("--expected-transitions", type=int, default=None)
     parser.add_argument(
         "--validate-only",
-        "--validate_only",
         action="store_true",
         help="Check the sidecar and array sizes without building.",
     )
     parser.add_argument(
         "--verify-load",
-        "--verify_load",
         action="store_true",
         help="Additionally compare built rows against the source NPZs.",
     )
-    parser.add_argument("--verify-samples", "--verify_samples", type=int, default=5)
+    parser.add_argument("--verify-samples", type=int, default=5)
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     add_arguments(parser)
-    hide_legacy_aliases(parser)
     return run(parser.parse_args(argv))
 
 

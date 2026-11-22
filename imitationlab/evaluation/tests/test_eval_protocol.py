@@ -92,12 +92,12 @@ def test_evaluate_checkpoint_adapter_emits_fall_only_contract() -> None:
         checkpoint="model.pt",
         output_json="summary.json",
     )
-    assert args[:4] == ["--checkpoint", "model.pt", "--output_json", "summary.json"]
+    assert args[:4] == ["--checkpoint", "model.pt", "--output-json", "summary.json"]
     assert "--randomization" in args
     assert "no_push" in args
     assert "env.terminations.foot_pos_xyz=null" in args
     assert "env.terminations.base_too_low=null" not in args
-    assert args[-1] != "--disable_early_terminations"
+    assert args[-1] != "--disable-early-terminations"
 
 
 def test_skill_commander_adapter_emits_gr00t_2000_step_contract() -> None:
@@ -107,10 +107,10 @@ def test_skill_commander_adapter_emits_gr00t_2000_step_contract() -> None:
         checkpoint="tracker.pt",
         output_dir="eval",
     )
-    assert args[args.index("--max_steps") + 1] == "2000"
-    assert args[args.index("--metric_interval") + 1] == "10"
-    assert "--fall_only_success" in args
-    assert "--disable_tracking_terminations" in args
+    assert args[args.index("--max-steps") + 1] == "2000"
+    assert args[args.index("--metric-interval") + 1] == "10"
+    assert "--fall-only-success" in args
+    assert "--disable-tracking-terminations" in args
 
 
 def test_unsupported_pairing_names_the_missing_field() -> None:

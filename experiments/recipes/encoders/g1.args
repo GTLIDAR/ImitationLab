@@ -5,31 +5,31 @@ env.expert_macro_frame_stride=1
 --headless
 --assert-kitless
 --seed 42
---z_dim 64
---horizon_steps 10
---encoder_window_mode intermediate
---source_anchor current
---source_history_steps 5
---transition_objective jepa_ntp
---jepa_ntp_head diff_chunk
---jepa_ntp_chunk_span boundary_next
---jepa_endpoint_coeff 0
---jepa_loss sigreg_ebm
---diffsr_phi_parameterization affine
---encoder_hidden_dims
+--z-dim 64
+--horizon-steps 10
+--encoder-window-mode intermediate
+--source-anchor current
+--source-history-steps 5
+--transition-objective jepa_ntp
+--jepa-ntp-head diff_chunk
+--jepa-ntp-chunk-span boundary_next
+--jepa-endpoint-coeff 0
+--jepa-loss sigreg_ebm
+--diffsr-phi-parameterization affine
+--encoder-hidden-dims
 2048
 1024
 512
 512
---encoder_activation silu
---encoder_layer_norm
---diffsr_feature_dim 256
---diffsr_embed_dim 1024
---diffsr_g_hidden_dims
+--encoder-activation silu
+--encoder-layer-norm
+--diffsr-feature-dim 256
+--diffsr-embed-dim 1024
+--diffsr-g-hidden-dims
 1024
 1024
 512
---diffsr_mu_hidden_dims
+--diffsr-mu-hidden-dims
 1024
 1024
 512

@@ -40,7 +40,6 @@ from pathlib import Path
 import numpy as np
 from filelock import FileLock
 
-from imitationlab.data_tools.common.cli_args import hide_legacy_aliases
 from imitationlab.data_tools.common.manifest_io import sanitize_motion_name, write_json
 from imitationlab.data_tools.common.isaac_process import run_isaac
 
@@ -91,29 +90,29 @@ def _run_batch_conversion(
     cmd = [
         python_exe,
         str(batch_converter_script),
-        "--jobs_json",
+        "--jobs-json",
         str(temp_jobs_path),
-        "--input_fps",
+        "--input-fps",
         str(input_fps),
-        "--output_fps",
+        "--output-fps",
         str(output_fps),
     ]
     if frame_range is not None:
-        cmd.extend(["--frame_range", str(frame_range[0]), str(frame_range[1])])
+        cmd.extend(["--frame-range", str(frame_range[0]), str(frame_range[1])])
     if device is not None:
         cmd.extend(["--device", device])
     if record_videos:
         cmd.extend(
             [
                 "--video",
-                "--video_width",
+                "--video-width",
                 str(video_width),
-                "--video_height",
+                "--video-height",
                 str(video_height),
             ]
         )
         if overwrite_videos:
-            cmd.append("--overwrite_video")
+            cmd.append("--overwrite-video")
 
     print(f"[INFO] Batch converting {len(jobs)} motion(s) in one Isaac Sim session.")
     print(f"[CMD]  {' '.join(shlex.quote(x) for x in cmd)}")
@@ -326,21 +325,18 @@ def main(argv: list[str] | None = None) -> None:
     )
     parser.add_argument(
         "--csv-dir",
-        "--csv_dir",
         type=str,
         required=True,
         help="Input folder containing CSV motion files.",
     )
     parser.add_argument(
         "--npz-dir",
-        "--npz_dir",
         type=str,
         required=True,
         help="Output folder for NPZ files.",
     )
     parser.add_argument(
         "--manifest-path",
-        "--manifest_path",
         type=str,
         required=True,
         help="Output manifest JSON path.",
@@ -353,7 +349,6 @@ def main(argv: list[str] | None = None) -> None:
     )
     parser.add_argument(
         "--batch-converter-script",
-        "--batch_converter_script",
         type=str,
         default=str(_resolve_default_batch_converter()),
         help="Path to batch_csv_to_npz.py used for one-shot batched conversion.",
@@ -366,21 +361,18 @@ def main(argv: list[str] | None = None) -> None:
     )
     parser.add_argument(
         "--input-fps",
-        "--input_fps",
         type=float,
         default=30.0,
         help="Input CSV FPS (30 for the G1 LAFAN1 release).",
     )
     parser.add_argument(
         "--output-fps",
-        "--output_fps",
         type=float,
         default=50.0,
         help="Output NPZ FPS passed to converter.",
     )
     parser.add_argument(
         "--frame-range",
-        "--frame_range",
         nargs=2,
         type=int,
         metavar=("START", "END"),
@@ -389,7 +381,6 @@ def main(argv: list[str] | None = None) -> None:
     )
     parser.add_argument(
         "--auto-trim-mode",
-        "--auto_trim_mode",
         type=str,
         choices=("none", "g1_shoulder_roll"),
         default="none",
@@ -401,14 +392,12 @@ def main(argv: list[str] | None = None) -> None:
     )
     parser.add_argument(
         "--auto-trim-search-frames",
-        "--auto_trim_search_frames",
         type=int,
         default=800,
         help="Maximum number of source CSV frames to inspect when auto trim is enabled.",
     )
     parser.add_argument(
         "--auto-trim-shoulder-roll-threshold",
-        "--auto_trim_shoulder_roll_threshold",
         type=float,
         default=1.0,
         help=(
@@ -418,7 +407,6 @@ def main(argv: list[str] | None = None) -> None:
     )
     parser.add_argument(
         "--auto-trim-hold-frames",
-        "--auto_trim_hold_frames",
         type=int,
         default=5,
         help=(
@@ -428,7 +416,6 @@ def main(argv: list[str] | None = None) -> None:
     )
     parser.add_argument(
         "--auto-trim-pre-roll",
-        "--auto_trim_pre_roll",
         type=int,
         default=5,
         help="Keep this many frames before the detected auto-trim start.",
@@ -453,28 +440,24 @@ def main(argv: list[str] | None = None) -> None:
     )
     parser.add_argument(
         "--skip-existing",
-        "--skip_existing",
         action="store_true",
         default=False,
         help="Skip conversion when target NPZ already exists.",
     )
     parser.add_argument(
         "--assume-npz-exists",
-        "--assume_npz_exists",
         action="store_true",
         default=False,
         help="Do not run converter; require NPZ files to already exist in npz_dir.",
     )
     parser.add_argument(
         "--dataset-name",
-        "--dataset_name",
         type=str,
         default="lafan1",
         help="Dataset name written to manifest.",
     )
     parser.add_argument(
         "--motion-name-prefix",
-        "--motion_name_prefix",
         type=str,
         default="",
         help="Optional prefix for generated motion names in manifest.",
@@ -487,40 +470,34 @@ def main(argv: list[str] | None = None) -> None:
     )
     parser.add_argument(
         "--record-videos",
-        "--record_videos",
         action="store_true",
         default=False,
         help="Record one MP4 per motion during the batched conversion session.",
     )
     parser.add_argument(
         "--video-dir",
-        "--video_dir",
         type=str,
         default=None,
         help="Output folder for recorded videos (defaults to a sibling 'videos' folder next to npz_dir).",
     )
     parser.add_argument(
         "--overwrite-videos",
-        "--overwrite_videos",
         action="store_true",
         default=False,
         help="Overwrite existing videos with the same output path.",
     )
     parser.add_argument(
         "--video-width",
-        "--video_width",
         type=int,
         default=640,
         help="Per-env video width in pixels when --record-videos is enabled.",
     )
     parser.add_argument(
         "--video-height",
-        "--video_height",
         type=int,
         default=480,
         help="Per-env video height in pixels when --record-videos is enabled.",
     )
-    hide_legacy_aliases(parser)
     args = parser.parse_args(argv)
     if args.batch_size < 0:
         parser.error("--batch-size must be nonnegative.")

@@ -20,7 +20,7 @@ def _source() -> str:
 
 def test_lowpass_flag_defaults_to_off() -> None:
     source = _source()
-    assert '"--action_lowpass_alpha"' in source
+    assert '"--action-lowpass-alpha"' in source
     assert "default=1.0" in source
     assert "if not 0.0 < action_lowpass_alpha <= 1.0:" in source
 

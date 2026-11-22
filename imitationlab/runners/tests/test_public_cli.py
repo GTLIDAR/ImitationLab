@@ -43,8 +43,8 @@ def test_legacy_checkpoint_recovers_architecture_and_evaluation_data(tmp_path, c
     model.parent.mkdir()
     torch.save({"policy_state_dict": {}}, model)
     (tmp_path / "command.txt").write_text(
-        "python scripts/tracking/train.py --task imitation-g1-v1 --algo WMBPTT --seed 17 "
-        "--max_iterations 1 agent.wm.dynamics_model=diffsr agent.wm.actor_hidden=[64,64,64] "
+        "python -m imitationlab.runners.train --task imitation-g1-v1 --algo WMBPTT --seed 17 "
+        "--max-iterations 1 agent.wm.dynamics_model=diffsr agent.wm.actor_hidden=[64,64,64] "
         "env.data.reference_arrays_dir=/old/bank agent.logger.log_dir=/old/run"
     )
     manifest = tmp_path / "eval motions.json"
@@ -68,7 +68,7 @@ def test_legacy_checkpoint_recovers_architecture_and_evaluation_data(tmp_path, c
     assert "agent.wm.actor_hidden=[64,64,64]" in args
     assert "agent.wm.dynamics_model=diffsr" in args
     assert not any("/old/" in arg for arg in args)
-    assert "--max_iterations" not in args
+    assert "--max-iterations" not in args
     assert f"env.data.manifest={json.dumps(str(manifest))}" in args
 
 
@@ -83,7 +83,7 @@ def test_resume_recovers_original_learner_and_respects_new_budget(tmp_path, caps
                     "--algo",
                     "WMBPTT",
                     "agent.wm.actor_source=real",
-                    "--max_iterations",
+                    "--max-iterations",
                     "1",
                 ]
             }
@@ -98,7 +98,7 @@ def test_resume_recovers_original_learner_and_respects_new_budget(tmp_path, caps
     )
     args = shlex.split(capsys.readouterr().out)
     assert "agent.wm.actor_source=real" in args
-    assert args[-2:] == ["--max_iterations", "10"]
+    assert args[-2:] == ["--max-iterations", "10"]
 
 
 def test_native_export_is_relocatable_and_preserves_weights(tmp_path):

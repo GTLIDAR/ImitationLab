@@ -25,7 +25,6 @@ from pathlib import Path
 
 import numpy as np
 
-from imitationlab.data_tools.common.cli_args import hide_legacy_aliases
 
 # World-frame position fields whose XY must shift with the anchor.
 _POS_FIELDS_XY = ("root_pos",)  # (T, 3)
@@ -77,9 +76,8 @@ def anchor_one(npz_path: Path, *, tol: float) -> dict[str, float]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--npz-dir", "--npz_dir", type=Path, required=True)
+    parser.add_argument("--npz-dir", type=Path, required=True)
     parser.add_argument("--tol", type=float, default=1e-5)
-    hide_legacy_aliases(parser)
     args = parser.parse_args()
 
     npz_dir = args.npz_dir.expanduser().resolve()

@@ -3034,7 +3034,7 @@ class ExpertDataPlane:
             if missing:
                 raise KeyError(
                     f"{store.directory} lacks macro fields {missing}. It was built "
-                    "without an anchor body; rebuild it with --anchor_body "
+                    "without an anchor body; rebuild it with --anchor-body "
                     f"{self._expert_anchor_body_name}."
                 )
         total = int(self.trajectory_manager.end.max().item())

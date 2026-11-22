@@ -33,11 +33,11 @@ def test_single_cell_argv_drops_isolation_and_keeps_evaluator_args():
         "eval_checkpoint_tree.py",
         "--tree",
         "t",
-        "--isolate_cells",
+        "--isolate-cells",
         "--arm",
         "a",
         "--",
-        "--num_envs",
+        "--num-envs",
         "4096",
     ]
     assert tree.single_cell_argv(argv, 250) == [
@@ -46,10 +46,10 @@ def test_single_cell_argv_drops_isolation_and_keeps_evaluator_args():
         "t",
         "--arm",
         "a",
-        "--only_frames",
+        "--only-frames",
         "250",
         "--",
-        "--num_envs",
+        "--num-envs",
         "4096",
     ]
 
@@ -57,7 +57,7 @@ def test_single_cell_argv_drops_isolation_and_keeps_evaluator_args():
 def test_single_cell_argv_refuses_a_preselected_cell():
     with pytest.raises(ValueError):
         tree.single_cell_argv(
-            ["x.py", "--only_frames", "1", "--isolate_cells", "--"], 2
+            ["x.py", "--only-frames", "1", "--isolate-cells", "--"], 2
         )
 
 
@@ -74,10 +74,10 @@ def test_run_isolated_fails_when_a_cell_writes_no_row(tmp_path, monkeypatch):
     calls = []
     monkeypatch.setattr(tree.subprocess, "call", lambda cmd: calls.append(cmd) or 0)
     assert (
-        tree.run_isolated(cells, ["x.py", "--isolate_cells", "--", "--seed", "0"]) == 1
+        tree.run_isolated(cells, ["x.py", "--isolate-cells", "--", "--seed", "0"]) == 1
     )
     # cell 2 wrote nothing, so it is retried once before counting as failed
-    assert [cmd[cmd.index("--only_frames") + 1] for cmd in calls] == ["1", "2", "2"]
+    assert [cmd[cmd.index("--only-frames") + 1] for cmd in calls] == ["1", "2", "2"]
     assert all(cmd[0] == sys.executable for cmd in calls)
 
 
@@ -98,7 +98,7 @@ def test_run_isolated_accepts_a_row_written_before_a_teardown_crash(
         return 139
 
     monkeypatch.setattr(tree.subprocess, "call", crash_after_writing)
-    assert tree.run_isolated(cells, ["x.py", "--isolate_cells", "--"]) == 0
+    assert tree.run_isolated(cells, ["x.py", "--isolate-cells", "--"]) == 0
 
 
 def test_run_isolated_retries_a_startup_crash(tmp_path, monkeypatch):
@@ -120,7 +120,7 @@ def test_run_isolated_retries_a_startup_crash(tmp_path, monkeypatch):
         return 139
 
     monkeypatch.setattr(tree.subprocess, "call", crash_then_succeed)
-    assert tree.run_isolated(cells, ["x.py", "--isolate_cells", "--"]) == 0
+    assert tree.run_isolated(cells, ["x.py", "--isolate-cells", "--"]) == 0
     assert len(attempts) == 2
 
 
@@ -164,12 +164,12 @@ def test_run_isolated_scores_a_fresh_summary_despite_a_nonzero_exit(
     os.utime(tmp_path / "o2.json", (0, 0))
 
     def fake_call(cmd):
-        if cmd[cmd.index("--only_frames") + 1] == "1":
+        if cmd[cmd.index("--only-frames") + 1] == "1":
             (tmp_path / "o1.json").write_text("{}")
         return 1
 
     monkeypatch.setattr(tree.subprocess, "call", fake_call)
-    assert tree.run_isolated(cells, ["x.py", "--isolate_cells", "--"]) == 1
+    assert tree.run_isolated(cells, ["x.py", "--isolate-cells", "--"]) == 1
     out = capsys.readouterr().out
     assert "cell f1 exited 1 after writing its summary; scored" in out
     assert "cell f2 failed (exit 1)" in out and "cell(s) failed: [2]" in out
@@ -201,12 +201,12 @@ def test_a_single_cell_keeps_the_hang_guard(monkeypatch, tmp_path):
             "x.py",
             "--tree",
             str(tmp_path),
-            "--output_root",
+            "--output-root",
             str(tmp_path / "out"),
             "--arm",
             "a",
-            "--isolate_cells",
-            "--hang_grace_seconds",
+            "--isolate-cells",
+            "--hang-grace-seconds",
             "60",
             "--",
             "--seed",
@@ -233,16 +233,16 @@ def test_a_child_keeps_its_cell_when_a_live_run_saves_a_newer_checkpoint(
             "x.py",
             "--tree",
             str(tmp_path),
-            "--output_root",
+            "--output-root",
             str(tmp_path / "out"),
             "--arm",
             "a",
-            "--min_frame_gap",
+            "--min-frame-gap",
             "100",
-            "--only_frames",
+            "--only-frames",
             "115",
-            "--isolate_cells",
-            "--hang_grace_seconds",
+            "--isolate-cells",
+            "--hang-grace-seconds",
             "60",
             "--",
             "--seed",
@@ -260,7 +260,7 @@ def test_group_child_argv_replaces_the_parents_frames() -> None:
         "x.py",
         "--tree",
         "t",
-        "--only_frames",
+        "--only-frames",
         "1",
         "2",
         "3",
@@ -276,8 +276,8 @@ def test_group_child_argv_replaces_the_parents_frames() -> None:
         "t",
         "--group",
         "2",
-        "--group_child",
-        "--only_frames",
+        "--group-child",
+        "--only-frames",
         "2",
         "3",
         "--",
@@ -288,7 +288,7 @@ def test_group_child_argv_replaces_the_parents_frames() -> None:
 
 def test_passthrough_ranks_reads_the_rank_list() -> None:
     assert tree.passthrough_ranks(
-        ["--a", "1", "--trajectory_ranks", "4", "5", "--b"]
+        ["--a", "1", "--trajectory-ranks", "4", "5", "--b"]
     ) == ["4", "5"]
     assert tree.passthrough_ranks(["--seed", "0"]) == []
 
@@ -298,7 +298,7 @@ def _grouped_argv(tmp_path, *extra):
         "x.py",
         "--tree",
         str(tmp_path),
-        "--output_root",
+        "--output-root",
         str(tmp_path / "replica{seed_suffix}"),
         "--arm",
         "a",
@@ -312,7 +312,7 @@ def _grouped_argv(tmp_path, *extra):
         "--",
         "--seed",
         "0",
-        "--trajectory_ranks",
+        "--trajectory-ranks",
         "0",
         "1",
         "2",
@@ -373,27 +373,27 @@ def test_a_group_child_runs_its_blocks_in_one_evaluator(monkeypatch, tmp_path) -
     monkeypatch.setattr(
         tree.sys,
         "argv",
-        _grouped_argv(tmp_path, "--group_child", "--only_frames", "10", "20"),
+        _grouped_argv(tmp_path, "--group-child", "--only-frames", "10", "20"),
     )
     assert tree.main() == 0
     args = seen["args"]
-    assert args[args.index("--num_envs") + 1] == "12"  # 3 clips x 4 blocks
+    assert args[args.index("--num-envs") + 1] == "12"  # 3 clips x 4 blocks
     assert "--grouped" in args
-    checkpoints = args[args.index("--checkpoints") + 1 : args.index("--output_jsons")]
+    checkpoints = args[args.index("--checkpoints") + 1 : args.index("--output-jsons")]
     assert checkpoints == ["c10.pt", "c10.pt", "c20.pt", "c20.pt"]
-    outputs = args[args.index("--output_jsons") + 1 :]
+    outputs = args[args.index("--output-jsons") + 1 :]
     assert outputs == [
         str(tmp_path / f"r{r}" / f"o{f}.json") for f in (10, 20) for r in range(2)
     ]
     indices = args[
-        args.index("--grouped_seed_indices") + 1 : args.index("--checkpoints")
+        args.index("--grouped-seed-indices") + 1 : args.index("--checkpoints")
     ]
     assert indices == ["0", "1", "0", "1"]
 
 
 @pytest.mark.parametrize(
     "extra",
-    [["--isolate_cells"], ["--", "--num_envs", "6"], ["--", "--checkpoints", "x"]],
+    [["--isolate-cells"], ["--", "--num-envs", "6"], ["--", "--checkpoints", "x"]],
 )
 def test_group_mode_refuses_conflicting_flags(monkeypatch, tmp_path, extra) -> None:
     argv = _grouped_argv(tmp_path)
@@ -429,8 +429,8 @@ def test_run_groups_retries_a_group_with_a_missing_row(monkeypatch, tmp_path) ->
     )
     assert len(calls) == 2
     assert (
-        calls[0][calls[0].index("--only_frames") + 1] == "1"
-        and "--group_child" in calls[0]
+        calls[0][calls[0].index("--only-frames") + 1] == "1"
+        and "--group-child" in calls[0]
     )
 
 
@@ -631,7 +631,7 @@ def test_a_rerun_child_passes_each_rows_seed_index(monkeypatch, tmp_path) -> Non
             "x.py",
             "--tree",
             str(run),
-            "--output_root",
+            "--output-root",
             str(tmp_path / "replica{seed_suffix}"),
             "--arm",
             "a",
@@ -641,14 +641,14 @@ def test_a_rerun_child_passes_each_rows_seed_index(monkeypatch, tmp_path) -> Non
             "2",
             "--repeats",
             "4",
-            "--group_child",
-            "--only_frames",
+            "--group-child",
+            "--only-frames",
             "100",
             "200",
             "--",
             "--seed",
             "0",
-            "--trajectory_ranks",
+            "--trajectory-ranks",
             "0",
             "1",
             "2",
@@ -657,9 +657,9 @@ def test_a_rerun_child_passes_each_rows_seed_index(monkeypatch, tmp_path) -> Non
     assert tree.main() == 0
     args = seen["args"]
     indices = args[
-        args.index("--grouped_seed_indices") + 1 : args.index("--checkpoints")
+        args.index("--grouped-seed-indices") + 1 : args.index("--checkpoints")
     ]
-    outputs = args[args.index("--output_jsons") + 1 :]
+    outputs = args[args.index("--output-jsons") + 1 :]
     assert [Path(p).parent.name for p in outputs] == [
         "replica_s2",
         "replica_s3",
@@ -669,4 +669,4 @@ def test_a_rerun_child_passes_each_rows_seed_index(monkeypatch, tmp_path) -> Non
         "replica_s3",
     ]
     assert indices == ["2", "3", "0", "1", "2", "3"]
-    assert args[args.index("--num_envs") + 1] == "18"  # 3 clips x 6 blocks
+    assert args[args.index("--num-envs") + 1] == "18"  # 3 clips x 6 blocks

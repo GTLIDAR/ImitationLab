@@ -42,7 +42,6 @@ from collections.abc import Iterable, Mapping
 from pathlib import Path
 from typing import Any
 
-from imitationlab.cli_args import add_kebab_aliases
 from imitationlab.evaluation.validation.collect_equivalence import (
     _hash,
     _install_deterministic_kernels,
@@ -279,14 +278,14 @@ def main(argv: list[str] | None = None) -> int:
     )
     run.add_argument("--out", required=True)
     run.add_argument("--task", default="imitation-g1-v1")
-    run.add_argument("--num_envs", type=int, default=256)
+    run.add_argument("--num-envs", type=int, default=256)
     run.add_argument("--steps", type=int, default=200)
     run.add_argument("--physics", default="", help="record:PATH or replay:PATH")
     cmp = sub.add_parser("compare", help="compare two run records")
     cmp.add_argument("a")
     cmp.add_argument("b")
     cmp.add_argument("--require", action="append", default=[])
-    args = add_kebab_aliases(parser).parse_args(argv)
+    args = parser.parse_args(argv)
     if args.command == "run":
         _run(args, overrides)
         return 0

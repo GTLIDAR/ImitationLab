@@ -12,19 +12,18 @@
 import argparse
 
 from isaaclab.app import AppLauncher
-from imitationlab.cli_args import add_kebab_aliases
 from imitationlab.runners.launch_compat import add_launcher_args
 
 # add argparse arguments
 parser = argparse.ArgumentParser(description="Zero agent for Isaac Lab environments.")
 parser.add_argument(
-    "--disable_fabric",
+    "--disable-fabric",
     action="store_true",
     default=False,
     help="Disable fabric and use USD I/O operations.",
 )
 parser.add_argument(
-    "--num_envs", type=int, default=None, help="Number of environments to simulate."
+    "--num-envs", type=int, default=None, help="Number of environments to simulate."
 )
 parser.add_argument("--task", type=str, default=None, help="Name of the task.")
 parser.add_argument(
@@ -40,14 +39,13 @@ parser.add_argument(
     help="Motion manifest (``env.data.manifest``) for the G1 tracking tasks; they need one.",
 )
 parser.add_argument(
-    "--max_steps",
+    "--max-steps",
     type=int,
     default=None,
     help="Stop after this many steps. By default the agent runs until the app closes.",
 )
 # append AppLauncher cli args
 add_launcher_args(parser)
-add_kebab_aliases(parser)
 # parse the arguments
 args_cli = parser.parse_args()
 

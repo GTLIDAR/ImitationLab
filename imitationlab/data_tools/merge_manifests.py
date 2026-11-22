@@ -27,7 +27,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from imitationlab.data_tools.common.cli_args import hide_legacy_aliases
 from imitationlab.data_tools.common.manifest_io import (
     motion_manifest_schema,
     sanitize_motion_name,
@@ -414,66 +413,41 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Merge G1 clip manifests and their language sidecars."
     )
-    parser.add_argument(
-        "--lafan1-manifest", "--lafan1_manifest", default=str(DEFAULT_LAFAN1_MANIFEST)
-    )
-    parser.add_argument(
-        "--lafan1-language", "--lafan1_language", default=str(DEFAULT_LAFAN1_LANGUAGE)
-    )
+    parser.add_argument("--lafan1-manifest", default=str(DEFAULT_LAFAN1_MANIFEST))
+    parser.add_argument("--lafan1-language", default=str(DEFAULT_LAFAN1_LANGUAGE))
     parser.add_argument(
         "--dance102-manifest",
-        "--dance102_manifest",
         default=None,
         help="Manifest of a Unitree Dance102 clip to include. The clip is not "
         "distributed with the repository; without this option it is left out.",
     )
-    parser.add_argument(
-        "--bones-manifest", "--bones_manifest", default=str(DEFAULT_BONES_MANIFEST)
-    )
-    parser.add_argument(
-        "--bones-language", "--bones_language", default=str(DEFAULT_BONES_LANGUAGE)
-    )
-    parser.add_argument(
-        "--output-manifest", "--output_manifest", default=str(DEFAULT_OUTPUT_MANIFEST)
-    )
-    parser.add_argument(
-        "--output-language", "--output_language", default=str(DEFAULT_OUTPUT_LANGUAGE)
-    )
+    parser.add_argument("--bones-manifest", default=str(DEFAULT_BONES_MANIFEST))
+    parser.add_argument("--bones-language", default=str(DEFAULT_BONES_LANGUAGE))
+    parser.add_argument("--output-manifest", default=str(DEFAULT_OUTPUT_MANIFEST))
+    parser.add_argument("--output-language", default=str(DEFAULT_OUTPUT_LANGUAGE))
     parser.add_argument(
         "--dataset-name",
-        "--dataset_name",
         default="g1_lafan1_bones_seed",
         help="Dataset name stored in the merged manifest.",
     )
-    parser.add_argument("--lafan1-prefix", "--lafan1_prefix", default="lafan1__")
-    parser.add_argument(
-        "--dance102-prefix", "--dance102_prefix", default="unitree_dance102__"
-    )
-    parser.add_argument("--bones-prefix", "--bones_prefix", default="bones_seed__")
+    parser.add_argument("--lafan1-prefix", default="lafan1__")
+    parser.add_argument("--dance102-prefix", default="unitree_dance102__")
+    parser.add_argument("--bones-prefix", default="bones_seed__")
     parser.add_argument(
         "--no-prefix-names",
-        "--no_prefix_names",
         action="store_true",
         default=False,
         help="Keep original motion names instead of prefixing by source.",
     )
-    parser.add_argument(
-        "--exclude-lafan1", "--exclude_lafan1", action="store_true", default=False
-    )
-    parser.add_argument(
-        "--exclude-dance102", "--exclude_dance102", action="store_true", default=False
-    )
-    parser.add_argument(
-        "--exclude-bones", "--exclude_bones", action="store_true", default=False
-    )
+    parser.add_argument("--exclude-lafan1", action="store_true", default=False)
+    parser.add_argument("--exclude-dance102", action="store_true", default=False)
+    parser.add_argument("--exclude-bones", action="store_true", default=False)
     parser.add_argument(
         "--allow-missing-motion-files",
-        "--allow_missing_motion_files",
         action="store_true",
         default=False,
         help="Write the manifest even if a referenced NPZ is missing.",
     )
-    hide_legacy_aliases(parser)
     return parser
 
 

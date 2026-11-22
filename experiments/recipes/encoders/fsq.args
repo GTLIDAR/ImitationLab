@@ -1,2 +1,2 @@
---args_file g1.args
---latent_mode sonic_fsq
+--args-file g1.args
+--latent-mode sonic_fsq

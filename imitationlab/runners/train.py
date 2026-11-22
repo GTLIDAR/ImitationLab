@@ -8,7 +8,6 @@ import os
 import sys
 from pathlib import Path
 
-from imitationlab.cli_args import add_kebab_aliases, canonical_argv
 from imitationlab.runners.provenance.config_keys import assert_no_unknown_config_keys
 from imitationlab.runners.registry import resolve_agent_cfg_entry_point
 from imitationlab.runners.runtime_bootstrap import (
@@ -39,28 +38,28 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Record videos during training.",
     )
     parser.add_argument(
-        "--video_length",
+        "--video-length",
         type=int,
         default=200,
         help="Video length in environment steps.",
     )
     parser.add_argument(
-        "--video_interval",
+        "--video-interval",
         type=int,
         default=2000,
         help="Steps between video recordings.",
     )
     parser.add_argument(
-        "--video_width", type=int, default=None, help="Optional render width override."
+        "--video-width", type=int, default=None, help="Optional render width override."
     )
     parser.add_argument(
-        "--video_height",
+        "--video-height",
         type=int,
         default=None,
         help="Optional render height override.",
     )
     parser.add_argument(
-        "--num_envs", type=int, default=None, help="Number of simulated environments."
+        "--num-envs", type=int, default=None, help="Number of simulated environments."
     )
     parser.add_argument(
         "--task", type=str, default=None, help="Registered Isaac Lab task name."
@@ -75,7 +74,7 @@ def _build_parser() -> argparse.ArgumentParser:
         "--seed", type=int, default=None, help="Environment and agent seed."
     )
     parser.add_argument(
-        "--log_interval",
+        "--log-interval",
         type=int,
         default=None,
         help="Metric cadence in environment steps.",
@@ -84,10 +83,10 @@ def _build_parser() -> argparse.ArgumentParser:
         "--checkpoint", type=str, default=None, help="Checkpoint to resume."
     )
     parser.add_argument(
-        "--max_iterations", type=int, default=None, help="Training rollout iterations."
+        "--max-iterations", type=int, default=None, help="Training rollout iterations."
     )
     parser.add_argument(
-        "--max_train_seconds",
+        "--max-train-seconds",
         type=float,
         default=None,
         help=(
@@ -100,7 +99,7 @@ def _build_parser() -> argparse.ArgumentParser:
         ),
     )
     parser.add_argument(
-        "--profile_iterations",
+        "--profile-iterations",
         action="store_true",
         default=False,
         help=(
@@ -108,7 +107,7 @@ def _build_parser() -> argparse.ArgumentParser:
             "training iteration."
         ),
     )
-    parser.add_argument("--export_io_descriptors", action="store_true", default=False)
+    parser.add_argument("--export-io-descriptors", action="store_true", default=False)
     parser.add_argument(
         "--algo",
         "--algorithm",
@@ -127,7 +126,7 @@ def _build_parser() -> argparse.ArgumentParser:
     if "--distributed" not in parser._option_string_actions:
         parser.add_argument("--distributed", action="store_true")
     parser.add_argument(
-        "--distributed_backend",
+        "--distributed-backend",
         choices=("nccl", "gloo"),
         default="nccl",
         help=(
@@ -136,24 +135,23 @@ def _build_parser() -> argparse.ArgumentParser:
         ),
     )
     parser.add_argument(
-        "--require_distributed_smoke",
+        "--require-distributed-smoke",
         help="Require completed multi-worker smoke health records before startup.",
     )
     parser.add_argument(
-        "--max_training_seconds",
+        "--max-training-seconds",
         type=float,
         default=None,
         help="Distributed qualification wall-clock cap, checked between iterations.",
     )
-    # setup_preset_cli chooses the help formatter, so both spellings are listed.
-    return add_kebab_aliases(parser, hide_snake_case=False)
+    return parser
 
 
 def _parse_args(argv: list[str]) -> argparse.Namespace:
     from isaaclab_tasks.utils import setup_preset_cli
 
     parser = _build_parser()
-    args_cli, hydra_args = setup_preset_cli(parser, canonical_argv(argv, parser))
+    args_cli, hydra_args = setup_preset_cli(parser, argv)
     sys.argv = [sys.argv[0]] + hydra_args
     return args_cli
 
@@ -180,7 +178,7 @@ def run(argv: list[str] | None = None, *, require_running_kit: bool = False) -> 
     """Resolve configuration, own the simulation context, and run training."""
     if argv is None:
         argv = sys.argv[1:]
-    # --args_file PATH: a file of tokens, expanded in place (imitationlab/runners/args_file.py).
+    # --args-file PATH: a file of tokens, expanded in place (imitationlab/runners/args_file.py).
     from imitationlab.runners.args_file import expand_args_files
 
     argv = expand_args_files(argv)
@@ -235,7 +233,7 @@ def run(argv: list[str] | None = None, *, require_running_kit: bool = False) -> 
         )
     if os.environ.get("ISAACLAB_SPLIT_RUNTIME") == "1" and needs_kit and not has_kit():
         raise RuntimeError(
-            "The split runtime requires PhysX to start through scripts/tracking/train_physx.py "
+            "The split runtime requires PhysX to start through imitationlab.runners.train_physx "
             "with /isaac-sim/python.sh."
         )
 

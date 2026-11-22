@@ -54,7 +54,6 @@ _append_workspace_sources()
 
 from isaaclab.app import AppLauncher
 from imitationlab.runners.launch_compat import add_launcher_args
-from imitationlab.data_tools.common.cli_args import hide_legacy_aliases
 
 
 parser = argparse.ArgumentParser(
@@ -64,7 +63,6 @@ parser = argparse.ArgumentParser(
 )
 parser.add_argument(
     "--jobs-json",
-    "--jobs_json",
     type=str,
     required=True,
     help=(
@@ -76,14 +74,12 @@ parser.add_argument(
 )
 parser.add_argument(
     "--input-fps",
-    "--input_fps",
     type=float,
     default=60.0,
     help="The fps of the input motions.",
 )
 parser.add_argument(
     "--frame-range",
-    "--frame_range",
     nargs=2,
     type=int,
     metavar=("START", "END"),
@@ -94,7 +90,6 @@ parser.add_argument(
 )
 parser.add_argument(
     "--output-fps",
-    "--output_fps",
     type=float,
     default=50.0,
     help="The fps of the output motions.",
@@ -107,27 +102,23 @@ parser.add_argument(
 )
 parser.add_argument(
     "--overwrite-video",
-    "--overwrite_video",
     action="store_true",
     default=False,
     help="Overwrite existing MP4 outputs declared in the jobs JSON.",
 )
 parser.add_argument(
     "--video-width",
-    "--video_width",
     type=int,
     default=640,
     help="Per-env video width in pixels.",
 )
 parser.add_argument(
     "--video-height",
-    "--video_height",
     type=int,
     default=480,
     help="Per-env video height in pixels.",
 )
 add_launcher_args(parser)
-hide_legacy_aliases(parser)
 args_cli = parser.parse_args()
 if args_cli.video:
     args_cli.enable_cameras = True

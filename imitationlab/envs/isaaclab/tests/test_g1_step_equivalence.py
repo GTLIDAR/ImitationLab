@@ -124,7 +124,7 @@ def _run_arm(
         str(out),
         "--steps",
         str(STEPS),
-        "--num_envs",
+        "--num-envs",
         str(NUM_ENVS),
         "--physics",
         physics,

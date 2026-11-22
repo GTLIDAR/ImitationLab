@@ -1,6 +1,6 @@
 """Bitwise equivalence of rollout collection with and without the fast paths.
 
-``run`` builds the env and agent exactly as ``scripts/tracking/train.py`` does
+``run`` builds the env and agent exactly as ``imitationlab.runners.train`` does
 (same argv, same checkpoint resume), then collects ``--iters`` batches with the
 agent's own collector instead of training, and writes one SHA-256 prefix per
 rollout leaf per env step (observations, actions, rewards, done flags, policy

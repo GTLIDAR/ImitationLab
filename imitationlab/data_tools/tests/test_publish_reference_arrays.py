@@ -373,5 +373,5 @@ def test_cli_reports_a_refused_public_push(
     assert main([*argv, "--persist-id", PERSIST_ID, "--public"]) == 1
     assert "BONES-SEED" in capsys.readouterr().err
     # Legacy snake-case spellings remain accepted.
-    legacy = ["push", "--source_dir", str(source), "--repo_id", "org/bank"]
-    assert main([*legacy, "--persist_id", PERSIST_ID, "--dry_run"]) == 0
+    legacy = ["push", "--source-dir", str(source), "--repo-id", "org/bank"]
+    assert main([*legacy, "--persist-id", PERSIST_ID, "--dry-run"]) == 0

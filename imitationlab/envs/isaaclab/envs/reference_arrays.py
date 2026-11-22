@@ -127,13 +127,13 @@ class ReferenceArrayStore:
                     f"{directory} was built with anchor body {stored_anchor!r} "
                     f"and retains bodies {stored_bodies}, so it cannot serve an "
                     f"environment anchored on {anchor_body!r}. Rebuild with "
-                    f"--anchor_body {anchor_body}, or add it to --body_names."
+                    f"--anchor-body {anchor_body}, or add it to --body-names."
                 )
             logger.warning(
                 "%s bakes anchor %r but this environment anchors on %r; deriving "
                 "the anchor pose from the retained body arrays instead. That is "
                 "correct but reads the full body block once, so prefer a "
-                "directory built with --anchor_body %s for repeated runs.",
+                "directory built with --anchor-body %s for repeated runs.",
                 directory,
                 stored_anchor,
                 anchor_body,

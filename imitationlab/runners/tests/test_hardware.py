@@ -136,7 +136,7 @@ def test_all_combinations_only_change_execution_sizes(policy, interface, bank):
                 "env.library_",
                 "agent.wm.imagine_batch=",
                 "agent.wm.wm_batch_size=",
-                "--num_envs",
+                "--num-envs",
             )
         )
         or value.isdigit()
@@ -150,9 +150,9 @@ def test_no_cuda_is_actionable_and_off_needs_no_gpu():
     off = choose_plan(cpu, LAFAN, profile="off")
     assert not off.errors and not off.overrides
     assert choose_plan(pc(), LAFAN, stage="pretrain").overrides == [
-        "--num_envs",
+        "--num-envs",
         "4",
-        "--batch_size",
+        "--batch-size",
         "128",
     ]
     assert (
@@ -191,12 +191,12 @@ def test_auto_is_default_and_caller_args_file_wins(tmp_path, capsys, monkeypatch
     bank = bank_at(tmp_path)
     user_args = tmp_path / "user.args"
     user_args.write_text(
-        "--num_envs 32\nagent.wm.imagine_batch=16\nenv.library_host_mapped=true\n"
+        "--num-envs 32\nagent.wm.imagine_batch=16\nenv.library_host_mapped=true\n"
     )
     main(["train", "--data", str(bank), "--args-file", str(user_args), "--dry-run"])
     argv = expand_args_files(shlex.split(capsys.readouterr().out), environ={})
     values = dict(x.split("=", 1) for x in argv if "=" in x)
-    assert flag_value(argv, "--num_envs") == "32"
+    assert flag_value(argv, "--num-envs") == "32"
     assert values["agent.wm.imagine_batch"] == "16"
     assert values["env.library_host_mapped"] == "true"
     assert "agent.wm.wm_batch_size=2048" in argv
@@ -212,11 +212,11 @@ def test_resume_and_off_skip_hardware_detection(tmp_path, capsys, monkeypatch):
     capsys.readouterr()
     ckpt = tmp_path / "model.pt"
     torch.save(
-        {"imitationlab": {"argv": ["--task", "imitation-g1-v1", "--num_envs", "77"]}},
+        {"imitationlab": {"argv": ["--task", "imitation-g1-v1", "--num-envs", "77"]}},
         ckpt,
     )
     main(["train", "--checkpoint", str(ckpt), "--dry-run"])
-    assert flag_value(shlex.split(capsys.readouterr().out), "--num_envs") == "77"
+    assert flag_value(shlex.split(capsys.readouterr().out), "--num-envs") == "77"
     with pytest.raises(SystemExit):
         main(["train", "--checkpoint", str(ckpt), "--hardware", "small", "--dry-run"])
 
@@ -230,7 +230,7 @@ def test_pretraining_override_precedence(tmp_path, capsys, monkeypatch):
             "pretrain",
             "--interface",
             "fsq",
-            "--batch_size",
+            "--batch-size",
             "16",
             "--num-envs",
             "2",
@@ -238,8 +238,8 @@ def test_pretraining_override_precedence(tmp_path, capsys, monkeypatch):
         ]
     )
     argv = expand_args_files(shlex.split(capsys.readouterr().out), environ={})
-    assert flag_value(argv, "--batch_size") == "16"
-    assert flag_value(argv, "--num_envs") == "2"
+    assert flag_value(argv, "--batch-size") == "16"
+    assert flag_value(argv, "--num-envs") == "2"
 
 
 def test_calibration_excludes_warmup_and_requires_two_complete_updates(tmp_path):
@@ -331,7 +331,7 @@ def test_tune_records_failures_and_only_selects_verified_runs(tmp_path, monkeypa
 
     def trial(command, env, log, timeout):
         assert "--max-train-seconds" not in command
-        assert "--max_train_seconds" not in command
+        assert "--max-train-seconds" not in command
         assert "agent.wm.wm_warmup_iters=0" in command
         assert "agent.save_interval=1000000000000" in command
         profile = flag_value(command, "--hardware")

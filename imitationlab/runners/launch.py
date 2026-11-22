@@ -8,7 +8,6 @@ import shlex
 import sys
 from pathlib import Path
 
-from imitationlab.cli_args import TRAIN_MODULES, canonical_argv, snake_case_options
 from imitationlab.paths import recipes_root
 from imitationlab.runners.artifacts import (
     MissingRunConfiguration,
@@ -44,7 +43,7 @@ TRAINING_CONFIGS = recipes_root() / "g1"
 
 
 def uses_packed_motions(overrides: list[str]) -> bool:
-    if any(arg == "--args_file" or arg.startswith("--args_file=") for arg in overrides):
+    if any(arg == "--args-file" or arg.startswith("--args-file=") for arg in overrides):
         from imitationlab.runners.args_file import expand_args_files
 
         overrides = expand_args_files(overrides, environ={})
@@ -142,8 +141,6 @@ def main(argv: list[str] | None = None) -> None:
         "--checkpoint", type=Path, help="Resume using the saved run settings."
     )
     args, overrides = parser.parse_known_args(argv)
-    # The trainer declares its options in snake case; accept kebab case too.
-    overrides = canonical_argv(overrides, snake_case_options(*TRAIN_MODULES))
     with reported_by(parser):
         _launch(parser, args, overrides)
 
@@ -248,7 +245,7 @@ def _launch(parser: argparse.ArgumentParser, args, overrides: list[str]) -> None
             "env.library_env_window=64",
         ]
     if args.interface == "explicit" and uses_packed_motions(overrides):
-        defaults = ["--args_file", str(TRAINING_CONFIGS / "packed.args")]
+        defaults = ["--args-file", str(TRAINING_CONFIGS / "packed.args")]
     if args.task == DEFAULT_TASK or (
         args.interface == "explicit" and uses_packed_motions(overrides)
     ):
@@ -256,11 +253,11 @@ def _launch(parser: argparse.ArgumentParser, args, overrides: list[str]) -> None
         # In particular, latent learners must not fall back to 500 world-model
         # warmup iterations and consume a short run without updating the actor.
         if algorithm == "WMBPTT":
-            defaults += ["--args_file", str(TRAINING_CONFIGS / "world_model.args")]
+            defaults += ["--args-file", str(TRAINING_CONFIGS / "world_model.args")]
         if args.policy == "supermimic":
-            defaults += ["--args_file", str(TRAINING_CONFIGS / "supermimic.args")]
+            defaults += ["--args-file", str(TRAINING_CONFIGS / "supermimic.args")]
     if args.checkpoint is None and args.task == DEFAULT_TASK and args.policy == "ppo":
-        defaults += ["--args_file", str(TRAINING_CONFIGS / "ppo.args")]
+        defaults += ["--args-file", str(TRAINING_CONFIGS / "ppo.args")]
     hardware_args = []
     hardware_plan = None
     if args.hardware != "off" or args.tuning:

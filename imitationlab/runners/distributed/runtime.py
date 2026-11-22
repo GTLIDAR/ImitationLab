@@ -63,7 +63,7 @@ def configure_runtime(args, env_cfg, agent_cfg):
     if smoke:
         require_smoke_success(smoke, world)
     if args.max_training_seconds is not None and args.max_training_seconds <= 0:
-        raise ValueError("--max_training_seconds must be positive")
+        raise ValueError("--max-training-seconds must be positive")
     if args.video:
         raise ValueError("Distributed qualification does not support training video")
     if args.seed == -1:
@@ -78,7 +78,7 @@ def configure_runtime(args, env_cfg, agent_cfg):
     rank = int(os.environ["LOCAL_RANK"])
     backend = str(getattr(args, "distributed_backend", None) or "nccl")
     if backend not in ("nccl", "gloo"):
-        raise ValueError(f"--distributed_backend must be nccl or gloo, got {backend!r}")
+        raise ValueError(f"--distributed-backend must be nccl or gloo, got {backend!r}")
     isolate_worker_temporary_directory(rank)
     print(
         f"[DISTRIBUTED] before CUDA init: rank={rank} backend={backend} "

@@ -361,7 +361,7 @@ def test_benchmark_can_hold_board_fixed_when_policy_seed_changes(
             )
         else:
             assert seed == selected_seed
-            ranks = command[command.index("--trajectory_ranks") + 1 :]
+            ranks = command[command.index("--trajectory-ranks") + 1 :]
             assert list(map(int, ranks)) == board["ranks"]
             raw = evaluation(board)
             raw["metadata"]["seed"] = seed

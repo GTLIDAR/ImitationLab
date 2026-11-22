@@ -3,7 +3,7 @@
 A board JSON keeps one number per episode. Global (world-frame) tracking needs
 the error as a function of time and the root paths themselves, for our tracker
 and for SONIC under one definition, so both evaluators can write this trace
-beside their JSON (``--root_trace``).
+beside their JSON (``--root-trace``).
 
 Definitions, identical to the evaluators' per-environment metrics:
 

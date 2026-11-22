@@ -39,6 +39,15 @@ Notable changes to ImitationLab are recorded in this file. The format follows
   loaded from the package directory (only the example ships there), the
   `legacy`/`f_matrix` and `fz`/`z_fz` option spellings, alternate command
   component names such as `qpos_qvel`, and `--emulate_joint_order_from`.
+- snake_case option spellings. Every option is kebab-case only, for example
+  `--num-envs` and `--max-train-seconds`; update recipes, job scripts and
+  argument files. A run recorded with snake_case options cannot be resumed
+  from its record.
+- The `scripts/tracking/` launchers. Start training and evaluation by module
+  name (`python -m imitationlab.runners.train`); a cluster stage's
+  `executable` is a module name. The PhysX bootstrap is
+  `imitationlab.runners.train_physx` and the CU130 evaluator bridge is
+  `imitationlab.runners.evaluate_cu130`.
 
 ### Fixed
 

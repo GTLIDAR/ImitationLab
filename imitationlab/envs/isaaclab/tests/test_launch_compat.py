@@ -58,7 +58,7 @@ def _parser() -> argparse.ArgumentParser:
 def test_legacy_launcher_flags_are_accepted_and_hidden():
     parser = _parser()
     args, rest = parser.parse_known_args(
-        ["--headless", "--enable_cameras", "--device", "cpu", "env.scene.num_envs=16"]
+        ["--headless", "--enable-cameras", "--device", "cpu", "env.scene.num_envs=16"]
     )
     assert args.headless is True
     assert args.enable_cameras is True
@@ -71,7 +71,7 @@ def test_legacy_launcher_flags_are_accepted_and_hidden():
 
     help_text = parser.format_help()
     assert "--headless" not in help_text
-    assert "--enable_cameras" not in help_text
+    assert "--enable-cameras" not in help_text
     assert "--visualizer" in help_text
 
 
@@ -579,7 +579,7 @@ def test_real_launcher_args_run_under_the_strict_kitless_guard():
         launch_compat.add_launcher_args(parser)
         args, remaining = setup_preset_cli(
             parser,
-            ["--headless", "--enable_cameras", "--viz", "newton_gl",
+            ["--headless", "--enable-cameras", "--viz", "newton_gl",
              "physics=newton_mjwarp", "env.scene.num_envs=16"],
         )
         assert args.headless is True and args.enable_cameras is True

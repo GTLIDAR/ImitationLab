@@ -29,8 +29,6 @@ import shlex
 import sys
 from pathlib import Path
 
-from imitationlab.data_tools.common.cli_args import hide_legacy_aliases
-
 
 DATASET_REPO_ID = "lvhaidong/LAFAN1_Retargeting_Dataset"
 DATASET_REPO_URL = f"https://huggingface.co/datasets/{DATASET_REPO_ID}"
@@ -178,14 +176,12 @@ def add_arguments(
 ) -> None:
     parser.add_argument(
         "--data-root",
-        "--data_root",
         type=str,
         default=str(_default_data_root()),
         help="Root folder for raw CSV files, converted NPZ files, and manifest output.",
     )
     parser.add_argument(
         "--robot-type",
-        "--robot_type",
         type=str,
         choices=ROBOT_CHOICES,
         default="g1",
@@ -225,7 +221,6 @@ def add_arguments(
     )
     parser.add_argument(
         "--batch-converter-script",
-        "--batch_converter_script",
         type=str,
         default=None,
         help="Optional path to the batched CSV-to-NPZ converter script.",
@@ -238,35 +233,30 @@ def add_arguments(
     )
     parser.add_argument(
         "--dataset-name",
-        "--dataset_name",
         type=str,
         default="lafan1",
         help="Dataset name written into the generated manifest when --prepare-npz is used.",
     )
     parser.add_argument(
         "--motion-name-prefix",
-        "--motion_name_prefix",
         type=str,
         default="",
         help="Optional prefix for generated motion names in the manifest.",
     )
     parser.add_argument(
         "--input-fps",
-        "--input_fps",
         type=float,
         default=30.0,
         help="Input CSV FPS for the retargeted Hugging Face dataset during conversion.",
     )
     parser.add_argument(
         "--output-fps",
-        "--output_fps",
         type=float,
         default=50.0,
         help="Output NPZ FPS for the conversion step.",
     )
     parser.add_argument(
         "--frame-range",
-        "--frame_range",
         nargs=2,
         type=int,
         metavar=("START", "END"),
@@ -275,7 +265,6 @@ def add_arguments(
     )
     parser.add_argument(
         "--auto-trim-mode",
-        "--auto_trim_mode",
         type=str,
         choices=("none", "g1_shoulder_roll"),
         default="none",
@@ -286,28 +275,24 @@ def add_arguments(
     )
     parser.add_argument(
         "--auto-trim-search-frames",
-        "--auto_trim_search_frames",
         type=int,
         default=800,
         help="Maximum number of CSV frames inspected by the auto-trim heuristic.",
     )
     parser.add_argument(
         "--auto-trim-shoulder-roll-threshold",
-        "--auto_trim_shoulder_roll_threshold",
         type=float,
         default=1.0,
         help="Absolute shoulder-roll threshold for --auto-trim-mode g1_shoulder_roll.",
     )
     parser.add_argument(
         "--auto-trim-hold-frames",
-        "--auto_trim_hold_frames",
         type=int,
         default=5,
         help="Require the auto-trim condition to hold for this many frames.",
     )
     parser.add_argument(
         "--auto-trim-pre-roll",
-        "--auto_trim_pre_roll",
         type=int,
         default=5,
         help="Keep this many frames before the detected auto-trim start.",
@@ -353,7 +338,6 @@ def add_arguments(
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     add_arguments(parser)
-    hide_legacy_aliases(parser)
     run(parser.parse_args(argv))
 
 

@@ -551,7 +551,7 @@ def test_pinned_reset_uses_the_selection_instead_of_the_sampler():
 def test_pinned_reset_refuses_to_fall_back_to_the_sampler():
     env = _pinned_env(None)
 
-    with pytest.raises(ValueError, match="trajectory_ranks"):
+    with pytest.raises(ValueError, match="trajectory-ranks"):
         G1RLEnv._g1_episode_starts(env, torch.tensor([0]))
 
 

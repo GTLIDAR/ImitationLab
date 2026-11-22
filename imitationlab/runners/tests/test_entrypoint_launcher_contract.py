@@ -213,7 +213,6 @@ def _isaaclab_torch_version() -> str:
     "relative",
     [
         "imitationlab/runners/runtime_bootstrap.py",
-        "scripts/tracking/kit_bootstrap/sitecustomize.py",
     ],
 )
 def test_cu130_bridge_checks_the_locked_torch_version(relative: str) -> None:

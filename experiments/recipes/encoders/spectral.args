@@ -1,2 +1,2 @@
---args_file g1.args
---latent_mode deterministic
+--args-file g1.args
+--latent-mode deterministic

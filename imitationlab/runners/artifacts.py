@@ -117,10 +117,7 @@ def checkpoint_run_spec(checkpoint: str | Path) -> dict:
         if command.is_file():
             tokens = shlex.split(command.read_text())
             for index, token in enumerate(tokens):
-                if (
-                    token.endswith("/tracking/train.py")
-                    or token == "imitationlab.runners.train"
-                ):
+                if token == "imitationlab.runners.train":
                     environment = {}
                     argv = expand_args_files(tokens[index + 1 :], environ=environment)
                     resolved_seed = None
