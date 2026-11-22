@@ -12,8 +12,8 @@ gym.register(
     disable_env_checker=True,
     kwargs={
         "env_cfg_entry_point": f"{__name__}.imitation_g1_env:ImitationG1EnvCfg",
-        "rlopt_cfg_entry_point": f"{agents.__name__}.rlopt_ppo_cfg:G1RLOptPPOConfig",
-        "rlopt_ppo_cfg_entry_point": f"{agents.__name__}.rlopt_ppo_cfg:G1RLOptPPOConfig",
-        "rlopt_wmbptt_cfg_entry_point": f"{agents.__name__}.rlopt_wmbptt_cfg:G1RLOptWMBPTTConfig",
+        "agent_cfg_entry_point": f"{agents.__name__}.ppo_cfg:G1PPOConfig",
+        "ppo_cfg_entry_point": f"{agents.__name__}.ppo_cfg:G1PPOConfig",
+        "wmbptt_cfg_entry_point": f"{agents.__name__}.wmbptt_cfg:G1WMBPTTConfig",
     },
 )

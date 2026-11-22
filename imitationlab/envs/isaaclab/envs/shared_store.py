@@ -45,7 +45,7 @@ SHM_RESERVE_BYTES = 2 * 1024**3
 def shared_store_path(key: str, *, directory: Path = SHM_DIR) -> Path:
     """The tmpfs path for a store identified by ``key`` (e.g. a persist id)."""
     safe = "".join(c if c.isalnum() or c in "-_." else "_" for c in key)
-    return directory / f"isaaclab_imitation_{safe}.bin"
+    return directory / f"imitationlab_{safe}.bin"
 
 
 def job_scope() -> str:

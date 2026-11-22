@@ -30,7 +30,7 @@ Usage (from the repository root, isaaclab env)::
 
     python -m imitationlab.evaluation.validation.collect_equivalence run \\
         --out eager.json --iters 10 --physics record:/tmp/phys.pt -- <train.py argv>
-    ISAACLAB_IMITATION_COLLECT_FASTPATH=1 IMITATIONLAB_COLLECT_FASTPATH=1 \\
+    IMITATIONLAB_ENV_COLLECT_FASTPATH=1 IMITATIONLAB_COLLECT_FASTPATH=1 \\
     python -m imitationlab.evaluation.validation.collect_equivalence run \\
         --out fast.json --iters 10 --physics replay:/tmp/phys.pt -- <train.py argv>
     python -m imitationlab.evaluation.validation.collect_equivalence compare eager.json fast.json

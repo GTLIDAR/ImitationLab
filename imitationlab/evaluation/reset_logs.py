@@ -3,7 +3,7 @@
 On every step with a reset, Isaac Lab rebuilds ``extras["log"]``:
 ``Episode_Reward/<term>`` is the mean over the environments reset at that step
 of the term's weighted episode sum divided by ``max_episode_length_s``, and
-command terms add ``Metrics/<term>/<name>`` the same way. RLOpt logs one such
+command terms add ``Metrics/<term>/<name>`` the same way. Training logs one such
 snapshot per training iteration. :class:`ResetLogRecorder` keeps every
 snapshot of a fixed-length rollout so an evaluation can report the same
 quantities as a training curve, averaged once the reset sampler has settled.

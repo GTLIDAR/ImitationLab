@@ -24,66 +24,18 @@ was tested under its own identity. The BONES-SEED selector reproduced the 129,78
 selection with SHA-256 `e714bbff883dc82e3cf05216cfe6347e8b6a6bc3a4eadd4648c20ee3eb6867d6`.
 The BONES-SEED training checks used existing packed banks. The raw G1
 archive was unavailable locally. One FSQ encoder update on LAFAN1 and one
-continuous DiffSR encoder update on the BONES-SEED subset each produced an
+continuous spectral encoder update on the BONES-SEED subset each produced an
 encoder that PPO, SuperMimic, and SVG loaded for a training iteration.
 
 The DiffSR learner completed a training iteration on freshly converted
-LAFAN1 with explicit commands and with a newly pretrained DiffSR encoder.
+LAFAN1 with explicit commands and with a newly pretrained spectral encoder.
 The latter checkpoint reloaded for a 20-step evaluation with the same
 encoder. The explicit run also passed with PyTorch compilation enabled.
 These runs used 16 environments and reduced model and batch sizes.
 
-## Unified package and CLI verification
+## Release candidate verification
 
-The `imitationlab` package migration was checked on the local RTX A4500 with
-`imitation-g1-v1`, seed 42, and the freshly converted LAFAN1 bank
-`lafan1@0ff4dce7ae91`. All training and encoder recipe files were compared
-byte for byte with the source snapshot taken before this migration and were
-unchanged.
-
-The default CPU task passed 891 tests with two skips. The Isaac Lab task
-suite passed 381 tests. After the final CLI and script-wrapper changes, the
-affected launcher and checkpoint tests passed another 369 tests. These
-suites overlap and should not be added into a single coverage count. Static
-checks and the package wheel build passed. The wheel's CLI and nested recipes
-were also checked outside the source checkout.
-
-| Local check | Result |
-| --- | --- |
-| PPO, SuperMimic, SVG, DiffSR with explicit commands | Each completed an optimizer update and wrote a checkpoint; the three world-model choices also exercised their native public learner classes |
-| SuperMimic and SVG with compilation enabled | Each completed an update with the packed graph environment and compiler enabled; SuperMimic used its native public learner class |
-| Pre-migration checkpoints | All four learners loaded and ran 20 evaluation steps; PPO resumed to the next rollout iteration |
-| FSQ and DiffSR encoder pretraining | Each completed one update; FSQ/PPO and DiffSR/DiffSR trackers trained and reloaded for evaluation |
-| Captured-step equivalence | Masked and captured steps matched bit for bit over 210 replayed-physics steps at 256 environments, including resets and the reference window |
-| Native export | Preserved checkpoint tensors and resolved a copied encoder after moving the bundle |
-| Motion data | Validated the 40-clip LAFAN1 bank and 129,785-clip BONES-SEED bank; repacked two real LAFAN1 clips with two workers and checked source equality |
-
-The encoder artifacts used by the latent tracking checks have SHA-256:
-
-- FSQ: `1d96a10540d1b7fc45462d7aa76ced495cdb83cf78c9afe4c91193d169676c9a`
-- DiffSR: `18bba9249824ed22c209a743193b73f8b7571bfef13ad716dd77843b72b66e43`
-
-Commands, run descriptions, evaluation JSON, and test logs are saved locally
-under ignored `outputs/reorganization/`. These are integration and compatibility
-checks using reduced batches. They do not establish convergence or sustained
-training throughput. BONES-SEED validation used the existing authorized local
-bank; its raw archive was not re-converted or distributed.
-
-After moving the learners and data tools into ImitationLab, all four
-learners completed another `imitation-g1-v1` explicit-command update on
-`lafan1@0ff4dce7ae91` with seed 42. The evaluator reloaded a pre-migration
-checkpoint for each learner and ran 20 steps. The native DiffSR pretrainer
-produced the same encoder file as the pre-migration smoke
-(`fff37d4d61a21e6ea9e0d04f5e23a7386e0ee62516d3f480458509bdcc02938e` SHA-256).
-The native DiffSR learner also completed a training iteration with that
-continuous `z` command. SVG completed a packed training iteration with
-PyTorch compilation enabled. PPO resumed from its pre-migration checkpoint.
-
-## Single-task release verification
-
-The single-task release registers only `imitation-g1-v1` and removes the
-earlier task designs, their aliases and the ONNX exporter. The
-[migration guide](migration.md) lists every removal and rename. The checks
+This release registers one task, `imitation-g1-v1`. The checks
 below ran on a local NVIDIA RTX PRO 6000 Blackwell Workstation Edition in the
 locked `default`, `isaaclab` and `static` environments, with seed 42, the
 LAFAN1 bank `g1_lafan1_40@d972c37c41da` and the BONES-SEED bank

@@ -73,7 +73,7 @@ def test_legacy_resume_restores_recipe_environment_before_exec(tmp_path, monkeyp
     torch.save({"policy_state_dict": {}}, model)
     recipe = tmp_path / "settings.args"
     recipe.write_text(
-        "%env ISAACLAB_IMITATION_COLLECT_FASTPATH=1\n"
+        "%env IMITATIONLAB_ENV_COLLECT_FASTPATH=1\n"
         "%env PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True\n"
     )
     (tmp_path / "command.txt").write_text(
@@ -89,14 +89,14 @@ def test_legacy_resume_restores_recipe_environment_before_exec(tmp_path, monkeyp
         )
     )
     monkeypatch.setattr(os, "environ", os.environ.copy())
-    monkeypatch.delenv("ISAACLAB_IMITATION_COLLECT_FASTPATH", raising=False)
+    monkeypatch.delenv("IMITATIONLAB_ENV_COLLECT_FASTPATH", raising=False)
     monkeypatch.setenv("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:False")
 
     class ExecCalled(Exception):
         pass
 
     def execv(executable, command):
-        assert os.environ["ISAACLAB_IMITATION_COLLECT_FASTPATH"] == "1"
+        assert os.environ["IMITATIONLAB_ENV_COLLECT_FASTPATH"] == "1"
         assert os.environ["PYTORCH_CUDA_ALLOC_CONF"] == "expandable_segments:False"
         assert command[-2:] == ["--checkpoint", str(model)]
         raise ExecCalled

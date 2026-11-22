@@ -232,7 +232,7 @@ def npz_member_shape(path: Path, member: str) -> tuple[int, ...]:
 def trajectory_plan_from_traj_info(
     traj_info_path: Path, npz_paths: dict[str, Path]
 ) -> list[dict[str, Any]]:
-    """Canonical order and offsets from an existing ILTools replay sidecar.
+    """Canonical order and offsets from an existing replay sidecar.
 
     Using the persisted sidecar keeps trajectory ranks byte-compatible with the
     replay that earlier runs indexed, which matters because planner goal indices
@@ -1010,7 +1010,7 @@ def add_arguments(
         type=Path,
         default=None,
         help=(
-            "Existing iltools_rb_manifest.json supplying the canonical trajectory "
+            "Existing replay_manifest.json supplying the canonical trajectory "
             "order and row offsets. Without it, manifest order is used and "
             "trajectory ranks may differ from an earlier replay."
         ),

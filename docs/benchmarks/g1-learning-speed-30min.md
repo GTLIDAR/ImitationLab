@@ -1,7 +1,7 @@
 # G1 learning speed: 30-minute runs
 
 This completed H100 sweep includes all 24 combinations: PPO, SuperMimic (BPTT),
-SVG and DiffSR, each with explicit, FSQ and DiffSR commands on LAFAN1 and
+SVG and DiffSR, each with explicit, FSQ and spectral commands on LAFAN1 and
 BONES-SEED. No combination is omitted. The [ten-minute study](g1-learning-speed/README.md)
 and its follow-ups remain available separately.
 

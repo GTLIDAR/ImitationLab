@@ -59,7 +59,7 @@
   "cases": [
     {
       "dataset": "bones_seed",
-      "interface": "diffsr",
+      "interface": "spectral",
       "policy": "supermimic",
       "status": "completed",
       "budget_seconds": 1800.0,
@@ -232,7 +232,7 @@
     },
     {
       "dataset": "bones_seed",
-      "interface": "diffsr",
+      "interface": "spectral",
       "policy": "supermimic",
       "status": "completed",
       "budget_seconds": 1800.0,
@@ -1099,7 +1099,7 @@
     },
     {
       "dataset": "lafan1",
-      "interface": "diffsr",
+      "interface": "spectral",
       "policy": "supermimic",
       "status": "completed",
       "budget_seconds": 1800.0,
@@ -1272,7 +1272,7 @@
     },
     {
       "dataset": "lafan1",
-      "interface": "diffsr",
+      "interface": "spectral",
       "policy": "supermimic",
       "status": "completed",
       "budget_seconds": 1800.0,

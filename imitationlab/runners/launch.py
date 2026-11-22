@@ -23,8 +23,6 @@ from imitationlab.runners.artifacts import (
 from imitationlab.runners.errors import reported_by
 from imitationlab.runners.registry import (
     DEFAULT_TASK,
-    canonical_interface,
-    interface_arg,
 )
 
 
@@ -86,9 +84,7 @@ def _saved_selection(spec: dict) -> dict:
         if encoded_path.lower() not in ("", "null", "none"):
             encoder = encoded_path
     interface = spec.get("interface")
-    if interface is not None:
-        interface = canonical_interface(interface)
-    else:
+    if interface is None:
         mode = overrides.get("env.skill_encoder_mode", "").strip("'\"")
         interface = (
             ("fsq" if mode == ENCODERS["fsq"] else "spectral")
@@ -113,7 +109,6 @@ def main(argv: list[str] | None = None) -> None:
     )
     parser.add_argument(
         "--interface",
-        type=interface_arg,
         choices=("explicit", *ENCODERS),
         help="Command interface. Defaults to explicit; spectral and fsq need --encoder.",
     )

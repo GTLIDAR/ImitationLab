@@ -33,7 +33,7 @@ def isolate_worker_temporary_directory(rank):
 
     root = (
         Path(tempfile.gettempdir())
-        / f"rlopt-job-{os.environ.get('SLURM_JOB_ID', os.getppid())}"
+        / f"imitationlab-job-{os.environ.get('SLURM_JOB_ID', os.getppid())}"
         / f"rank-{rank}"
     )
     root.mkdir(parents=True, exist_ok=True)
@@ -99,7 +99,7 @@ def configure_runtime(args, env_cfg, agent_cfg):
         if isinstance(value, str) and value.startswith("cuda"):
             setattr(data, name, device)
     for key in ("TORCHINDUCTOR_CACHE_DIR", "TRITON_CACHE_DIR", "WARP_CACHE_PATH"):
-        root = os.environ.get(key, str(Path("/tmp") / f"rlopt-{key.lower()}"))
+        root = os.environ.get(key, str(Path("/tmp") / f"imitationlab-{key.lower()}"))
         os.environ[key] = str(
             Path(root)
             / f"job-{os.environ.get('SLURM_JOB_ID', os.getppid())}"

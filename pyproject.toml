@@ -69,4 +69,4 @@ namespaces = true
 
 [tool.setuptools.data-files]
 "share/imitationlab/recipes/g1" = ["experiments/recipes/g1/packed.args", "experiments/recipes/g1/world_model.args", "experiments/recipes/g1/supermimic.args", "experiments/recipes/g1/ppo.args"]
-"share/imitationlab/recipes/encoders" = ["experiments/recipes/encoders/g1.args", "experiments/recipes/encoders/fsq.args", "experiments/recipes/encoders/spectral.args", "experiments/recipes/encoders/diffsr.args"]
+"share/imitationlab/recipes/encoders" = ["experiments/recipes/encoders/g1.args", "experiments/recipes/encoders/fsq.args", "experiments/recipes/encoders/spectral.args"]

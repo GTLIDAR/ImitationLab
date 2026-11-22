@@ -14,6 +14,28 @@ Notable changes to ImitationLab are recorded in this file. The format follows
   GitHub release is published and uploads them to PyPI through trusted
   publishing.
 
+### Changed
+
+- Environment variables use the `IMITATIONLAB_` prefix:
+  `IMITATIONLAB_ENV_COLLECT_FASTPATH`, `IMITATIONLAB_UNITREE_USD_PATH`,
+  `IMITATIONLAB_UNITREE_USD_CACHE_ROOT`, `IMITATIONLAB_COMPILE_MDP` and
+  `IMITATIONLAB_MOTION_CACHE_ROOT`.
+- The provenance page lists only the revisions of vendored and upstream
+  components.
+
+### Removed
+
+- The migration guide.
+- `--interface diffsr` and the `encoders/diffsr.args` recipe; use `spectral`.
+  Saved records that name the interface `diffsr` are no longer read.
+- Names carried over from earlier packages. The agent config keys are
+  `agent_cfg_entry_point`, `ppo_cfg_entry_point` and `wmbptt_cfg_entry_point`;
+  the config classes are `G1PPOConfig` and `G1WMBPTTConfig`; a packed bank's
+  sidecar is `replay_manifest.json`; motion caches are named
+  `imitationlab_g1_*`; the cluster runtime defaults to
+  `/opt/imitationlab-runtime`. Rename `iltools_rb_manifest.json` in an existing
+  packed bank to keep using it.
+
 ### Fixed
 
 - The wheel now contains the three USD layers under

@@ -22,9 +22,8 @@ from torchrl.data.replay_buffers import TensorDictReplayBuffer
 logger = logging.getLogger(__name__)
 
 #: Sidecar written next to a persisted memmap buffer so it can be reopened
-#: without walking the Zarr hierarchy again. Keep the original filename
-#: so existing caches remain readable.
-_PERSIST_MANIFEST_NAME = "iltools_rb_manifest.json"
+#: without walking the Zarr hierarchy again.
+_PERSIST_MANIFEST_NAME = "replay_manifest.json"
 _PERSIST_FORMAT_VERSION = 1
 
 

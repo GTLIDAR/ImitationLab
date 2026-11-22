@@ -44,10 +44,10 @@ completion, so BONES-SEED can have high success with a mean below ten seconds.
 | lafan1 | fsq | supermimic | 600.44 | 100.0 | 23.0 / 64.5 | 10.00 | 16.52 |
 | lafan1 | fsq | svg | 600.50 | 72.5 | 59.5 / 419.3 | 9.24 | 16.52 |
 | lafan1 | fsq | diffsr | 600.70 | 87.5 | 50.7 / 262.0 | 9.66 | 16.53 |
-| lafan1 | diffsr | ppo | 601.03 | 17.5 | 74.1 / 263.1 | 6.03 | 16.28 |
-| lafan1 | diffsr | supermimic | 600.42 | 100.0 | 21.2 / 55.7 | 10.00 | 16.70 |
-| lafan1 | diffsr | svg | 600.46 | 80.0 | 57.6 / 339.6 | 9.41 | 16.48 |
-| lafan1 | diffsr | diffsr | 600.57 | 87.5 | 53.2 / 246.2 | 9.69 | 16.49 |
+| lafan1 | spectral | ppo | 601.03 | 17.5 | 74.1 / 263.1 | 6.03 | 16.28 |
+| lafan1 | spectral | supermimic | 600.42 | 100.0 | 21.2 / 55.7 | 10.00 | 16.70 |
+| lafan1 | spectral | svg | 600.46 | 80.0 | 57.6 / 339.6 | 9.41 | 16.48 |
+| lafan1 | spectral | diffsr | 600.57 | 87.5 | 53.2 / 246.2 | 9.69 | 16.49 |
 | bones_seed | explicit | ppo | 600.38 | 85.5 | 60.9 / 657.2 | 5.61 | 13.68 |
 | bones_seed | explicit | supermimic | 600.47 | 99.6 | 15.7 / 75.5 | 5.96 | 14.02 |
 | bones_seed | explicit | svg | 600.48 | 96.5 | 37.0 / 334.0 | 5.88 | 13.96 |
@@ -56,10 +56,10 @@ completion, so BONES-SEED can have high success with a mean below ten seconds.
 | bones_seed | fsq | supermimic | 600.36 | 99.2 | 22.9 / 88.6 | 5.95 | 19.43 |
 | bones_seed | fsq | svg | 600.58 | 85.2 | 55.3 / 226.9 | 5.58 | 19.08 |
 | bones_seed | fsq | diffsr | 600.43 | 97.3 | 52.3 / 339.9 | 5.90 | 19.07 |
-| bones_seed | diffsr | ppo | 600.58 | 66.4 | 81.2 / 456.6 | 4.75 | 19.06 |
-| bones_seed | diffsr | supermimic | 600.45 | 99.2 | 26.7 / 116.5 | 5.95 | 19.55 |
-| bones_seed | diffsr | svg | 600.64 | 85.2 | 52.8 / 268.9 | 5.56 | 19.20 |
-| bones_seed | diffsr | diffsr | 600.26 | 98.0 | 49.0 / 298.1 | 5.92 | 19.19 |
+| bones_seed | spectral | ppo | 600.58 | 66.4 | 81.2 / 456.6 | 4.75 | 19.06 |
+| bones_seed | spectral | supermimic | 600.45 | 99.2 | 26.7 / 116.5 | 5.95 | 19.55 |
+| bones_seed | spectral | svg | 600.64 | 85.2 | 52.8 / 268.9 | 5.56 | 19.20 |
+| bones_seed | spectral | diffsr | 600.26 | 98.0 | 49.0 / 298.1 | 5.92 | 19.19 |
 
 ## Timed checkpoints
 
@@ -81,10 +81,10 @@ the first checkpoint after 600 seconds.
 | supermimic / fsq | 0.0% / 147.5 @ 3.81 | 0.0% / 147.5 @ 3.81 | 0.0% / 140.0 @ 5.00 | 100.0% / 23.0 @ 10.01 | 10.01 min |
 | svg / fsq | 0.0% / 147.0 @ 5.35 | 0.0% / 147.0 @ 5.35 | 0.0% / 147.0 @ 5.35 | 72.5% / 59.5 @ 10.01 | not reached |
 | diffsr / fsq | 0.0% / 147.6 @ 3.60 | 0.0% / 147.6 @ 3.60 | 0.0% / 151.5 @ 5.01 | 87.5% / 50.7 @ 10.01 | not reached |
-| ppo / diffsr | 0.0% / 171.1 @ 1.00 | 0.0% / 133.5 @ 2.01 | 0.0% / 103.8 @ 5.02 | 17.5% / 74.1 @ 10.02 | not reached |
-| supermimic / diffsr | 0.0% / 147.4 @ 3.96 | 0.0% / 147.4 @ 3.96 | 0.0% / 138.9 @ 5.00 | 100.0% / 21.2 @ 10.01 | 10.01 min |
-| svg / diffsr | 0.0% / 146.9 @ 5.26 | 0.0% / 146.9 @ 5.26 | 0.0% / 146.9 @ 5.26 | 80.0% / 57.6 @ 10.01 | not reached |
-| diffsr / diffsr | 0.0% / 147.6 @ 3.57 | 0.0% / 147.6 @ 3.57 | 0.0% / 156.2 @ 5.00 | 87.5% / 53.2 @ 10.01 | not reached |
+| ppo / spectral | 0.0% / 171.1 @ 1.00 | 0.0% / 133.5 @ 2.01 | 0.0% / 103.8 @ 5.02 | 17.5% / 74.1 @ 10.02 | not reached |
+| supermimic / spectral | 0.0% / 147.4 @ 3.96 | 0.0% / 147.4 @ 3.96 | 0.0% / 138.9 @ 5.00 | 100.0% / 21.2 @ 10.01 | 10.01 min |
+| svg / spectral | 0.0% / 146.9 @ 5.26 | 0.0% / 146.9 @ 5.26 | 0.0% / 146.9 @ 5.26 | 80.0% / 57.6 @ 10.01 | not reached |
+| diffsr / spectral | 0.0% / 147.6 @ 3.57 | 0.0% / 147.6 @ 3.57 | 0.0% / 156.2 @ 5.00 | 87.5% / 53.2 @ 10.01 | not reached |
 
 ## bones_seed
 
@@ -98,10 +98,10 @@ the first checkpoint after 600 seconds.
 | supermimic / fsq | 2.0% / 100.6 @ 3.76 | 2.0% / 100.6 @ 3.76 | 82.8% / 74.9 @ 5.00 | 99.2% / 22.9 @ 10.01 | 10.01 min |
 | svg / fsq | 2.0% / 100.5 @ 5.46 | 2.0% / 100.5 @ 5.46 | 2.0% / 100.5 @ 5.46 | 85.2% / 55.3 @ 10.01 | not reached |
 | diffsr / fsq | 2.0% / 100.5 @ 3.53 | 2.0% / 100.5 @ 3.53 | 2.0% / 102.2 @ 5.01 | 97.3% / 52.3 @ 10.01 | 10.01 min |
-| ppo / diffsr | 2.0% / 109.9 @ 1.01 | 2.0% / 94.3 @ 2.01 | 3.9% / 66.0 @ 5.02 | 66.4% / 81.2 @ 10.01 | not reached |
-| supermimic / diffsr | 2.0% / 100.6 @ 3.79 | 2.0% / 100.6 @ 3.79 | 2.7% / 99.7 @ 5.01 | 99.2% / 26.7 @ 10.01 | 10.01 min |
-| svg / diffsr | 2.0% / 100.4 @ 5.33 | 2.0% / 100.4 @ 5.33 | 2.0% / 100.4 @ 5.33 | 85.2% / 52.8 @ 10.01 | not reached |
-| diffsr / diffsr | 2.0% / 100.6 @ 3.56 | 2.0% / 100.6 @ 3.56 | 2.0% / 100.5 @ 5.01 | 98.0% / 49.0 @ 10.00 | 10.00 min |
+| ppo / spectral | 2.0% / 109.9 @ 1.01 | 2.0% / 94.3 @ 2.01 | 3.9% / 66.0 @ 5.02 | 66.4% / 81.2 @ 10.01 | not reached |
+| supermimic / spectral | 2.0% / 100.6 @ 3.79 | 2.0% / 100.6 @ 3.79 | 2.7% / 99.7 @ 5.01 | 99.2% / 26.7 @ 10.01 | 10.01 min |
+| svg / spectral | 2.0% / 100.4 @ 5.33 | 2.0% / 100.4 @ 5.33 | 2.0% / 100.4 @ 5.33 | 85.2% / 52.8 @ 10.01 | not reached |
+| diffsr / spectral | 2.0% / 100.6 @ 3.56 | 2.0% / 100.6 @ 3.56 | 2.0% / 100.5 @ 5.01 | 98.0% / 49.0 @ 10.00 | 10.00 min |
 
 ## Protocol and limits
 
@@ -113,7 +113,7 @@ Success means no root tracking failure: absolute root-height error ≤0.25 m and
 
 Threshold times are the first sampled checkpoints meeting the target, without interpolation. “Not reached” means no saved checkpoint met the target within this run; a transient crossing between checkpoints is unknown. One seed does not establish a statistically reliable learner ranking.
 
-FSQ and DiffSR each use a dataset-specific frozen encoder; its pretraining record includes the update count and architecture. Encoder process time and policy startup are added separately for end-to-end time; queueing and evaluation are excluded. Reusing an encoder amortizes its cost across policies. All timing is specific to the recorded hardware, software, source snapshot, and compiler cache state. The cluster sweep uses separate cold compiler caches per job.
+FSQ and spectral each use a dataset-specific frozen encoder; its pretraining record includes the update count and architecture. Encoder process time and policy startup are added separately for end-to-end time; queueing and evaluation are excluded. Reusing an encoder amortizes its cost across policies. All timing is specific to the recorded hardware, software, source snapshot, and compiler cache state. The cluster sweep uses separate cold compiler caches per job.
 
 Raw BONES-SEED data, per-motion results, and model weights stay outside Git. Only aggregate measurements and hashes are published here.
 
@@ -121,10 +121,10 @@ Raw BONES-SEED data, per-motion results, and model weights stay outside Git. Onl
 
 | Dataset | Command | Learner | Profile | Envs | Encoder min | Startup min | Last train min | Last end-to-end min | MPJPE-G mm | Mean survival s |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| bones_seed | diffsr | diffsr | standard | 4096 | 5.45 | 3.74 | 10.00 | 19.19 | 298.1 | 5.92 |
-| bones_seed | diffsr | ppo | large | 8192 | 5.45 | 3.60 | 10.01 | 19.06 | 456.6 | 4.75 |
-| bones_seed | diffsr | supermimic | large | 8192 | 5.45 | 4.09 | 10.01 | 19.55 | 116.5 | 5.95 |
-| bones_seed | diffsr | svg | standard | 4096 | 5.45 | 3.74 | 10.01 | 19.20 | 268.9 | 5.56 |
+| bones_seed | spectral | diffsr | standard | 4096 | 5.45 | 3.74 | 10.00 | 19.19 | 298.1 | 5.92 |
+| bones_seed | spectral | ppo | large | 8192 | 5.45 | 3.60 | 10.01 | 19.06 | 456.6 | 4.75 |
+| bones_seed | spectral | supermimic | large | 8192 | 5.45 | 4.09 | 10.01 | 19.55 | 116.5 | 5.95 |
+| bones_seed | spectral | svg | standard | 4096 | 5.45 | 3.74 | 10.01 | 19.20 | 268.9 | 5.56 |
 | bones_seed | explicit | diffsr | xlarge | 16384 | 0.00 | 3.89 | 10.01 | 13.89 | 375.2 | 5.61 |
 | bones_seed | explicit | ppo | large | 8192 | 0.00 | 3.68 | 10.01 | 13.68 | 657.2 | 5.61 |
 | bones_seed | explicit | supermimic | xlarge | 16384 | 0.00 | 4.01 | 10.01 | 14.02 | 75.5 | 5.96 |
@@ -133,10 +133,10 @@ Raw BONES-SEED data, per-motion results, and model weights stay outside Git. Onl
 | bones_seed | fsq | ppo | large | 8192 | 5.39 | 3.64 | 10.03 | 19.06 | 667.2 | 5.25 |
 | bones_seed | fsq | supermimic | large | 8192 | 5.39 | 4.03 | 10.01 | 19.43 | 88.6 | 5.95 |
 | bones_seed | fsq | svg | standard | 4096 | 5.39 | 3.68 | 10.01 | 19.08 | 226.9 | 5.58 |
-| lafan1 | diffsr | diffsr | standard | 4096 | 3.55 | 2.92 | 10.01 | 16.49 | 246.2 | 9.69 |
-| lafan1 | diffsr | ppo | large | 8192 | 3.55 | 2.70 | 10.02 | 16.28 | 263.1 | 6.03 |
-| lafan1 | diffsr | supermimic | xlarge | 16384 | 3.55 | 3.13 | 10.01 | 16.70 | 55.7 | 10.00 |
-| lafan1 | diffsr | svg | standard | 4096 | 3.55 | 2.92 | 10.01 | 16.48 | 339.6 | 9.41 |
+| lafan1 | spectral | diffsr | standard | 4096 | 3.55 | 2.92 | 10.01 | 16.49 | 246.2 | 9.69 |
+| lafan1 | spectral | ppo | large | 8192 | 3.55 | 2.70 | 10.02 | 16.28 | 263.1 | 6.03 |
+| lafan1 | spectral | supermimic | xlarge | 16384 | 3.55 | 3.13 | 10.01 | 16.70 | 55.7 | 10.00 |
+| lafan1 | spectral | svg | standard | 4096 | 3.55 | 2.92 | 10.01 | 16.48 | 339.6 | 9.41 |
 | lafan1 | explicit | diffsr | xlarge | 16384 | 0.00 | 3.07 | 10.01 | 13.08 | 408.8 | 9.88 |
 | lafan1 | explicit | ppo | large | 8192 | 0.00 | 2.69 | 10.00 | 12.69 | 394.0 | 8.82 |
 | lafan1 | explicit | supermimic | xlarge | 16384 | 0.00 | 3.07 | 10.01 | 13.08 | 53.4 | 10.00 |

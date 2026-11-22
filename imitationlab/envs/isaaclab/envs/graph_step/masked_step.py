@@ -187,7 +187,7 @@ class MaskedStepper:
             problems.append(
                 "a host-mapped packed reference store (resident arrays, "
                 "runtime_cache_device=cpu, device_gather fast path: "
-                "ISAACLAB_IMITATION_COLLECT_FASTPATH=1)"
+                "IMITATIONLAB_ENV_COLLECT_FASTPATH=1)"
             )
         term = getattr(env, "_reference_term", None)
         if reset_sampler and (

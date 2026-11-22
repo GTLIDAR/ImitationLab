@@ -134,7 +134,7 @@ def policy_runs(block_keys: Sequence[Any]) -> tuple[list[Any], list[PolicyRun]]:
 class BlockPolicy(nn.Module):
     """Each policy acts on its own runs of blocks; the observation is shared.
 
-    The forward is ``WMPolicy``'s (RLOpt ``wm_bptt/agent.py``) with one actor per
+    The forward is ``WMPolicy``'s (``algorithms/common/world_model/learner.py``) with one actor per
     run of blocks: ``actor(obs, bf16=...)`` plus the task's reference setpoint
     when that checkpoint is residual. ``task.policy_obs_from_env`` must be row by
     row, as the G1 env's is (each row reads its own env's history and its own clip's

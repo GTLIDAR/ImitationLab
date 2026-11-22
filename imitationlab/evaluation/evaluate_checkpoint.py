@@ -338,7 +338,7 @@ parser.add_argument(
     default=None,
     help=(
         "Agent config entry point to build the network from, e.g. "
-        "rlopt_ppo_cfg_entry_point. Must match what the checkpoint was "
+        "ppo_cfg_entry_point. Must match what the checkpoint was "
         "TRAINED with: the tuned recipe changes widths and activations, so "
         "loading a tuned checkpoint under the default contract fails on a "
         "state-dict mismatch. Defaults to the task's algorithm entry point."

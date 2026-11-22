@@ -52,7 +52,7 @@ env:
   CLUSTER_ISAACLAB_DIR: /home/user/imitationlab/isaaclab
   CLUSTER_PYTHON_EXECUTABLE: scripts/tracking/train.py
   CLUSTER_SIM_BACKEND: auto
-  CLUSTER_CU130_RUNTIME_ROOT: /opt/isaaclab-imitation-runtime-spec/.pixi/envs/container-runtime
+  CLUSTER_CU130_RUNTIME_ROOT: /opt/imitationlab-runtime-spec/.pixi/envs/container-runtime
   CLUSTER_G1_USD_PATH: repo
   CLUSTER_USE_OVERLAY: "0"
   CLUSTER_SKIP_CACHE_COPY: "1"

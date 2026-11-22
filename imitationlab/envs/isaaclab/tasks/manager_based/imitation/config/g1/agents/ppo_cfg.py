@@ -12,7 +12,7 @@ from imitationlab.algorithms.ppo import PPOTrainerConfig
 
 
 @configclass
-class G1RLOptPPOConfig(PPOTrainerConfig):
+class G1PPOConfig(PPOTrainerConfig):
     """PPO for G1 tracking: five epochs of four minibatches per 24-step rollout."""
 
     def __post_init__(self):

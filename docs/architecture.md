@@ -85,5 +85,4 @@ checkpoint and any frozen encoder. See
 
 Tests for the learner, data, runner, and environment contracts live with the
 owning packages. Code uses the `imitationlab` import paths. See
-[migration](migration.md) for the names of earlier releases and
 [contributing](../CONTRIBUTING.md) for where new code belongs.

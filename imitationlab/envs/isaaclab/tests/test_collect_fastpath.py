@@ -16,7 +16,7 @@ from tensordict import TensorDict
 from torchrl.data.tensor_specs import Composite, Unbounded
 from torchrl.envs.transforms import VecGymEnvTransform
 
-import imitationlab.envs.isaaclab.envs.torchrl_adapter as rlopt_wrapper
+import imitationlab.envs.isaaclab.envs.torchrl_adapter as torchrl_adapter
 from imitationlab.envs.isaaclab.envs import collect_fastpath
 from imitationlab.envs.isaaclab.envs.torchrl_adapter import (
     IsaacLabTerminalObsReader,
@@ -104,7 +104,7 @@ def test_a_live_timer_or_the_off_switch_leaves_the_stock_compute(
 
 
 def test_zero_from_spec_matches_spec_zero(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(rlopt_wrapper, "_FAST_SPEC_ZERO", True)
+    monkeypatch.setattr(torchrl_adapter, "_FAST_SPEC_ZERO", True)
     spec = _obs_spec()
     _assert_same_td(_zero_from_spec(spec), spec.zero())
     leaf = spec["policy", "a"]
@@ -282,7 +282,7 @@ def test_hand_off_is_installed_only_for_the_imitation_env(
 
     from imitationlab.envs.isaaclab.envs import ImitationRLEnv
 
-    monkeypatch.setattr(rlopt_wrapper, "_FAST_TERMINAL_SWAP", True)
+    monkeypatch.setattr(torchrl_adapter, "_FAST_TERMINAL_SWAP", True)
     other = _FakeOuter(ManagerBasedRLEnv.__new__(ManagerBasedRLEnv))
     attach_terminal_obs_reader(other)
     assert type(other.transform) is VecGymEnvTransform
@@ -293,7 +293,7 @@ def test_hand_off_is_installed_only_for_the_imitation_env(
     assert type(imitation.transform) is IsaacLabVecGymEnvTransform
     assert imitation.readers[0].hand_off_batched is True
 
-    monkeypatch.setattr(rlopt_wrapper, "_FAST_TERMINAL_SWAP", False)
+    monkeypatch.setattr(torchrl_adapter, "_FAST_TERMINAL_SWAP", False)
     off = _FakeOuter(ImitationRLEnv.__new__(ImitationRLEnv))
     attach_terminal_obs_reader(off)
     assert type(off.transform) is VecGymEnvTransform

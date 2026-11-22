@@ -33,7 +33,7 @@ README remains an integration check.
 | --- | --- |
 | Task | `imitation-g1-v1` |
 | Learners | PPO, SuperMimic (BPTT), SVG, DiffSR |
-| Command interfaces | Explicit, FSQ, DiffSR |
+| Command interfaces | Explicit, FSQ, Spectral |
 | Banks | LAFAN1 (40 clips), BONES-SEED (129,785 clips) |
 | Policy training | 600 cumulative training seconds per combination |
 | Snapshots | First completed iteration after 60, 120, 300, 600 seconds |

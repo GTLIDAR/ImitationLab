@@ -142,7 +142,7 @@ def _directive_lines(d: SlurmDirectives) -> list[str]:
     return lines
 
 
-# W&B caps a run's tags at 64 characters and RLOpt adds a
+# W&B caps a run's tags at 64 characters and the learner's logger adds a
 # `logdir:<19-char timestamp>_wandb-<run id>` tag, which leaves 31 characters
 # for the id itself. The random token and its separator take 7 of them.
 _WANDB_RUN_ID_MAX = 31

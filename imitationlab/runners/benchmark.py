@@ -19,8 +19,6 @@ from imitationlab.runners.errors import UserError
 from imitationlab.runners.registry import (
     DEFAULT_TASK,
     INTERFACES,
-    canonical_interface,
-    interface_arg,
 )
 from imitationlab.runners.tuning import run_trial, source_fingerprint
 
@@ -312,7 +310,7 @@ def frozen_encoder_record(
     record = json.loads(record_path.read_text())
     if (
         record["status"] != "completed"
-        or canonical_interface(record["interface"]) != canonical_interface(interface)
+        or record["interface"] != interface
         or record["board"]["bank_sha256"] != board["bank_sha256"]
         or record["seed"] != seed
         or record["source_sha256"] != source_sha256
@@ -560,7 +558,6 @@ def main(argv=None) -> int:
         )
         p.add_argument(
             "--interface",
-            type=interface_arg,
             choices=INTERFACES if name == "run" else INTERFACES[1:],
             default="explicit" if name == "run" else None,
             required=name == "pretrain",

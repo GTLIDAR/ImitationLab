@@ -3,7 +3,7 @@
 Each fast path replaces host-side work on the control-step path (Python
 dispatch, host synchronizations, redundant copies) with code that produces the
 same tensors bit for bit: same values, dtypes, shapes, devices, and random-number
-consumption. ``ISAACLAB_IMITATION_COLLECT_FASTPATH`` selects them:
+consumption. ``IMITATIONLAB_ENV_COLLECT_FASTPATH`` selects them:
 
 - unset, empty, ``0`` or ``none``: the original code paths (the default);
 - ``1`` or ``all``: every fast path;
@@ -21,7 +21,7 @@ from __future__ import annotations
 import logging
 import os
 
-ENV_VAR = "ISAACLAB_IMITATION_COLLECT_FASTPATH"
+ENV_VAR = "IMITATIONLAB_ENV_COLLECT_FASTPATH"
 
 FEATURES: tuple[str, ...] = (
     # tracking_reward_points: cached offsets tensor instead of a per-step
@@ -95,7 +95,7 @@ def describe() -> dict[str, object]:
 if ENABLED:
     # Warning level so it reaches the job log without logging configuration.
     logging.getLogger(__name__).warning(
-        "isaaclab_imitation collection fast paths ON (%s=%r): %s",
+        "Environment collection fast paths ON (%s=%r): %s",
         ENV_VAR,
         os.environ.get(ENV_VAR, ""),
         ", ".join(describe()["enabled"]),

@@ -644,7 +644,7 @@ class LoggingManager:
 
             # Opt-in, bit-exact collection fast paths: recorded so a run's
             # collection code path is traceable from its W&B config.
-            wandb_kwargs["config"]["rlopt_collect_fastpath"] = _collect_fastpath_state()
+            wandb_kwargs["config"]["collect_fastpath"] = _collect_fastpath_state()
 
         # TorchRL's get_logger routes the file-backed loggers to ``logger_name``
         # and ignores the ``log_dir`` kwarg entirely, so passing the component

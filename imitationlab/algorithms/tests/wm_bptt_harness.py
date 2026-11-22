@@ -275,7 +275,7 @@ def make_agent(
     **wm: Any,
 ) -> WMBPTT:
     """A real agent. ``wm`` overrides ``WMBPTTConfig`` (after ``SMALL``)."""
-    # G1RLOptWMBPTTConfig's fields, which need Isaac Lab to import.
+    # G1WMBPTTConfig's fields, which need Isaac Lab to import.
     fields = {
         "task_model": G1_TASK,
         "goal": "explicit",

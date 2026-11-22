@@ -1697,7 +1697,7 @@
     },
     {
       "dataset": "lafan1",
-      "interface": "diffsr",
+      "interface": "spectral",
       "policy": "ppo",
       "status": "completed",
       "budget_seconds": 1800.0,
@@ -1875,7 +1875,7 @@
     },
     {
       "dataset": "lafan1",
-      "interface": "diffsr",
+      "interface": "spectral",
       "policy": "supermimic",
       "status": "completed",
       "budget_seconds": 1800.0,
@@ -2091,7 +2091,7 @@
     },
     {
       "dataset": "lafan1",
-      "interface": "diffsr",
+      "interface": "spectral",
       "policy": "svg",
       "status": "completed",
       "budget_seconds": 1800.0,
@@ -2306,7 +2306,7 @@
     },
     {
       "dataset": "lafan1",
-      "interface": "diffsr",
+      "interface": "spectral",
       "policy": "diffsr",
       "status": "completed",
       "budget_seconds": 1800.0,
@@ -4155,7 +4155,7 @@
     },
     {
       "dataset": "bones_seed",
-      "interface": "diffsr",
+      "interface": "spectral",
       "policy": "ppo",
       "status": "completed",
       "budget_seconds": 1800.0,
@@ -4337,7 +4337,7 @@
     },
     {
       "dataset": "bones_seed",
-      "interface": "diffsr",
+      "interface": "spectral",
       "policy": "supermimic",
       "status": "completed",
       "budget_seconds": 1800.0,
@@ -4553,7 +4553,7 @@
     },
     {
       "dataset": "bones_seed",
-      "interface": "diffsr",
+      "interface": "spectral",
       "policy": "svg",
       "status": "completed",
       "budget_seconds": 1800.0,
@@ -4750,7 +4750,7 @@
     },
     {
       "dataset": "bones_seed",
-      "interface": "diffsr",
+      "interface": "spectral",
       "policy": "diffsr",
       "status": "completed",
       "budget_seconds": 1800.0,
@@ -4974,7 +4974,7 @@
   "encoders": [
     {
       "dataset": "bones_seed",
-      "interface": "diffsr",
+      "interface": "spectral",
       "status": "completed",
       "seed": 42,
       "source_sha256": "9756613231dd12379bf73cf6285026f165f74ce7bd8ba29a913137ba4f021eb2",
@@ -5464,7 +5464,7 @@
     },
     {
       "dataset": "lafan1",
-      "interface": "diffsr",
+      "interface": "spectral",
       "status": "completed",
       "seed": 42,
       "source_sha256": "9756613231dd12379bf73cf6285026f165f74ce7bd8ba29a913137ba4f021eb2",

@@ -58,7 +58,7 @@ parser.add_argument(
     default=None,
     help=(
         "Agent config entry point used to rebuild the policy, e.g. "
-        "rlopt_ppo_cfg_entry_point. It must match training."
+        "ppo_cfg_entry_point. It must match training."
     ),
 )
 parser.add_argument(

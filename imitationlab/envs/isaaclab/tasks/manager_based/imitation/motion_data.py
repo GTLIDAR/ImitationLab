@@ -27,9 +27,9 @@ Naming here is functional. A *clip* is one motion file with a frame rate; a
 *manifest* names an ordered set of them. Which dataset those clips came from
 (LAFAN1, Dance102, BONES-SEED) is data, not code: it appears as a manifest
 label used to make cache directories self-describing, and nothing branches on
-it. The one historical spelling that survives, ``lafan1_csv``, is the ILTools
-loader key (:data:`~.motion_manifest.CLIP_LOADER_KEY`) and lives only at that
-submodule boundary.
+it. The one dataset-named spelling, ``lafan1_csv``, is the clip-loader key
+(:data:`~.motion_manifest.CLIP_LOADER_KEY`) and lives only at the loader
+boundary.
 """
 
 from __future__ import annotations
@@ -132,7 +132,7 @@ class MotionDataCfg:
     ``persist_id`` reused for changed content; set this whenever the source
     content changes. Without this explicit flag, v2 refuses a nonempty
     ``persist_dir`` whose source, motion selection, or key list differs instead
-    of allowing ILTools to replace it implicitly. Prefer a fresh, versioned
+    of letting the replay store replace it implicitly. Prefer a fresh, versioned
     directory even for intentional rebuilds so interrupted fills cannot damage
     a previously valid cache.
     """
@@ -469,7 +469,7 @@ class ResolvedMotionData:
     """Zarr cache location, or ``None`` when prebuilt reference arrays replace it."""
 
     loader_kwargs: dict[str, Any] = field(default_factory=dict)
-    """ILTools clip-loader call arguments; empty when loading a prebuilt cache."""
+    """Clip-loader call arguments; empty when loading a prebuilt cache."""
 
     reference_arrays_dir: str | None = None
     """Prebuilt training-shaped arrays, which bypass the Zarr and the replay."""

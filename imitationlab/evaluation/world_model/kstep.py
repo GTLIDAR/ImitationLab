@@ -71,7 +71,7 @@ def main() -> int:
     from isaaclab.app import launch_simulation
     from isaaclab_tasks.utils import resolve_task_config
 
-    env_cfg, _ = resolve_task_config(args.task, "rlopt_wmbptt_cfg_entry_point")
+    env_cfg, _ = resolve_task_config(args.task, "wmbptt_cfg_entry_point")
     env_cfg.scene.num_envs = args.num_envs
     env_cfg.seed = args.seed
     with launch_simulation(env_cfg, args):

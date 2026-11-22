@@ -132,7 +132,7 @@ _ROOT_QPOS_EE_MACRO_TERMS = (
 
 _METRES_TO_MM = 1000.0
 
-_PERSIST_MANIFEST_NAME = "iltools_rb_manifest.json"
+_PERSIST_MANIFEST_NAME = "replay_manifest.json"
 _PERSIST_FORMAT_VERSION = 1
 
 
@@ -174,7 +174,7 @@ def _wxyz_to_xyzw_index(device: torch.device) -> torch.Tensor:
 def _convert_reference_quats_to_xyzw(reference: TensorDict) -> TensorDict:
     """Convert dataset quaternions from WXYZ to Isaac Lab 3.0's XYZW layout.
 
-    Reference datasets (NPZ/zarr built by ImitationLearningTools) store
+    Reference datasets (NPZ/zarr built by ``imitationlab.data_tools``) store
     quaternions scalar-first (w, x, y, z). Isaac Lab 3.0 switched the
     simulation state and all ``isaaclab.utils.math`` helpers to scalar-last
     (x, y, z, w), so every reference frame is converted once at the
@@ -219,7 +219,7 @@ def _build_zarr_cache(loader_kwargs: dict[str, Any], zarr_path: Path) -> None:
 
 
 def _normalize_persist_selection(value: Any) -> list[str] | None:
-    """Match ILTools' persisted-cache key normalization."""
+    """Match the replay store's persisted-cache key normalization."""
     if value is None:
         return None
     if isinstance(value, str):
@@ -238,7 +238,7 @@ def _require_matching_persisted_replay(
 ) -> None:
     """Refuse an implicit rebuild of a nonempty persisted replay directory.
 
-    ILTools intentionally treats a cache-key mismatch as a cache miss and
+    The replay store treats a cache-key mismatch as a cache miss and
     refills the same directory. That behavior is unsafe for the v2 integration
     surface: selecting one motion for evaluation can overwrite the sidecar and
     leading rows of a 95 GiB full-dataset cache. A first build into an empty
@@ -311,8 +311,8 @@ class ExpertDataPlane:
         """Phase 1: load the dataset and build the trajectory manager.
 
         Runs in the env's ``__init__`` before ``super().__init__`` (the
-        CommandManager is not built yet), exactly where the legacy env loads
-        its reference data.
+        CommandManager is not built yet), so the reference data is loaded before
+        any manager reads it.
         """
         self._env = env
         device = torch.device(cfg.sim.device)
@@ -844,7 +844,7 @@ class ExpertDataPlane:
     def finalize(self, scene: Any, robot: Any) -> None:
         """Phase 2: bind the plane to the live scene (post-``super().__init__``).
 
-        Mirrors the legacy env's post-super initialization: retarget the
+        The post-``super().__init__`` initialization: retarget the
         trajectory manager to the live articulation joint order, capture env
         origins and default joint state, finalize reference body names, build
         the MDP fast-path caches, and resolve the MPJPE metric bodies.
@@ -1178,10 +1178,9 @@ class ExpertDataPlane:
         The CommandManager builds the command terms inside
         ``ManagerBasedRLEnv.load_managers`` (during ``super().__init__``) and
         its manager table print accesses ``term.command`` eagerly -- before
-        the env has set its post-super ``robot`` attribute. Mirroring the
-        legacy env's guard (``if not hasattr(self, "robot"): self.robot =
-        self.scene["robot"]``), every robot read resolves from the scene when
-        the env attribute is not yet assigned.
+        the env has set its post-super ``robot`` attribute. Every robot read
+        therefore resolves from the scene (``self.scene["robot"]``) when the
+        env attribute is not yet assigned.
         """
         robot = getattr(self._env, "robot", None)
         if robot is None:

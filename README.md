@@ -125,7 +125,7 @@ The policy learner and the command interface are independent choices.
 Both latent interfaces pretrain the same spectral skill objective: a bilinear
 spectral energy ties the skill latent to the motion transition, and a
 predictor keeps it predictable one chunk ahead. They differ only in whether
-the latent is quantized. `--interface diffsr` remains an alias for `spectral`.
+the latent is quantized.
 
 ## Commands
 
@@ -254,8 +254,8 @@ ImitationLab builds on [Isaac Lab](https://github.com/isaac-sim/IsaacLab) and
 Newton/MJWarp, includes the official
 [SuperMimic](https://github.com/HybridRobotics/supermimic) baseline, and
 adapts components credited in
-[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Source revisions are listed
-in [provenance](docs/provenance.md). Motion data comes from the Unitree
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Pinned upstream revisions
+are listed in [upstream revisions](docs/provenance.md). Motion data comes from the Unitree
 retargeting of LAFAN1 and from Bones Studio's BONES-SEED.
 
 ## License

@@ -16,40 +16,16 @@ DEFAULT_TASK = "imitation-g1-v1"
 INTERFACES = ("explicit", "fsq", "spectral")
 LATENT_INTERFACES = INTERFACES[1:]
 
-#: Earlier interface names. Saved run settings, encoder records, tuning
-#: selections and benchmark results may carry them; read them through
-#: :func:`canonical_interface`.
-INTERFACE_ALIASES = {"diffsr": "spectral"}
-
-
-def canonical_interface(name: str) -> str:
-    """Return the current name of a command interface (``diffsr`` -> ``spectral``)."""
-    return INTERFACE_ALIASES.get(name, name)
-
-
-def interface_arg(name: str) -> str:
-    """argparse ``type`` for ``--interface``: accepts the deprecated names."""
-    canonical = canonical_interface(name)
-    if canonical != name:
-        import warnings
-
-        warnings.warn(
-            f"--interface {name} is deprecated; use --interface {canonical}.",
-            FutureWarning,
-            stacklevel=2,
-        )
-    return canonical
-
 
 #: The registry kwarg that names an algorithm-independent agent config. A run
 #: that leaves ``--agent`` at this value gets the algorithm-specific key below.
-GENERIC_AGENT_ENTRY_POINT = "rlopt_cfg_entry_point"
+GENERIC_AGENT_ENTRY_POINT = "agent_cfg_entry_point"
 
-#: Gym-registry kwarg keys of the algorithm-specific agent configs. The key
-#: names are part of the saved run record (``--agent``); do not rename them.
+#: Gym-registry kwarg keys of the algorithm-specific agent configs. A run
+#: record stores the key it used (``--agent``).
 ENTRY_POINT_ALGORITHM_MAP = {
-    "rlopt_ppo_cfg_entry_point": "PPO",
-    "rlopt_wmbptt_cfg_entry_point": "WMBPTT",
+    "ppo_cfg_entry_point": "PPO",
+    "wmbptt_cfg_entry_point": "WMBPTT",
 }
 
 
@@ -64,7 +40,7 @@ def is_eager_task(task: str) -> bool:
 
 def agent_entry_point_key(algorithm: str) -> str:
     """The registry kwarg key of the agent config for ``algorithm``."""
-    return f"rlopt_{algorithm.lower()}_cfg_entry_point"
+    return f"{algorithm.lower()}_cfg_entry_point"
 
 
 def resolve_agent_cfg_entry_point(

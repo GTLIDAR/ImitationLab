@@ -314,7 +314,7 @@ def test_traj_info_sidecar_fixes_the_order_and_offsets(
         cursor += lengths[name] - 1
         ends.append(cursor)
 
-    traj_info_path = tmp_path / "iltools_rb_manifest.json"
+    traj_info_path = tmp_path / "replay_manifest.json"
     traj_info_path.write_text(
         json.dumps(
             {
@@ -465,7 +465,7 @@ def test_multi_take_motions_are_refused_rather_than_duplicated(
     source_tree: tuple[Path, dict[str, int]], tmp_path: Path
 ) -> None:
     manifest, lengths = source_tree
-    traj_info_path = tmp_path / "iltools_rb_manifest.json"
+    traj_info_path = tmp_path / "replay_manifest.json"
     rows = lengths["walk"] - 1
     traj_info_path.write_text(
         json.dumps(

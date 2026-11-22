@@ -19,7 +19,7 @@ def _load_unitree_g1_joint_order() -> tuple[str, ...]:
         / "unitree_joint_order.py"
     )
     spec = importlib.util.spec_from_file_location(
-        "_isaaclab_imitation_unitree_joint_order", module_path
+        "_imitationlab_unitree_joint_order", module_path
     )
     if spec is None or spec.loader is None:
         raise RuntimeError(f"Could not load Unitree joint-order module: {module_path}")

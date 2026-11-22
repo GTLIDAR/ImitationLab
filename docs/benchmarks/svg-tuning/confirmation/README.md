@@ -12,10 +12,10 @@ The boards contain all 40 LAFAN1 clips and 256 fixed BONES-SEED clips, each star
 | --- | --- | --- | --- |
 | LAFAN1 | Explicit | Yes | No |
 | LAFAN1 | FSQ | Yes | No |
-| LAFAN1 | DiffSR | Yes | No |
+| LAFAN1 | Spectral | Yes | No |
 | BONES-SEED | Explicit | Yes | No |
 | BONES-SEED | FSQ | Yes | No |
-| BONES-SEED | DiffSR | Yes | No |
+| BONES-SEED | Spectral | Yes | No |
 
 ![Final pose-error ratios by case and policy seed](final-ratios.svg)
 
@@ -27,14 +27,14 @@ Ratios below one favor SVG on that error metric. Each point is one policy seed; 
 | LAFAN1 | Explicit | 43 | 100.00% / 100.00% | 13.88 / 12.86 | 61.39 / 51.55 | 10.00 / 10.00 | No |
 | LAFAN1 | FSQ | 42 | 100.00% / 100.00% | 19.62 / 18.70 | 48.24 / 43.88 | 10.00 / 10.01 | No |
 | LAFAN1 | FSQ | 43 | 100.00% / 100.00% | 19.93 / 19.45 | 51.22 / 48.33 | 10.00 / 10.01 | No |
-| LAFAN1 | DiffSR | 42 | 100.00% / 100.00% | 19.61 / 17.75 | 44.77 / 41.47 | 10.00 / 10.00 | No |
-| LAFAN1 | DiffSR | 43 | 100.00% / 100.00% | 18.40 / 18.38 | 43.02 / 42.20 | 10.00 / 10.01 | No |
+| LAFAN1 | Spectral | 42 | 100.00% / 100.00% | 19.61 / 17.75 | 44.77 / 41.47 | 10.00 / 10.00 | No |
+| LAFAN1 | Spectral | 43 | 100.00% / 100.00% | 18.40 / 18.38 | 43.02 / 42.20 | 10.00 / 10.01 | No |
 | BONES-SEED | Explicit | 42 | 100.00% / 100.00% | 13.25 / 13.38 | 59.45 / 63.84 | 10.00 / 10.01 | Yes |
 | BONES-SEED | Explicit | 43 | 100.00% / 100.00% | 13.81 / 13.25 | 66.45 / 60.52 | 10.00 / 10.00 | No |
 | BONES-SEED | FSQ | 42 | 98.83% / 100.00% | 19.86 / 18.60 | 73.69 / 56.27 | 10.00 / 10.00 | No |
 | BONES-SEED | FSQ | 43 | 98.83% / 100.00% | 19.77 / 18.87 | 72.66 / 60.27 | 10.00 / 10.00 | No |
-| BONES-SEED | DiffSR | 42 | 98.83% / 100.00% | 18.40 / 17.52 | 60.25 / 47.07 | 10.00 / 10.00 | No |
-| BONES-SEED | DiffSR | 43 | 98.83% / 100.00% | 18.60 / 17.38 | 62.18 / 49.21 | 10.00 / 10.00 | No |
+| BONES-SEED | Spectral | 42 | 98.83% / 100.00% | 18.40 / 17.52 | 60.25 / 47.07 | 10.00 / 10.00 | No |
+| BONES-SEED | Spectral | 43 | 98.83% / 100.00% | 18.60 / 17.38 | 62.18 / 49.21 | 10.00 / 10.00 | No |
 
 A per-seed tracking win requires no lower success count or survival, and lower local and global pose error. A case needs that result in both seeds to support a replicated improvement here. Two seeds do not establish statistical significance or broader robustness. No checkpoint is selected retrospectively. All other outcomes are tradeoffs or regressions, even if throughput improves. The time column is the first observed checkpoint with at least 90% success and local error at most 40 mm; it is not an interpolated crossing or the selection criterion.
 
@@ -46,7 +46,7 @@ All LAFAN1 runs survive the full ten seconds. BONES-SEED BPTT and explicit SVG a
 
 ![fsq tracking curves](curves-fsq.svg)
 
-![diffsr tracking curves](curves-diffsr.svg)
+![spectral tracking curves](curves-spectral.svg)
 
 Frozen SVG overrides:
 

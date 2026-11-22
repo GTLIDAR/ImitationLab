@@ -148,7 +148,7 @@ def test_no_unbounded_source_feeds_a_truncating_head(tmp_path: Path) -> None:
 
 @pytest.mark.parametrize("declared", ["a", "ids-ctrl-s0", "x" * 40])
 def test_the_id_never_exceeds_the_wandb_cap(tmp_path: Path, declared: str) -> None:
-    """RLOpt adds a `logdir:` tag and W&B caps a tag at 64 characters, which
+    """The learner's logger adds a `logdir:` tag and W&B caps a tag at 64 characters, which
     leaves 31 for the id."""
     state = tmp_path / f"state-{len(declared)}" / "wandb_run_id"
     assert _run(_harness(tmp_path, state, declared), tmp_path).returncode == 0

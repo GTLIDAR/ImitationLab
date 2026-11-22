@@ -114,7 +114,7 @@ def test_signal_handler_ignores_repeated_sigterm():
 
 
 def test_wmbptt_compile_options_come_before_the_env() -> None:
-    """``ImitationLearningTools`` helpers compile during env setup, and
+    """The motion-data helpers compile during env setup, and
     ``wm.elementwise_3x3`` refuses a process that has compiled."""
     source = (_RUNNERS / "train_impl.py").read_text()
     assert source.index("apply_compile_options(agent_cfg.wm)") < source.index(

@@ -37,7 +37,7 @@ parser.add_argument("--task", type=str, default=None, help="Name of the task.")
 parser.add_argument(
     "--agent",
     type=str,
-    default="rlopt_cfg_entry_point",
+    default="agent_cfg_entry_point",
     help="ImitationLab agent configuration entry point.",
 )
 parser.add_argument(

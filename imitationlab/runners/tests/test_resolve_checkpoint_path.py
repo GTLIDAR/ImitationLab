@@ -58,9 +58,9 @@ def test_a_directory_resolves_to_the_newest_checkpoint(tmp_path: Path) -> None:
 
 
 def test_it_walks_the_per_run_logger_subdirectories(tmp_path: Path) -> None:
-    # The real layout: <tracker>/rlopt_train/<timestamp>_wandb-<id>/model_step_N.pt
-    first = tmp_path / "rlopt_train" / "2026-08-15_10-00-00_wandb-aaa"
-    second = tmp_path / "rlopt_train" / "2026-08-15_22-00-00_wandb-bbb"
+    # The real layout: <tracker>/train/<timestamp>_wandb-<id>/model_step_N.pt
+    first = tmp_path / "train" / "2026-08-15_10-00-00_wandb-aaa"
+    second = tmp_path / "train" / "2026-08-15_22-00-00_wandb-bbb"
     first.mkdir(parents=True)
     second.mkdir(parents=True)
     old_ckpt = first / "model_step_2500000000.pt"
@@ -89,6 +89,6 @@ def test_a_light_checkpoint_is_not_a_resume_point(tmp_path: Path) -> None:
 
 
 def test_an_empty_tree_fails_loudly(tmp_path: Path) -> None:
-    (tmp_path / "rlopt_train" / "run").mkdir(parents=True)
+    (tmp_path / "train" / "run").mkdir(parents=True)
     with pytest.raises(FileNotFoundError, match="no model_step"):
         resolve(str(tmp_path))

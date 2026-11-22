@@ -55,7 +55,7 @@ to the SuperMimic row above because the learner and dataset differ.
 Additional workflow checks passed with this source:
 
 - Automatic encoder sizing selected four data environments and batch size 128
-  for FSQ/LAFAN1 and DiffSR/BONES-SEED. Both completed two updates with finite
+  for FSQ/LAFAN1 and spectral/BONES-SEED. Both completed two updates with finite
   checkpoints. These encoder checks used explicitly reduced 64-wide hidden
   layers, not the normal encoder network sizes.
 - A fresh SuperMimic run reused the winning selection and saved its resolved

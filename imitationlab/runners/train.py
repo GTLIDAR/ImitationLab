@@ -68,7 +68,7 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--agent",
         type=str,
-        default="rlopt_cfg_entry_point",
+        default="agent_cfg_entry_point",
         help="ImitationLab agent configuration entry point.",
     )
     parser.add_argument(

@@ -8,7 +8,7 @@ import json
 import math
 from pathlib import Path
 
-from imitationlab.runners.registry import DEFAULT_TASK, INTERFACES, canonical_interface
+from imitationlab.runners.registry import DEFAULT_TASK, INTERFACES
 
 POLICIES = ("ppo", "supermimic", "svg", "diffsr")
 DATASETS = ("lafan1", "bones_seed")
@@ -23,7 +23,7 @@ def summarize(paths: list[Path]) -> dict:
     gpus = set()
     for path in paths:
         raw = json.loads(path.read_text())
-        key = (raw["dataset"], canonical_interface(raw["interface"]), raw["policy"])
+        key = (raw["dataset"], raw["interface"], raw["policy"])
         if key in cases:
             raise ValueError(f"Duplicate benchmark case: {key}")
         if raw["status"] == "completed":

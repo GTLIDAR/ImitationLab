@@ -367,7 +367,7 @@
     },
     {
       "dataset": "bones_seed",
-      "interface": "diffsr",
+      "interface": "spectral",
       "policy": "diffsr",
       "status": "completed",
       "budget_seconds": 600.0,
@@ -483,7 +483,7 @@
     },
     {
       "dataset": "bones_seed",
-      "interface": "diffsr",
+      "interface": "spectral",
       "policy": "svg",
       "status": "completed",
       "budget_seconds": 600.0,
@@ -579,7 +579,7 @@
     },
     {
       "dataset": "bones_seed",
-      "interface": "diffsr",
+      "interface": "spectral",
       "policy": "ppo",
       "status": "completed",
       "budget_seconds": 600.0,
@@ -1037,7 +1037,7 @@
     },
     {
       "dataset": "lafan1",
-      "interface": "diffsr",
+      "interface": "spectral",
       "policy": "ppo",
       "status": "completed",
       "budget_seconds": 600.0,

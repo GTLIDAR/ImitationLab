@@ -172,10 +172,10 @@ def test_evaluate_applies_pinned_reset_settings_to_the_task(tmp_path, capsys):
 def test_agent_entry_point_keys_are_stable():
     # Saved runs record these registry keys through --agent.
     assert ENTRY_POINT_ALGORITHM_MAP == {
-        "rlopt_ppo_cfg_entry_point": "PPO",
-        "rlopt_wmbptt_cfg_entry_point": "WMBPTT",
+        "ppo_cfg_entry_point": "PPO",
+        "wmbptt_cfg_entry_point": "WMBPTT",
     }
-    assert agent_entry_point_key("WMBPTT") == "rlopt_wmbptt_cfg_entry_point"
+    assert agent_entry_point_key("WMBPTT") == "wmbptt_cfg_entry_point"
 
 
 def test_agent_entry_point_resolution(monkeypatch):
@@ -185,13 +185,13 @@ def test_agent_entry_point_resolution(monkeypatch):
     gym.register(
         id=task,
         entry_point="gymnasium.envs.classic_control:CartPoleEnv",
-        kwargs={"rlopt_ppo_cfg_entry_point": "pkg:Cfg"},
+        kwargs={"ppo_cfg_entry_point": "pkg:Cfg"},
     )
     try:
-        assert resolve_agent_cfg_entry_point(task, "PPO") == "rlopt_ppo_cfg_entry_point"
+        assert resolve_agent_cfg_entry_point(task, "PPO") == "ppo_cfg_entry_point"
         assert resolve_agent_cfg_entry_point(task, "PPO", "custom_key") == "custom_key"
         assert resolve_agent_cfg_entry_point(None, "WMBPTT") == (
-            "rlopt_wmbptt_cfg_entry_point"
+            "wmbptt_cfg_entry_point"
         )
         with pytest.raises(UserError, match=r"no agent config.*\['PPO'\]"):
             resolve_agent_cfg_entry_point(task, "WMBPTT")

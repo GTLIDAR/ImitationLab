@@ -4,7 +4,7 @@ Isaac Lab's Hydra path merges CLI overrides into the config object with
 ``setattr``, so ``agent.ppo.some_typo=false`` becomes an attribute nobody
 reads and the run proceeds as if the setting were applied. Five fine-tune
 campaigns in 2026-09 passed ``agent.ppo.update_normalizers_after_rollout=false``
-before that key existed in RLOpt; their READMEs claimed a frozen normalizer
+before that key existed in the learner; their READMEs claimed a frozen normalizer
 that never was. ``env.*`` has the same trap: ``env.reset_fail_shar=0.3`` ran a
 control arm that looked like a treatment arm. This check walks the resolved
 config and raises on any public attribute that is not declared, so the mistake
@@ -46,6 +46,6 @@ def assert_no_unknown_config_keys(config: Any, *, prefix: str = "agent") -> None
     if unknown:
         raise ValueError(
             "config overrides name fields that do not exist (typo, a key this "
-            "task does not declare, or a key the installed RLOpt does not "
+            "task does not declare, or a key the learner does not "
             "implement): " + ", ".join(unknown)
         )

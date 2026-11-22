@@ -20,7 +20,6 @@ from imitationlab.cli_args import (
 from imitationlab.runners.errors import UserError, reported_by
 from imitationlab.runners.registry import (
     DEFAULT_TASK,
-    interface_arg,
     is_eager_task,
 )
 
@@ -53,7 +52,6 @@ def _pretrain(argv: list[str]) -> int:
     parser.add_argument(
         "--interface",
         required=True,
-        type=interface_arg,
         choices=("fsq", "spectral"),
         help="Encoder to pretrain.",
     )

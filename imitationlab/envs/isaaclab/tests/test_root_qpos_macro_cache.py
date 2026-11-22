@@ -30,7 +30,7 @@ def _persist_manifest(*, motions: list[str] | None) -> dict:
 def test_persisted_replay_guard_accepts_exact_identity(tmp_path) -> None:
     persist_dir = tmp_path / "full"
     persist_dir.mkdir()
-    (persist_dir / "iltools_rb_manifest.json").write_text(
+    (persist_dir / "replay_manifest.json").write_text(
         json.dumps(_persist_manifest(motions=None)), encoding="utf-8"
     )
 
@@ -47,7 +47,7 @@ def test_persisted_replay_guard_accepts_exact_identity(tmp_path) -> None:
 def test_persisted_replay_guard_refuses_subset_overwrite(tmp_path) -> None:
     persist_dir = tmp_path / "full"
     persist_dir.mkdir()
-    manifest_path = persist_dir / "iltools_rb_manifest.json"
+    manifest_path = persist_dir / "replay_manifest.json"
     original = json.dumps(_persist_manifest(motions=None))
     manifest_path.write_text(original, encoding="utf-8")
 

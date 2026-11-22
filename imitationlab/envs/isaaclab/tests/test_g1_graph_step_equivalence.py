@@ -50,7 +50,7 @@ def _run(tmp_path: Path, name: str, module: str, mode: str, *args: str) -> Path:
     out = tmp_path / f"{name}.json"
     env = dict(
         os.environ,
-        ISAACLAB_IMITATION_COLLECT_FASTPATH="1",
+        IMITATIONLAB_ENV_COLLECT_FASTPATH="1",
         WANDB_MODE="disabled",
         OMNI_KIT_ACCEPT_EULA="YES",
         TERM=os.environ.get("TERM", "xterm"),

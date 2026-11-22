@@ -245,7 +245,7 @@ def test_provenance_keys_survive_loader_kwargs_build() -> None:
 def test_cache_dir_from_entries_family_prefix(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    monkeypatch.setenv("ISAACLAB_IMITATION_MOTION_CACHE_ROOT", str(tmp_path))
+    monkeypatch.setenv("IMITATIONLAB_MOTION_CACHE_ROOT", str(tmp_path))
     entries = [{"name": "m", "path": "/tmp/x/m.npz", "input_fps": 50.0}]
     manifest_path = tmp_path / "g1_bones_manifest.json"
 
@@ -258,8 +258,8 @@ def test_cache_dir_from_entries_family_prefix(
         )
     )
 
-    assert default_path.name.startswith("iltools_g1_lafan1_tracking_")
-    assert bones_path.name.startswith("iltools_g1_bones_seed_tracking_")
+    assert default_path.name.startswith("imitationlab_g1_lafan1_tracking_")
+    assert bones_path.name.startswith("imitationlab_g1_bones_seed_tracking_")
     # The content digest is unchanged by the family prefix.
     assert default_path.name.split("_")[-1] == bones_path.name.split("_")[-1]
     assert default_path.parent == bones_path.parent == tmp_path

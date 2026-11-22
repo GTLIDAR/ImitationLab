@@ -29,8 +29,8 @@ KIT_MODULE_PREFIXES = (
 #: fail -- pass ``--experimental-compute-only-physx`` to try.
 COMPUTE_ONLY_GPU_MARKERS = ("A100",)
 RUNTIME_ROOT_CANDIDATES = (
-    Path("/opt/isaaclab-imitation-runtime"),
-    Path("/opt/isaaclab-imitation-runtime-spec/.pixi/envs/container-runtime"),
+    Path("/opt/imitationlab-runtime"),
+    Path("/opt/imitationlab-runtime-spec/.pixi/envs/container-runtime"),
 )
 
 

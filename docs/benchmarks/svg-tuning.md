@@ -90,7 +90,7 @@ candidate for confirmation. If no candidate wins, report that result.
 The captured path passed 45 CUDA graph tests, including graph/eager update
 parity and sampling while replay fills and wraps; the CPU suites passed
 1,026 tests with two skips. Local public training and evaluation reload
-checks passed for explicit, FSQ, and DiffSR commands. Those small integration
+checks passed for explicit, FSQ, and spectral commands. Those small integration
 checks used 16 environments and 1,536 frames, with small smoke encoders for
 the latent interfaces; they do not establish tracking quality. The H100
 comparison uses the normal networks and frozen benchmark encoders.

@@ -77,7 +77,7 @@ def test_packed_motions_enable_the_compatible_training_defaults(policy, tmp_path
     resolved = shlex.split(subprocess.check_output(command, text=True))
     environ = {}
     expanded = expand_args_files(resolved[2:], environ=environ)
-    assert environ["ISAACLAB_IMITATION_COLLECT_FASTPATH"] == "1"
+    assert environ["IMITATIONLAB_ENV_COLLECT_FASTPATH"] == "1"
     assert "env.step_mode=graph" in expanded
     assert expanded[-2:] == ["--num_envs", "16"]
     imagined_defaults = policy in (None, "supermimic")

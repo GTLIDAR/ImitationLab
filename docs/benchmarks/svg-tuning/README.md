@@ -6,9 +6,9 @@ Each screen run used one H100 80 GB, seed 42, explicit commands, and 1,800 polic
 
 ## Final comparison across interfaces and seeds
 
-The [final report](confirmation/README.md) covers both banks, explicit/FSQ/DiffSR commands, and policy seeds 42/43: 24 accepted runs, 12 matched pairs, and 132 evaluated checkpoints. Twenty runs are fresh; four explicit seed-42 runs are reused from selection. All use the same source archive and fixed evaluation boards; latent pairs share frozen encoder weights. No different recipe or checkpoint was chosen for individual cases.
+The [final report](confirmation/README.md) covers both banks, explicit/FSQ/spectral commands, and policy seeds 42/43: 24 accepted runs, 12 matched pairs, and 132 evaluated checkpoints. Twenty runs are fresh; four explicit seed-42 runs are reused from selection. All use the same source archive and fixed evaluation boards; latent pairs share frozen encoder weights. No different recipe or checkpoint was chosen for individual cases.
 
-SVG's BONES-SEED explicit seed-42 improvement did not repeat at seed 43. Its LAFAN1 explicit seed-42 result already traded lower local error for higher global error. BPTT had lower values of both errors in every fresh pair. On BONES-SEED with FSQ or DiffSR commands, SVG reached 253/256 successful clips (98.83%) in both seeds versus BPTT's 256/256; survival also decreased. The other pairs tied on success and survival. All runs first met 90% success plus local error at most 40 mm at approximately ten minutes, which does not erase the final tracking differences.
+SVG's BONES-SEED explicit seed-42 improvement did not repeat at seed 43. Its LAFAN1 explicit seed-42 result already traded lower local error for higher global error. BPTT had lower values of both errors in every fresh pair. On BONES-SEED with FSQ or spectral commands, SVG reached 253/256 successful clips (98.83%) in both seeds versus BPTT's 256/256; survival also decreased. The other pairs tied on success and survival. All runs first met 90% success plus local error at most 40 mm at approximately ten minutes, which does not erase the final tracking differences.
 
 ![Final SVG versus BPTT tracking errors](confirmation/final-ratios.svg)
 
@@ -125,19 +125,19 @@ The 12 BPTT reference cases cover both banks, all three interfaces, and policy s
 | LAFAN1 | explicit | 43 | 100.00% | 12.90 | 47.26 | 10.000 |
 | LAFAN1 | fsq | 42 | 100.00% | 17.91 | 44.55 | 10.000 |
 | LAFAN1 | fsq | 43 | 100.00% | 18.67 | 45.32 | 10.000 |
-| LAFAN1 | diffsr | 42 | 100.00% | 18.44 | 41.95 | 10.000 |
-| LAFAN1 | diffsr | 43 | 100.00% | 17.78 | 41.39 | 10.000 |
+| LAFAN1 | spectral | 42 | 100.00% | 18.44 | 41.95 | 10.000 |
+| LAFAN1 | spectral | 43 | 100.00% | 17.78 | 41.39 | 10.000 |
 | BONES-SEED | explicit | 42 | 100.00% | 13.26 | 61.44 | 5.959 |
 | BONES-SEED | explicit | 43 | 100.00% | 13.47 | 63.89 | 5.959 |
 | BONES-SEED | fsq | 42 | 99.22% | 18.56 | 54.65 | 5.948 |
 | BONES-SEED | fsq | 43 | 100.00% | 18.63 | 60.90 | 5.959 |
-| BONES-SEED | diffsr | 42 | 100.00% | 17.16 | 49.99 | 5.959 |
-| BONES-SEED | diffsr | 43 | 100.00% | 17.25 | 50.89 | 5.959 |
+| BONES-SEED | spectral | 42 | 100.00% | 17.16 | 49.99 | 5.959 |
+| BONES-SEED | spectral | 43 | 100.00% | 17.25 | 50.89 | 5.959 |
 
 These are reference measurements from the contact source, `bb0d1be`, with the same 30-minute budget. They are not paired controls for the newer captured-SVG source; the final comparison uses matching controls from that newer source. BONES-SEED survival can be below ten seconds because clips end at their available length. The [aggregate records](bptt-reference-repeats.json) retain every accepted checkpoint, frozen encoder hashes, source and submission provenance, and the original CUDA-unavailable allocation. Two seeds do not establish statistical significance.
 
 ## Scope and provenance
 
-The SVG screens use one policy seed; the final comparison and BPTT reference repeats use two. These are acquisition measurements on training motions, not held-out generalization or full-bank coverage. Each clip starts at frame zero and runs for at most 10 seconds. The default BPTT recipe retains its model-only contact reward and captured updates; this compares complete recipes, not only gradient estimators. The SVG candidate screens use explicit commands; the final comparison and BPTT reference repeats also cover FSQ and DiffSR commands.
+The SVG screens use one policy seed; the final comparison and BPTT reference repeats use two. These are acquisition measurements on training motions, not held-out generalization or full-bank coverage. Each clip starts at frame zero and runs for at most 10 seconds. The default BPTT recipe retains its model-only contact reward and captured updates; this compares complete recipes, not only gradient estimators. The SVG candidate screens use explicit commands; the final comparison and BPTT reference repeats also cover FSQ and spectral commands.
 
 Initial-screen training source: `1f6e75c0711cce33ada4564db78880f3d7332405`. Source fingerprint: `77bf2292037789a09aaeaa566c90fe1121ba97d55940ad371496fdcdb6c942a8`. The [initial aggregate measurements](initial-screen.json) retain all 84 evaluated checkpoints, actual clocks, hardware/software records, optimizer evidence, and source/checkpoint hashes. Later source groups are identified above and in their records. Raw BONES-SEED records and checkpoints remain outside Git.

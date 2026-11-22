@@ -77,7 +77,7 @@ def main() -> int:
     from isaaclab_tasks.utils import resolve_task_config
     from imitationlab.runners.launch_compat import needs_kit
 
-    env_cfg, agent_cfg = resolve_task_config(args.task, "rlopt_wmbptt_cfg_entry_point")
+    env_cfg, agent_cfg = resolve_task_config(args.task, "wmbptt_cfg_entry_point")
     env_cfg.scene.num_envs = args.num_envs
     env_cfg.seed = args.seed
     kit = needs_kit(env_cfg, args)  # resolves the physics preset before launching

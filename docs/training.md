@@ -35,8 +35,6 @@ or interface specified, training selects `supermimic` and `explicit`.
 | `fsq` | A frozen spectral skill encoder's 64 normalized scalar lattice values and two phase values with the supplied recipe |
 | `spectral` | A frozen spectral skill encoder's 64 continuous values and two phase values with the supplied recipe |
 
-`--interface diffsr` is the earlier name of `spectral` and still works.
-
 The `fsq` and `spectral` interfaces are the latent interfaces. Both encoders
 use ten 38-value root-and-joint frames at 50 Hz. Which frame these values are
 expressed in is set by `env.expert_macro_anchor_mode`:

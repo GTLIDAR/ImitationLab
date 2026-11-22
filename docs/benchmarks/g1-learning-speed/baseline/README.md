@@ -29,10 +29,10 @@ Final checkpoints are checked for finite tensors and positive learner optimizer 
 | supermimic / fsq | 0.0% / 147.5 @ 3.81 | 0.0% / 147.5 @ 3.81 | 0.0% / 140.0 @ 5.00 | 100.0% / 23.0 @ 10.01 | 10.01 min |
 | svg / fsq | 0.0% / 146.9 @ 5.45 | 0.0% / 146.9 @ 5.45 | 0.0% / 146.9 @ 5.45 | 50.0% / 67.4 @ 10.01 | not reached |
 | diffsr / fsq | 0.0% / 147.4 @ 3.71 | 0.0% / 147.4 @ 3.71 | 0.0% / 146.9 @ 5.02 | 0.0% / 153.6 @ 10.02 | not reached |
-| ppo / diffsr | 0.0% / 171.0 @ 1.03 | 0.0% / 111.6 @ 2.03 | 0.0% / 92.6 @ 5.02 | 0.0% / 86.6 @ 10.02 | not reached |
-| supermimic / diffsr | 0.0% / 147.4 @ 3.96 | 0.0% / 147.4 @ 3.96 | 0.0% / 138.9 @ 5.00 | 100.0% / 21.2 @ 10.01 | 10.01 min |
-| svg / diffsr | 0.0% / 147.0 @ 5.39 | 0.0% / 147.0 @ 5.39 | 0.0% / 147.0 @ 5.39 | 52.5% / 67.9 @ 10.00 | not reached |
-| diffsr / diffsr | 0.0% / 147.4 @ 3.66 | 0.0% / 147.4 @ 3.66 | 0.0% / 148.6 @ 5.01 | 0.0% / 177.7 @ 10.01 | not reached |
+| ppo / spectral | 0.0% / 171.0 @ 1.03 | 0.0% / 111.6 @ 2.03 | 0.0% / 92.6 @ 5.02 | 0.0% / 86.6 @ 10.02 | not reached |
+| supermimic / spectral | 0.0% / 147.4 @ 3.96 | 0.0% / 147.4 @ 3.96 | 0.0% / 138.9 @ 5.00 | 100.0% / 21.2 @ 10.01 | 10.01 min |
+| svg / spectral | 0.0% / 147.0 @ 5.39 | 0.0% / 147.0 @ 5.39 | 0.0% / 147.0 @ 5.39 | 52.5% / 67.9 @ 10.00 | not reached |
+| diffsr / spectral | 0.0% / 147.4 @ 3.66 | 0.0% / 147.4 @ 3.66 | 0.0% / 148.6 @ 5.01 | 0.0% / 177.7 @ 10.01 | not reached |
 
 ## bones_seed
 
@@ -46,10 +46,10 @@ Final checkpoints are checked for finite tensors and positive learner optimizer 
 | supermimic / fsq | 2.0% / 100.6 @ 3.76 | 2.0% / 100.6 @ 3.76 | 82.8% / 74.9 @ 5.00 | 99.2% / 22.9 @ 10.01 | 10.01 min |
 | svg / fsq | 2.0% / 100.5 @ 5.32 | 2.0% / 100.5 @ 5.32 | 2.0% / 100.5 @ 5.32 | 88.7% / 53.3 @ 10.01 | not reached |
 | diffsr / fsq | 2.0% / 100.6 @ 3.61 | 2.0% / 100.6 @ 3.61 | 2.0% / 101.6 @ 5.01 | 94.9% / 51.4 @ 10.01 | 10.01 min |
-| ppo / diffsr | 2.0% / 121.7 @ 1.03 | 1.6% / 119.6 @ 2.02 | 2.3% / 77.7 @ 5.00 | 62.1% / 81.3 @ 10.03 | not reached |
-| supermimic / diffsr | 2.0% / 100.6 @ 3.79 | 2.0% / 100.6 @ 3.79 | 2.7% / 99.7 @ 5.01 | 99.2% / 26.7 @ 10.01 | 10.01 min |
-| svg / diffsr | 2.0% / 100.5 @ 5.30 | 2.0% / 100.5 @ 5.30 | 2.0% / 100.5 @ 5.30 | 91.8% / 51.1 @ 10.01 | 10.01 min |
-| diffsr / diffsr | 2.0% / 100.6 @ 3.62 | 2.0% / 100.6 @ 3.62 | 2.0% / 101.5 @ 5.01 | 92.6% / 51.4 @ 10.01 | 10.01 min |
+| ppo / spectral | 2.0% / 121.7 @ 1.03 | 1.6% / 119.6 @ 2.02 | 2.3% / 77.7 @ 5.00 | 62.1% / 81.3 @ 10.03 | not reached |
+| supermimic / spectral | 2.0% / 100.6 @ 3.79 | 2.0% / 100.6 @ 3.79 | 2.7% / 99.7 @ 5.01 | 99.2% / 26.7 @ 10.01 | 10.01 min |
+| svg / spectral | 2.0% / 100.5 @ 5.30 | 2.0% / 100.5 @ 5.30 | 2.0% / 100.5 @ 5.30 | 91.8% / 51.1 @ 10.01 | 10.01 min |
+| diffsr / spectral | 2.0% / 100.6 @ 3.62 | 2.0% / 100.6 @ 3.62 | 2.0% / 101.5 @ 5.01 | 92.6% / 51.4 @ 10.01 | 10.01 min |
 
 ## Protocol and limits
 
@@ -61,7 +61,7 @@ Success means no root tracking failure: absolute root-height error ≤0.25 m and
 
 Threshold times are the first sampled checkpoints meeting the target, without interpolation. “Not reached” means no saved checkpoint met the target within this run; a transient crossing between checkpoints is unknown. One seed does not establish a statistically reliable learner ranking.
 
-FSQ and DiffSR each use a dataset-specific frozen encoder; its pretraining record includes the update count and architecture. Encoder process time and policy startup are added separately for end-to-end time; queueing and evaluation are excluded. Reusing an encoder amortizes its cost across policies. All timing is specific to the recorded hardware, software, source snapshot, and compiler cache state. The cluster sweep uses separate cold compiler caches per job.
+FSQ and spectral each use a dataset-specific frozen encoder; its pretraining record includes the update count and architecture. Encoder process time and policy startup are added separately for end-to-end time; queueing and evaluation are excluded. Reusing an encoder amortizes its cost across policies. All timing is specific to the recorded hardware, software, source snapshot, and compiler cache state. The cluster sweep uses separate cold compiler caches per job.
 
 Raw BONES-SEED data, per-motion results, and model weights stay outside Git. Only aggregate measurements and hashes are published here.
 
@@ -69,10 +69,10 @@ Raw BONES-SEED data, per-motion results, and model weights stay outside Git. Onl
 
 | Dataset | Command | Learner | Profile | Envs | Encoder min | Startup min | Last train min | Last end-to-end min | MPJPE-G mm | Mean survival s |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| bones_seed | diffsr | diffsr | large | 8192 | 5.45 | 4.06 | 10.01 | 19.51 | 313.3 | 5.80 |
-| bones_seed | diffsr | ppo | large | 8192 | 5.45 | 2.85 | 10.03 | 18.33 | 391.7 | 4.56 |
-| bones_seed | diffsr | supermimic | large | 8192 | 5.45 | 4.09 | 10.01 | 19.55 | 116.5 | 5.95 |
-| bones_seed | diffsr | svg | large | 8192 | 5.45 | 4.03 | 10.01 | 19.48 | 237.6 | 5.72 |
+| bones_seed | spectral | diffsr | large | 8192 | 5.45 | 4.06 | 10.01 | 19.51 | 313.3 | 5.80 |
+| bones_seed | spectral | ppo | large | 8192 | 5.45 | 2.85 | 10.03 | 18.33 | 391.7 | 4.56 |
+| bones_seed | spectral | supermimic | large | 8192 | 5.45 | 4.09 | 10.01 | 19.55 | 116.5 | 5.95 |
+| bones_seed | spectral | svg | large | 8192 | 5.45 | 4.03 | 10.01 | 19.48 | 237.6 | 5.72 |
 | bones_seed | explicit | diffsr | xlarge | 16384 | 0.00 | 3.89 | 10.01 | 13.89 | 375.2 | 5.61 |
 | bones_seed | explicit | ppo | large | 8192 | 0.00 | 3.69 | 10.00 | 13.69 | 759.6 | 5.72 |
 | bones_seed | explicit | supermimic | xlarge | 16384 | 0.00 | 4.01 | 10.01 | 14.02 | 75.5 | 5.96 |
@@ -81,10 +81,10 @@ Raw BONES-SEED data, per-motion results, and model weights stay outside Git. Onl
 | bones_seed | fsq | ppo | large | 8192 | 5.39 | 2.84 | 10.01 | 18.24 | 377.5 | 4.53 |
 | bones_seed | fsq | supermimic | large | 8192 | 5.39 | 4.03 | 10.01 | 19.43 | 88.6 | 5.95 |
 | bones_seed | fsq | svg | large | 8192 | 5.39 | 4.09 | 10.01 | 19.48 | 239.3 | 5.69 |
-| lafan1 | diffsr | diffsr | xlarge | 16384 | 3.55 | 3.10 | 10.01 | 16.66 | 254.7 | 1.02 |
-| lafan1 | diffsr | ppo | large | 8192 | 3.55 | 2.58 | 10.02 | 16.16 | 138.3 | 2.94 |
-| lafan1 | diffsr | supermimic | xlarge | 16384 | 3.55 | 3.13 | 10.01 | 16.70 | 55.7 | 10.00 |
-| lafan1 | diffsr | svg | xlarge | 16384 | 3.55 | 3.11 | 10.01 | 16.68 | 619.2 | 8.43 |
+| lafan1 | spectral | diffsr | xlarge | 16384 | 3.55 | 3.10 | 10.01 | 16.66 | 254.7 | 1.02 |
+| lafan1 | spectral | ppo | large | 8192 | 3.55 | 2.58 | 10.02 | 16.16 | 138.3 | 2.94 |
+| lafan1 | spectral | supermimic | xlarge | 16384 | 3.55 | 3.13 | 10.01 | 16.70 | 55.7 | 10.00 |
+| lafan1 | spectral | svg | xlarge | 16384 | 3.55 | 3.11 | 10.01 | 16.68 | 619.2 | 8.43 |
 | lafan1 | explicit | diffsr | xlarge | 16384 | 0.00 | 3.07 | 10.01 | 13.08 | 408.8 | 9.88 |
 | lafan1 | explicit | ppo | large | 8192 | 0.00 | 2.70 | 10.02 | 12.72 | 164.9 | 4.19 |
 | lafan1 | explicit | supermimic | xlarge | 16384 | 0.00 | 3.07 | 10.01 | 13.08 | 53.4 | 10.00 |

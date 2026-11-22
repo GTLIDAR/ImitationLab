@@ -822,7 +822,7 @@ def _build_env(spec: dict[str, Any]):
     import isaaclab_tasks  # noqa: F401
     from isaaclab_tasks.utils import resolve_task_config
 
-    env_cfg, _ = resolve_task_config(spec["task"], "rlopt_wmbptt_cfg_entry_point")
+    env_cfg, _ = resolve_task_config(spec["task"], "wmbptt_cfg_entry_point")
     shared = spec.get("shared_library")
     if shared is not None:
         if shared["lengths"] != spec["lengths"]:

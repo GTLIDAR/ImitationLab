@@ -49,10 +49,10 @@ def resolve_unitree_g1_29dof_usd_path() -> str:
     comparisons retired the alternatives: the official asset reached ep_len
     63.5 versus 58.9 for Isaac Sim's bundled mesh-less test fixture and 8.0
     for the old modified URDF-conversion tree.
-    ``ISAACLAB_IMITATION_UNITREE_USD_PATH`` remains as an explicit escape
+    ``IMITATIONLAB_UNITREE_USD_PATH`` remains as an explicit escape
     hatch for asset experiments only.
     """
-    explicit_path = os.environ.get("ISAACLAB_IMITATION_UNITREE_USD_PATH")
+    explicit_path = os.environ.get("IMITATIONLAB_UNITREE_USD_PATH")
     if explicit_path:
         return str(Path(explicit_path).expanduser())
     if not UNITREE_G1_29DOF_USD_FILE.is_file():

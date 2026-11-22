@@ -8,8 +8,8 @@
     "exact_board_count_thresholds": true,
     "measurements_unchanged": true,
     "corrected_cases": [
-      "lafan1/diffsr/diffsr",
-      "lafan1/diffsr/svg",
+      "lafan1/spectral/diffsr",
+      "lafan1/spectral/svg",
       "lafan1/explicit/diffsr",
       "lafan1/explicit/ppo",
       "lafan1/fsq/diffsr"

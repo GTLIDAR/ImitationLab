@@ -16,7 +16,7 @@ LATENT_TASK = "imitationlab.envs.isaaclab.task_model.g1_task:G1LatentTrackingTas
 
 
 @configclass
-class G1RLOptWMBPTTConfig(WMBPTTTrainerConfig):
+class G1WMBPTTConfig(WMBPTTTrainerConfig):
     """SuperMimic recipe: k = 8, H = 32, 4096 imagined rollouts, gamma 0.99."""
 
     _command_interface = None

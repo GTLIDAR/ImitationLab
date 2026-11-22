@@ -56,7 +56,7 @@ def _maybe_compile(fn):
     expert sampling. Compiling every shape can spawn many Inductor workers and
     exhaust memory before training reaches the first update.
     """
-    enabled = os.environ.get("ISAACLAB_IMITATION_COMPILE_MDP", "").lower()
+    enabled = os.environ.get("IMITATIONLAB_COMPILE_MDP", "").lower()
     if enabled in {"1", "true", "yes", "on"}:
         return torch.compile(fn)
     return fn

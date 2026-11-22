@@ -13,7 +13,7 @@ import math
 import os
 from pathlib import Path
 
-from imitationlab.runners.registry import LATENT_INTERFACES, canonical_interface
+from imitationlab.runners.registry import LATENT_INTERFACES
 
 GIB = 2**30
 PROFILE_NAMES = ("small", "standard", "large", "xlarge")
@@ -216,7 +216,7 @@ def choose_plan(
         and stage == "train"
         and hardware.gpu_name.startswith("NVIDIA H100")
         and policy in ("svg", "diffsr")
-        and canonical_interface(interface) in LATENT_INTERFACES
+        and interface in LATENT_INTERFACES
         and PROFILE_NAMES.index(name) > PROFILE_NAMES.index("standard")
     ):
         # Ten-minute H100 checks improve LAFAN1 learning and BONES DiffSR,

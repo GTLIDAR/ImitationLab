@@ -23,8 +23,6 @@ from imitationlab.cli_args import (
 )
 from imitationlab.runners.registry import (
     INTERFACES,
-    canonical_interface,
-    interface_arg,
 )
 from imitationlab.runners.errors import UserError, reported_by
 from imitationlab.runners.registry import DEFAULT_TASK
@@ -129,8 +127,6 @@ def load_selection(
     except (OSError, json.JSONDecodeError) as exc:
         raise UserError(f"Cannot read tuning selection {path}: {exc}") from exc
     context = saved.get("context")
-    if isinstance(context, dict) and "interface" in context:
-        context = {**context, "interface": canonical_interface(context["interface"])}
     if context != context_signature(plan, argv, encoder):
         raise UserError(
             "Tuning selection does not match this hardware, source, software, data, encoder, or workload overrides. Recalibrate or omit --tuning."
@@ -278,7 +274,6 @@ def main(argv: list[str] | None = None, *, calibrate: bool = False) -> int:
     )
     parser.add_argument(
         "--interface",
-        type=interface_arg,
         choices=INTERFACES,
         default="explicit",
         help="Command interface (default: %(default)s).",

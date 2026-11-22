@@ -16,9 +16,9 @@ all just different *contents* of the same blob, distinguished by the free-form
     }
 
 ``lafan1_csv`` in that payload is NOT a dataset name: it is the key of the
-ILTools clip loader that consumes the blob (see :data:`CLIP_LOADER_KEY`), owned
-by the ImitationLearningTools submodule. It is the one place that spelling is
-allowed to appear, and nothing in this repo should branch on it.
+clip loader that consumes the blob (see :data:`CLIP_LOADER_KEY` and
+``imitationlab.data_tools.lafan1.loader``). It is the one place that spelling
+is allowed to appear, and nothing in this repo should branch on it.
 
 This module owns reading, validating, and writing the blob. It is deliberately
 stdlib-only (json/pathlib/hashlib) so scripts and tests can load a manifest by
@@ -42,11 +42,10 @@ from typing import Any
 PACKAGE_ROOT = Path(__file__).resolve().parents[3]
 MANIFESTS_DIR = PACKAGE_ROOT / "manifests"
 
-# The ILTools loader that consumes a clip manifest, and the payload key it
-# reads its entries from. This is a submodule contract (see
-# ``iltools/datasets/loaders.py``), which is why the spelling is historical:
-# it is the ONLY place a dataset name appears as a code identifier, and it is
-# passed through to the loader rather than branched on.
+# The payload key the clip loader (``imitationlab.data_tools.lafan1.loader``)
+# reads a manifest's entries from. It is the ONLY place a dataset name appears
+# as a code identifier, and it is passed through to the loader rather than
+# branched on.
 CLIP_LOADER_KEY = "lafan1_csv"
 
 # ``metadata.family`` names the motion-data lineage a manifest describes and
@@ -57,7 +56,7 @@ CLIP_LOADER_KEY = "lafan1_csv"
 KNOWN_MANIFEST_FAMILIES = ("lafan1", "dance102", "bones_seed", "unified")
 
 # Entry keys carried through normalization beyond the required
-# name/path/input_fps(/frame_range) set. The ILTools ``Lafan1CsvLoader``
+# name/path/input_fps(/frame_range) set. ``Lafan1CsvLoader``
 # reads entries with ``Mapping.get`` and ignores unknown keys, so preserving
 # these provenance keys is safe end to end.
 _PRESERVED_ENTRY_KEYS = ("source_dataset", "source_motion_name")
@@ -150,7 +149,7 @@ def load_clip_manifest(
 
 
 def load_clip_loader_options(manifest_path: str | Path) -> dict[str, int]:
-    """Load optional ILTools loader options from manifest metadata."""
+    """Load optional clip-loader options from manifest metadata."""
     manifest_file = Path(manifest_path).expanduser().resolve()
     data = json.loads(manifest_file.read_text(encoding="utf-8"))
     if not isinstance(data, dict):
@@ -207,7 +206,7 @@ def build_clip_loader_kwargs(
     dataset_name: str = "lafan1",
     canonical_joint_names: list[str] | None = None,
 ) -> dict[str, Any]:
-    """Build the ILTools clip-loader call arguments from resolved clip entries.
+    """Build the clip-loader call arguments from resolved clip entries.
 
     These are call arguments, not configuration: everything here is derived
     from the environment config and the manifest, so the result is built at
@@ -253,13 +252,13 @@ def cache_dir_from_entries(
     """Create a stable cache path tied to the manifest identity and entries.
 
     The directory name is prefixed with the manifest's ``family`` so caches
-    self-describe (``iltools_g1_bones_seed_tracking_*``). The two ``"lafan1"``
+    self-describe (``imitationlab_g1_bones_seed_tracking_*``). The two ``"lafan1"``
     fallbacks below are frozen spellings, not defaults worth generalizing:
     changing either would rename -- and therefore invalidate -- every cache
     built before this function existed.
     """
     cache_root = Path(
-        os.environ.get("ISAACLAB_IMITATION_MOTION_CACHE_ROOT", "/tmp")
+        os.environ.get("IMITATIONLAB_MOTION_CACHE_ROOT", "/tmp")
     ).expanduser()
     resolved_manifest_path = None
     manifest_name = "lafan1"
@@ -279,7 +278,7 @@ def cache_dir_from_entries(
     )
     digest = hashlib.sha1(signature.encode("utf-8")).hexdigest()[:12]
     return str(
-        cache_root / f"iltools_g1_{family_name}_tracking_{manifest_name}_{digest}"
+        cache_root / f"imitationlab_g1_{family_name}_tracking_{manifest_name}_{digest}"
     )
 
 

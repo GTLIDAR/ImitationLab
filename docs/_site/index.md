@@ -79,13 +79,6 @@ No motion data is distributed with the repository. [Setup](setup.md) covers
 the environments, and [motion data](motion-data.md) covers preparing a
 reference bank to train on.
 
-## Names in older reports
-
-Reports written before 2026-11-13 call the continuous spectral skill interface
-`diffsr` or "DiffSR commands"; it is now `--interface spectral`, and
-`--interface diffsr` remains an alias. "DiffSR" as a policy learner
-(`--policy diffsr`) is unchanged.
-
 ## Citation
 
 If you use ImitationLab or its spectral skill encoders in your research,
@@ -118,8 +111,7 @@ hardware
 architecture
 policy-learners
 motion-data-tools
-Migration <migration>
-Provenance <provenance>
+Upstream revisions <provenance>
 ```
 
 ```{toctree}

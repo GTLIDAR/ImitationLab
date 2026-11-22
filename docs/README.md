@@ -22,8 +22,7 @@ order; the [project README](../README.md) has the short version.
 | [Motion data tools](../imitationlab/data_tools/README.md) | Python API for loaders, replay storage, and reset sampling |
 | [Contributing](../CONTRIBUTING.md) | Workflow, checks, and what to record when reporting results |
 | [Changelog](../CHANGELOG.md) | Notable changes in each release |
-| [Migration](migration.md) | Earlier scripts, task IDs, module names, and checkpoints |
-| [Provenance](provenance.md) | Source revisions this repository started from |
+| [Upstream revisions](provenance.md) | Pinned revisions of vendored and upstream components |
 
 ## Results
 
@@ -41,7 +40,3 @@ and limits.
 | [Compatibility matrix](compatibility-matrix.md) | Bounded integration check of all 24 learner/interface/dataset combinations |
 | [Release verification](release-verification.md) | Bounded integration checks of motion ingestion, one training iteration, checkpoint reload, and a short rollout |
 
-**Note on names.** Reports written before 2026-11-13 call the continuous
-spectral skill interface `diffsr` or "DiffSR commands"; it is now
-`--interface spectral`, and `--interface diffsr` remains an alias. "DiffSR" as
-a policy learner (`--policy diffsr`) is unchanged.

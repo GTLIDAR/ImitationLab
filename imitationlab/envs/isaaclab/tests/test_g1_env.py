@@ -31,16 +31,16 @@ def test_public_g1_task_binds_wmbptt_to_the_configured_interface(encoder):
     from imitationlab.envs.isaaclab.tasks.manager_based.imitation.command_interface import (
         bind_command_interface,
     )
-    from imitationlab.envs.isaaclab.tasks.manager_based.imitation.config.g1.agents.rlopt_wmbptt_cfg import (
+    from imitationlab.envs.isaaclab.tasks.manager_based.imitation.config.g1.agents.wmbptt_cfg import (
         EXPLICIT_TASK,
         LATENT_TASK,
-        G1RLOptWMBPTTConfig,
+        G1WMBPTTConfig,
     )
 
     spec = gym.spec("imitation-g1-v1")
     assert spec.kwargs["env_cfg_entry_point"].endswith(":ImitationG1EnvCfg")
     cfg = ImitationG1EnvCfg(skill_encoder_path=encoder)
-    agent = G1RLOptWMBPTTConfig()
+    agent = G1WMBPTTConfig()
     bind_command_interface(agent, cfg)
     expected = (LATENT_TASK, "z") if encoder else (EXPLICIT_TASK, "explicit")
     assert (agent.wm.task_model, agent.wm.goal) == expected
@@ -442,11 +442,11 @@ def test_the_newton_selector_keeps_the_replica_solver_and_rejects_drift():
 
 
 def test_the_agent_uses_the_replica_action_clip_and_persistent_proprio_history():
-    from imitationlab.envs.isaaclab.tasks.manager_based.imitation.config.g1.agents.rlopt_wmbptt_cfg import (
-        G1RLOptWMBPTTConfig,
+    from imitationlab.envs.isaaclab.tasks.manager_based.imitation.config.g1.agents.wmbptt_cfg import (
+        G1WMBPTTConfig,
     )
 
-    cfg = G1RLOptWMBPTTConfig()
+    cfg = G1WMBPTTConfig()
     assert cfg.wm.action_clip == 20.0
     assert cfg.wm.goal == "explicit"
     assert cfg.policy.input_keys[-1] == ("wm", "proprio_history")
@@ -454,11 +454,11 @@ def test_the_agent_uses_the_replica_action_clip_and_persistent_proprio_history()
 
 
 def test_ppo_reads_the_flat_feature_groups():
-    from imitationlab.envs.isaaclab.tasks.manager_based.imitation.config.g1.agents.rlopt_ppo_cfg import (
-        G1RLOptPPOConfig,
+    from imitationlab.envs.isaaclab.tasks.manager_based.imitation.config.g1.agents.ppo_cfg import (
+        G1PPOConfig,
     )
 
-    cfg = G1RLOptPPOConfig()
+    cfg = G1PPOConfig()
     assert cfg.policy.input_keys == [("policy", "features")]
     assert cfg.value_function.input_keys == [("critic", "features")]
     # The packed-data recipe (experiments/recipes/g1/ppo.args) adds normalization.
@@ -469,11 +469,11 @@ def test_ppo_reads_the_flat_feature_groups():
 
 
 def test_latent_live_observations_share_the_rollout_task(monkeypatch):
-    from imitationlab.envs.isaaclab.tasks.manager_based.imitation.config.g1.agents.rlopt_ppo_cfg import (
-        G1RLOptPPOConfig,
+    from imitationlab.envs.isaaclab.tasks.manager_based.imitation.config.g1.agents.ppo_cfg import (
+        G1PPOConfig,
     )
-    from imitationlab.envs.isaaclab.tasks.manager_based.imitation.config.g1.agents.rlopt_wmbptt_cfg import (
-        G1RLOptWMBPTTConfig,
+    from imitationlab.envs.isaaclab.tasks.manager_based.imitation.config.g1.agents.wmbptt_cfg import (
+        G1WMBPTTConfig,
     )
 
     # The encoder file is read only to pin its hash; the switch is the path.
@@ -484,8 +484,8 @@ def test_latent_live_observations_share_the_rollout_task(monkeypatch):
     assert cfg.observations.critic.features.func is g1.latent_critic_features
     assert cfg.data.resolved_reference_prefetch_mode() == "next"
     assert cfg.sim.physics.num_substeps == 4
-    ppo = G1RLOptPPOConfig()
-    wm = G1RLOptWMBPTTConfig()
+    ppo = G1PPOConfig()
+    wm = G1WMBPTTConfig()
     wm.bind_env_config(cfg)
     assert ppo.policy.input_keys == [("policy", "features")]
     assert ppo.value_function.input_keys == [("critic", "features")]

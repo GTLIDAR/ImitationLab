@@ -1,11 +1,7 @@
 # Learner and interface compatibility
 
-**Note.** This report predates the rename of the continuous command interface:
-"DiffSR commands" and the `diffsr` interface below are now
-`--interface spectral`.
-
 This check covers the native ImitationLab learners on `imitation-g1-v1`:
-PPO, SuperMimic, SVG, and DiffSR, each with explicit, FSQ, and DiffSR command
+PPO, SuperMimic, SVG, and DiffSR, each with explicit, FSQ, and spectral command
 interfaces. Each combination is run on LAFAN1 and BONES-SEED separately.
 The optional official mjlab SuperMimic baseline uses a different task and is
 outside this matrix.
@@ -50,7 +46,7 @@ Bank paths must contain a
 motion data. BONES-SEED requires separate authorization from Bones Studio;
 raw data, checkpoints, per-motion evaluation output, and logs stay outside Git.
 
-Each dataset gets its own FSQ and DiffSR encoder. Pretraining runs two updates
+Each dataset gets its own FSQ and spectral encoder. Pretraining runs two updates
 with batch size 16, four data environments, and one evaluation batch. Both
 encoders retain the 64-dimensional command and ten-frame reference window.
 For this bounded check, encoder hidden layers are `[64, 64]`, DiffSR feature
@@ -110,9 +106,9 @@ encoder SHA-256 values below are also checked against each tracker run.
 | Bank | Interface | Encoder SHA-256 |
 | --- | --- | --- |
 | lafan1 | fsq | `a56fa3d45aca8b2534e48261040ec4813292b43d6896017fe8d16ec756f0f915` |
-| lafan1 | diffsr | `480027a3a20b5b19fc398834e551a5f99bbe93dd1e6763f6c039f8b1b193b5dd` |
+| lafan1 | spectral | `480027a3a20b5b19fc398834e551a5f99bbe93dd1e6763f6c039f8b1b193b5dd` |
 | bones_seed | fsq | `41396c85feb05e059ea3917deafaadd1def382d593a153c877f4e2ab8bc43ab4` |
-| bones_seed | diffsr | `b4e68911e47faf9a8d861efd93b95194a77b3c123da343acef77b2c01e82627d` |
+| bones_seed | spectral | `b4e68911e47faf9a8d861efd93b95194a77b3c123da343acef77b2c01e82627d` |
 
 ## Issue found during verification
 

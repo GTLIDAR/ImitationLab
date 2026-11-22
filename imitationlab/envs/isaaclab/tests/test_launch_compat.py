@@ -551,7 +551,7 @@ def test_importing_the_module_does_not_load_kit_or_usd():
         # A pxr import before Kit starts breaks the Kit USD extensions. The
         # Isaac Lab task registration imports pxr, so it must stay out.
         early = [
-            name for name in ("pxr", "isaaclab_imitation", "imitationlab.envs.isaaclab.tasks")
+            name for name in ("pxr", "imitationlab.envs.isaaclab.tasks")
             if name in sys.modules
         ]
         assert not early, early

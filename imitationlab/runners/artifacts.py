@@ -13,9 +13,8 @@ from imitationlab.runners.args_file import expand_args_files
 from imitationlab.runners.errors import UserError
 
 RUNTIME_ENVIRONMENT = (
-    "ISAACLAB_IMITATION_COLLECT_FASTPATH",
+    "IMITATIONLAB_ENV_COLLECT_FASTPATH",
     "IMITATIONLAB_COLLECT_FASTPATH",
-    "RLOPT_COLLECT_FASTPATH",
     "PYTORCH_CUDA_ALLOC_CONF",
     "PYTORCH_ALLOC_CONF",
     "TORCHDYNAMO_DISABLE",

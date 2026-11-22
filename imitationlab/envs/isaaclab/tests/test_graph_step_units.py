@@ -166,7 +166,7 @@ def test_graph_step_names_the_fast_paths_capture_needs(monkeypatch) -> None:
     message = str(caught.value)
     assert "device_gather" in message and "never_resample" in message
     assert "reward_offsets" not in message
-    assert "ISAACLAB_IMITATION_COLLECT_FASTPATH=1" in message
+    assert "IMITATIONLAB_ENV_COLLECT_FASTPATH=1" in message
 
 
 def _log_stepper(term_names: list[str], dones: torch.Tensor):

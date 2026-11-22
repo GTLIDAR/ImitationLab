@@ -729,7 +729,7 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
         raise RuntimeError("No valid rollout transitions were recorded.")
 
     base_metadata = {
-        "labeler": "rlopt_policy_rollout",
+        "labeler": "imitationlab_policy_rollout",
         "task": args_cli.task,
         "algorithm": args_cli.algorithm,
         "checkpoint": str(checkpoint_path),

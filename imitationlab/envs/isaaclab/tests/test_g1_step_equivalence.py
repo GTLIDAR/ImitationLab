@@ -4,7 +4,7 @@ The first arm records physics with default settings. Every other arm replays
 that trace, so the only differences left are the options under test:
 
 - ``replay``: the same settings, the harness's self-check;
-- ``fast``: ``ISAACLAB_IMITATION_COLLECT_FASTPATH=1``. Every leaf must match, so
+- ``fast``: ``IMITATIONLAB_ENV_COLLECT_FASTPATH=1``. Every leaf must match, so
   this is the counterpart of ``test_collect_fastpath_equivalence.py``;
 - ``wm_only``: ``env.wm_only_observations=true``. The `wm` group, its terminal
   rows, rewards, dones, sampler state and both random streams must match, and the
@@ -104,7 +104,7 @@ def _run_arm(
     out = tmp_path / f"{name}.json"
     env = dict(
         os.environ,
-        ISAACLAB_IMITATION_COLLECT_FASTPATH=fast,
+        IMITATIONLAB_ENV_COLLECT_FASTPATH=fast,
         WANDB_MODE="disabled",
         OMNI_KIT_ACCEPT_EULA="YES",
         TERM=os.environ.get("TERM", "xterm"),

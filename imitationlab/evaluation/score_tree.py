@@ -16,7 +16,7 @@ The TRAINER layout, as it stands on the cluster::
 
 Here the frame count has to come from the file name. Before 2026-08-16 the
 step counter restarted on every chained resume, so a second segment's
-`model_step_250085376` was not 250M cumulative frames. RLOpt now names every
+`model_step_250085376` was not 250M cumulative frames. The learners now name every
 checkpoint by cumulative frames and records the same count in it
 (`cumulative_env_frames`). A tree spread over several run directories is
 therefore read only when every checkpoint's recorded count equals its file
