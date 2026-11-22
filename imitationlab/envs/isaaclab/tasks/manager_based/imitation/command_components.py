@@ -53,19 +53,6 @@ COMMAND_TERM_NAME_COMPONENTS: dict[str, str] = {
     for component, term_name in COMMAND_COMPONENT_TERM_NAMES.items()
 }
 
-COMMAND_COMPONENT_ALIASES: dict[str, str] = {
-    **{name: name for name in COMMAND_COMPONENT_ORDER},
-    "qpos_qvel": "joint_qpos_qvel",
-    "full_joint_state": "joint_qpos_qvel",
-    "qpos": "joint_qpos",
-    "keypoint_position": "keypoint_pos",
-    "keypoint_orientation": "keypoint_ori",
-    "ee_position": "ee_pos",
-    "ee_orientation": "ee_ori",
-    "root_position": "root_pos",
-    "root_orientation": "root_ori",
-}
-
 # Named component sets: labels for common selections, not a second mechanism.
 COMMAND_SPACE_COMPONENTS: dict[str, tuple[str, ...]] = {
     "full_body": ("joint_qpos_qvel", "root_pos", "root_ori"),
@@ -123,13 +110,12 @@ def normalize_command_components(
     normalized: list[str] = []
     for raw_name in command_components:
         name = str(raw_name).strip().lower().replace("-", "_")
-        try:
-            normalized.append(COMMAND_COMPONENT_ALIASES[name])
-        except KeyError as err:
+        if name not in COMMAND_COMPONENT_ORDER:
             raise ValueError(
                 f"Unsupported command component {raw_name!r}. Expected a subset "
                 f"of {list(COMMAND_COMPONENT_ORDER)}."
-            ) from err
+            )
+        normalized.append(name)
     if not normalized:
         raise ValueError("command components must select at least one component.")
     duplicates = sorted({name for name in normalized if normalized.count(name) > 1})
@@ -161,7 +147,6 @@ def component_term_names(components: Sequence[str]) -> tuple[str, ...]:
 
 
 __all__ = [
-    "COMMAND_COMPONENT_ALIASES",
     "COMMAND_COMPONENT_ORDER",
     "COMMAND_COMPONENT_TERM_NAMES",
     "COMMAND_SPACE_COMPONENTS",

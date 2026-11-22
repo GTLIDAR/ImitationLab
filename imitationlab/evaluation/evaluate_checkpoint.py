@@ -2775,11 +2775,8 @@ def main(env_cfg: ManagerBasedRLEnvCfg | DirectRLEnvCfg | DirectMARLEnvCfg, agen
 
             if command_stats is not None:
                 # The observation groups are nested, so the published command
-                # is ("policy", "latent_command"); the flat key is the legacy
-                # single-group layout.
+                # is ("policy", "latent_command").
                 published = td.get(("policy", "latent_command"), None)
-                if published is None:
-                    published = td.get("latent_command", None)
                 if published is not None:
                     flat = published.detach().reshape(num_envs, -1).float()
                     live = step_active.to(flat.device).reshape(-1)

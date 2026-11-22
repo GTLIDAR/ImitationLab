@@ -35,6 +35,10 @@ Notable changes to ImitationLab are recorded in this file. The format follows
   `imitationlab_g1_*`; the cluster runtime defaults to
   `/opt/imitationlab-runtime`. Rename `iltools_rb_manifest.json` in an existing
   packed bank to keep using it.
+- Compatibility shims: the `rl-video-step-*.mp4` clip names, cluster profiles
+  loaded from the package directory (only the example ships there), the
+  `legacy`/`f_matrix` and `fz`/`z_fz` option spellings, alternate command
+  component names such as `qpos_qvel`, and `--emulate_joint_order_from`.
 
 ### Fixed
 

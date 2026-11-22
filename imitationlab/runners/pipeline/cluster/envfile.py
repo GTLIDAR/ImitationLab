@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import re
 import shlex
-from pathlib import Path
 
 from imitationlab.runners.pipeline.cluster.common import PipelineError
 
@@ -27,19 +26,3 @@ def render_job_env(env: dict[str, str], *, plan_sha: str, stage: str) -> str:
             raise PipelineError(f"invalid environment variable name: '{key}'")
         lines.append(f"export {key}={shlex.quote(str(env[key]))}")
     return "\n".join(lines) + "\n"
-
-
-def parse_env_file(path: Path) -> dict[str, str]:
-    """Parse a legacy ``KEY=VALUE`` env file (used by parity tests only)."""
-    if not path.is_file():
-        raise PipelineError(f"env file not found: {path}")
-    parsed: dict[str, str] = {}
-    for raw_line in path.read_text().splitlines():
-        line = raw_line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, _, value = line.partition("=")
-        key = key.strip()
-        if _KEY_RE.match(key):
-            parsed[key] = value.strip()
-    return parsed

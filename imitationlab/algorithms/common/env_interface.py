@@ -9,10 +9,10 @@ the learners to environment-specific methods.
 Instead there is ONE capability object. An imitation environment exposes it as
 ``env.imitation_interface``; the learner resolves it once
 (:func:`resolve_imitation_interface`) and everything else is typed attribute
-access on :class:`ImitationEnvInterface`. Environments that predate the
-attribute are still supported: :class:`LegacyMethodInterface` adapts the
-historical method names, so this module is the only module that knows
-them.
+access on :class:`ImitationEnvInterface`. An environment without the
+attribute is adapted by :class:`MethodInterface`, which maps each capability
+to an environment method, so this module is the only module that knows the
+method names.
 """
 
 from __future__ import annotations
@@ -25,7 +25,7 @@ from tensordict import TensorDict
 
 __all__ = [
     "ImitationEnvInterface",
-    "LegacyMethodInterface",
+    "MethodInterface",
     "require_imitation_interface",
     "resolve_imitation_interface",
     "supports",
@@ -34,8 +34,8 @@ __all__ = [
 # The wrapper attributes an environment stack is threaded through.
 _WRAPPER_ATTRS = ("base_env", "env", "_env", "unwrapped")
 
-# Capability name -> the historical environment method it was called by.
-_LEGACY_METHOD_NAMES: dict[str, str] = {
+# Capability name -> the environment method that implements it.
+_METHOD_NAMES: dict[str, str] = {
     "expert_macro_frame_stride": "expert_macro_frame_stride",
     "expert_macro_anchor_mode": "expert_macro_anchor_mode",
     "sample_expert_macro_transition_batch": "sample_expert_macro_transition_batch",
@@ -115,11 +115,11 @@ class ImitationEnvInterface(Protocol):
         ...
 
 
-class LegacyMethodInterface:
-    """Adapter over an environment that predates ``imitation_interface``.
+class MethodInterface:
+    """Adapter over an environment that has no ``imitation_interface``.
 
     Resolves each capability lazily by walking the wrapper stack for its
-    historical method name, so an environment only pays for what an agent
+    method name, so an environment only pays for what an agent
     actually asks for and a missing capability is reported by name.
     """
 
@@ -128,12 +128,12 @@ class LegacyMethodInterface:
         self._cache: dict[str, Callable | None] = {}
 
     def __repr__(self) -> str:
-        return f"LegacyMethodInterface({type(self._env).__name__})"
+        return f"MethodInterface({type(self._env).__name__})"
 
     def _method(self, capability: str) -> Callable | None:
         if capability in self._cache:
             return self._cache[capability]
-        method_name = _LEGACY_METHOD_NAMES.get(capability)
+        method_name = _METHOD_NAMES.get(capability)
         method = (
             None if method_name is None else _walk_for_callable(self._env, method_name)
         )
@@ -180,8 +180,8 @@ def resolve_imitation_interface(env: object) -> ImitationEnvInterface:
     """The environment's imitation interface -- the single resolution point.
 
     Walks the wrapper stack once for an ``imitation_interface`` attribute and
-    falls back to :class:`LegacyMethodInterface` for environments that expose
-    the historical method names instead. Always returns an object; probe it
+    falls back to :class:`MethodInterface` for environments that expose
+    the methods directly. Always returns an object; probe it
     with :func:`supports` and fail loudly where a capability is required.
     """
     stack: list[object] = [env]
@@ -206,7 +206,7 @@ def resolve_imitation_interface(env: object) -> ImitationEnvInterface:
                 stack.extend(next_obj)
             else:
                 stack.append(next_obj)
-    return LegacyMethodInterface(env)
+    return MethodInterface(env)
 
 
 def supports(interface: object, capability: str) -> bool:

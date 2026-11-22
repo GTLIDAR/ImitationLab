@@ -121,10 +121,6 @@ class BilinearSR(ABC, nn.Module):
         self.feature_dim = feature_dim
         self.embed_dim = embed_dim
         self.phi_parameterization = str(phi_parameterization).strip().lower()
-        aliases = {"legacy": "bilinear", "f_matrix": "bilinear"}
-        self.phi_parameterization = aliases.get(
-            self.phi_parameterization, self.phi_parameterization
-        )
         if self.phi_parameterization not in {
             "concat",
             "bilinear",
@@ -139,8 +135,7 @@ class BilinearSR(ABC, nn.Module):
             msg = (
                 "phi_parameterization must be one of 'concat', 'bilinear', "
                 "'affine', 'affine_no_bias', 'affine_poe', 'identity', 'identity_bias', 'linear', or "
-                "'linear_bias' "
-                "(aliases: 'legacy', 'f_matrix'), got "
+                "'linear_bias', got "
                 f"{phi_parameterization!r}."
             )
             raise ValueError(msg)
@@ -184,8 +179,8 @@ class BilinearSR(ABC, nn.Module):
 
         # --- Shared phi components ---
         if self._matrix_f:
-            # Checkpoint-era parameterization: F(s) is matrix-valued and the
-            # policy consumes F(s) z. Kept for backwards-compatible evaluation.
+            # Bilinear parameterization: F(s) is matrix-valued and the policy
+            # consumes F(s) z.
             self.state_net = ResidualMLP(
                 input_dim=obs_dim,
                 output_dim=embed_dim * feature_dim,
@@ -248,7 +243,7 @@ class BilinearSR(ABC, nn.Module):
             self.state_net_ema = None
 
     def _F(self, s: Tensor, use_ema: bool = False) -> Tensor:
-        """Return matrix-valued F(s) for legacy bilinear checkpoints."""
+        """Return matrix-valued F(s) of the bilinear parameterization."""
         net = (
             self.state_net_ema
             if use_ema and self.state_net_ema is not None

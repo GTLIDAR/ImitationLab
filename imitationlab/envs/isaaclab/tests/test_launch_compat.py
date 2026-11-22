@@ -368,7 +368,6 @@ def test_attach_video_recorder_takes_camera_overrides_and_keeps_other_visualizer
 def test_attach_video_recorder_retires_clips_of_earlier_runs(tmp_path):
     """A reused directory must hold only the clips of the new run."""
     (tmp_path / "clip_0000.mp4").write_bytes(b"old")
-    (tmp_path / "rl-video-step-0.mp4").write_bytes(b"older")
     (tmp_path / "notes.txt").write_text("keep")
 
     launch_compat.attach_video_recorder(
@@ -379,10 +378,7 @@ def test_attach_video_recorder_retires_clips_of_earlier_runs(tmp_path):
     assert list(tmp_path.rglob("*.mp4")) == []
     assert (tmp_path / "notes.txt").read_text() == "keep"
     retired = sorted(path.name for path in tmp_path.glob("*.superseded-*"))
-    assert [name.split(".superseded-")[0] for name in retired] == [
-        "clip_0000.mp4",
-        "rl-video-step-0.mp4",
-    ]
+    assert [name.split(".superseded-")[0] for name in retired] == ["clip_0000.mp4"]
     (old_clip,) = tmp_path.glob("clip_0000.mp4.superseded-*")
     assert old_clip.read_bytes() == b"old"
 
@@ -441,9 +437,9 @@ def test_attach_video_recorder_gives_each_prefix_its_own_clip_names(tmp_path):
     assert (tmp_path / "kneel_sonic_0000.mp4").read_bytes() == b"sonic"
 
 
-def test_attach_video_recorder_retires_the_old_name_of_a_label(tmp_path):
-    (tmp_path / "kneel_ours-step-0.mp4").write_bytes(b"old RecordVideo name")
-    (tmp_path / "kneel_sonic-step-0.mp4").write_bytes(b"other label")
+def test_attach_video_recorder_retires_only_the_clips_of_its_label(tmp_path):
+    (tmp_path / "kneel_ours_0000.mp4").write_bytes(b"earlier run")
+    (tmp_path / "kneel_sonic_0000.mp4").write_bytes(b"other label")
 
     launch_compat.attach_video_recorder(
         _video_cfg(4),
@@ -453,8 +449,8 @@ def test_attach_video_recorder_retires_the_old_name_of_a_label(tmp_path):
         output_filename_prefix="kneel_ours",
     )
 
-    assert not (tmp_path / "kneel_ours-step-0.mp4").exists()
-    assert (tmp_path / "kneel_sonic-step-0.mp4").exists()
+    assert not (tmp_path / "kneel_ours_0000.mp4").exists()
+    assert (tmp_path / "kneel_sonic_0000.mp4").exists()
 
 
 @pytest.mark.parametrize("prefix", ["", "../escape", "a/b", ".hidden", "with space"])

@@ -256,11 +256,6 @@ pixi run -e isaaclab imitationlab evaluate \
 
 Use matching data, ranks, and horizons for comparisons.
 
-**Older checkpoints.** New checkpoints carry the launch settings. For an older
-checkpoint, keep the original run directory with its `command.txt` or
-`run.json`. For an older standalone checkpoint with no recorded settings, pass
-`--policy`, `--data`, and the original architecture and encoder overrides.
-
 ## Export a checkpoint
 
 Export a native bundle from a run directory or checkpoint. The bundle contains

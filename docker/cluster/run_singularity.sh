@@ -278,18 +278,14 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 # load variables to set the Isaac Lab path on the cluster.
 # A workspace submitted by `python -m imitationlab.runners.pipeline.cluster`
-# carries a frozen, fully-resolved env file; source ONLY that. The legacy
-# .env.cluster re-source plus its capture/restore allow-lists (which silently
-# reverted any variable not registered in every list) was retired 2026-08-15
-# along with the old submission script, so a workspace without the frozen file is a
-# legacy invocation and gets a loud, immediate error instead of that fallback.
+# carries a frozen, fully-resolved env file; source ONLY that. A workspace
+# without it was not submitted through the pipeline and gets an immediate error.
 if [ -f "$SCRIPT_DIR/job_env.resolved.sh" ]; then
     echo "[INFO] Using frozen job environment: $SCRIPT_DIR/job_env.resolved.sh"
     # shellcheck disable=SC1091
     source "$SCRIPT_DIR/job_env.resolved.sh"
 else
     echo "[ERROR] No frozen job environment found at '$SCRIPT_DIR/job_env.resolved.sh'." >&2
-    echo "[ERROR] The legacy .env.cluster submission path was retired 2026-08-15." >&2
     echo "[ERROR] Submit through 'python -m imitationlab.runners.pipeline.cluster plan/submit' instead." >&2
     exit 2
 fi

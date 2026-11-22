@@ -38,7 +38,7 @@ class _FakeEnv:
     """Serves macro batches; records the horizons it was asked for."""
 
     def __init__(self) -> None:
-        # `sample_achieved_chunk_windows` has no legacy-name mapping, so the
+        # `sample_achieved_chunk_windows` has no method-name mapping, so the
         # env must present itself as the imitation interface, exactly as the
         # real ImitationRLEnv does.
         self.imitation_interface = self

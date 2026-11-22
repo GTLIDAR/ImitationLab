@@ -12,7 +12,6 @@ import pytest
 from imitationlab.evaluation.video_capture import (
     FOLLOW_EYE_OFFSET,
     FOLLOW_LOOKAT_OFFSET,
-    LEGACY_CLIP_NAME,
     VideoCapture,
     aim_camera_at_robot,
     attach_video_capture,
@@ -235,13 +234,10 @@ def test_report_ignores_a_stale_clip_from_an_earlier_run(tmp_path: Path) -> None
         capture.report()
 
 
-def test_retained_clip_prefers_the_develop_clip_and_falls_back_to_the_old_name(
+def test_retained_clip_is_the_first_recorder_clip(
     tmp_path: Path,
 ) -> None:
     assert retained_clip(tmp_path) is None
-
-    (tmp_path / LEGACY_CLIP_NAME).write_bytes(b"old render")
-    assert retained_clip(tmp_path) == tmp_path / LEGACY_CLIP_NAME
 
     (tmp_path / "clip_0001.mp4").write_bytes(b"b")
     (tmp_path / "clip_0000.mp4").write_bytes(b"a")

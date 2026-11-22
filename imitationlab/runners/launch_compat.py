@@ -60,9 +60,6 @@ _NEWTON_GL_SOURCE = "viz:newton_gl"
 DEFAULT_CLIP_PREFIX = "clip"
 """Default clip file prefix of ``VideoRecorderCfg``: ``clip_0000.mp4``, ``clip_0001.mp4``."""
 
-_LEGACY_CLIP_PREFIX = "rl-video"
-"""Prefix of ``gym.wrappers.RecordVideo`` when it had no ``name_prefix``: ``rl-video-step-0.mp4``."""
-
 _CLIP_PREFIX_PATTERN = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
 """Allowed clip prefix: a plain file name part, so a prefix cannot leave the video directory."""
 
@@ -194,31 +191,20 @@ def _retire_stale_clips(
     """Rename the clips of earlier runs that have this prefix, so no ``*.mp4`` pattern finds them.
 
     ``VideoRecorder`` never overwrites: it numbers a new clip ``max(existing) + 1``.
-    The old ``RecordVideo`` wrapper reused one file name. A reused directory
-    would therefore keep the old clips next to the new ones, and a reader that
+    A reused directory would therefore keep the old clips next to the new ones, and a reader that
     takes the first ``*.mp4`` (even one that searches subdirectories) could
     report a stale clip. This function appends ``.superseded-<time>`` to each old
     file name. The data stays on disk. Nothing is deleted.
 
-    Only the clips of this prefix are retired: ``<prefix>_*.mp4`` from the
-    ``develop`` recorder, and the file name that ``RecordVideo`` gave the same
-    prefix (``<prefix>-step-*.mp4``, or ``rl-video-step-*.mp4`` for the default
-    prefix). Several runs may therefore share one directory, each with its own
-    prefix, and keep every clip. Files of other prefixes stay as they are.
+    Only the clips of this prefix are retired (``<prefix>_*.mp4``). Several
+    runs may therefore share one directory, each with its own prefix, and keep
+    every clip. Files of other prefixes stay as they are.
 
     Returns:
         The new paths of the renamed files.
     """
-    legacy_prefix = (
-        _LEGACY_CLIP_PREFIX
-        if output_filename_prefix == DEFAULT_CLIP_PREFIX
-        else output_filename_prefix
-    )
     # Match the index exactly: prefix "ours" must not take "ours_full_0000.mp4".
-    own_clip = re.compile(
-        rf"{re.escape(output_filename_prefix)}_\d{{4,}}\.mp4"
-        rf"|{re.escape(legacy_prefix)}-step-\d+\.mp4"
-    )
+    own_clip = re.compile(rf"{re.escape(output_filename_prefix)}_\d{{4,}}\.mp4")
     stale = sorted(
         path
         for path in out_dir.glob("*.mp4")

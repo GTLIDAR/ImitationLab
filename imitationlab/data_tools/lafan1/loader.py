@@ -588,14 +588,6 @@ class Lafan1CsvLoader(BaseLoader):
 
                 global_idx += 1
 
-            # Backward-compat convenience aliases for single/multi-source entries.
-            if motion_entry["source_files"]:
-                motion_entry["source_file"] = motion_entry["source_files"][0]
-            if motion_entry["source_fps"]:
-                motion_entry["source_fps_single"] = motion_entry["source_fps"][0]
-            if motion_entry["output_fps"]:
-                motion_entry["output_fps_single"] = motion_entry["output_fps"][0]
-
             if motion_group is not None:
                 motion_group.attrs["num_trajectories"] = len(motion_sources)
                 motion_group.attrs["trajectory_lengths"] = motion_entry[

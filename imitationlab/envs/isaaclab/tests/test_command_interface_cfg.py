@@ -97,8 +97,8 @@ def test_components_are_canonically_ordered_not_as_written():
     )
 
 
-def test_components_accept_the_hydra_string_form_and_aliases():
-    assert normalize_command_components("[qpos,root_position,root_orientation]") == (
+def test_components_accept_the_hydra_string_form():
+    assert normalize_command_components("[root_ori,joint_qpos,root_pos]") == (
         "joint_qpos",
         "root_pos",
         "root_ori",

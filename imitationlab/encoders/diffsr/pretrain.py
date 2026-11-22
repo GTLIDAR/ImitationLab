@@ -104,13 +104,8 @@ def _normalize_transition_objective(name: str, value: str) -> str:
 
 def _normalize_command_mode(value: str) -> str:
     normalized = str(value).strip().lower()
-    aliases = {"fz": "phi", "z_fz": "z_phi"}
-    normalized = aliases.get(normalized, normalized)
     if normalized not in {"z", "phi", "z_phi"}:
-        msg = (
-            "command_mode must be one of 'z', 'phi', or 'z_phi' "
-            f"(aliases: 'fz', 'z_fz'), got {value!r}."
-        )
+        msg = f"command_mode must be one of 'z', 'phi', or 'z_phi', got {value!r}."
         raise ValueError(msg)
     return normalized
 

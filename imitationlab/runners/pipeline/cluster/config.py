@@ -8,7 +8,6 @@ allow-list anywhere on the new path.
 from __future__ import annotations
 
 import os
-import warnings
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, cast
@@ -197,15 +196,7 @@ def resolve_profile_path(name_or_path: str) -> Path:
         if path.is_file():
             return path
     packaged = _package_profile_path(name_or_path)
-    if packaged.is_file():
-        if name_or_path != EXAMPLE_PROFILE_NAME:
-            warnings.warn(
-                f"loading cluster profile '{name_or_path}' from the package "
-                f"directory ({packaged}) is deprecated; move it to "
-                f"{searched[-1]} or to ${PROFILE_DIR_ENV}",
-                DeprecationWarning,
-                stacklevel=3,
-            )
+    if name_or_path == EXAMPLE_PROFILE_NAME and packaged.is_file():
         return packaged
     looked_in = ", ".join(str(path.parent) for path in searched)
     raise PipelineError(

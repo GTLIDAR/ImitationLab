@@ -26,7 +26,6 @@ __all__ = [
     "CLIP_NAME",
     "FOLLOW_EYE_OFFSET",
     "FOLLOW_LOOKAT_OFFSET",
-    "LEGACY_CLIP_NAME",
     "VideoCapture",
     "aim_camera_at_robot",
     "attach_video_capture",
@@ -45,7 +44,6 @@ DEFAULT_CLIP_PREFIX = "clip"
 CLIP_NAME = f"{DEFAULT_CLIP_PREFIX}_0000.mp4"
 """First clip file the Isaac Lab ``develop`` recorder writes into a directory."""
 
-LEGACY_CLIP_NAME = "rl-video-step-0.mp4"
 """Clip file that ``gym.wrappers.RecordVideo`` wrote before the ``develop`` move."""
 
 FOLLOW_EYE_OFFSET = (2.6, 2.6, 1.6)
@@ -258,8 +256,7 @@ def retained_clip(directory: str | Path) -> Path | None:
 
     A reader that needs one clip of a finished run, such as a post-run check or
     an annotation file, uses this instead of a fixed file name. It prefers the
-    first ``clip_*.mp4`` of the ``develop`` recorder. It falls back to the
-    ``rl-video-step-0.mp4`` that older renders hold.
+    first ``clip_*.mp4`` of the recorder.
 
     :func:`~imitationlab.runners.launch_compat.attach_video_recorder` renames the
     clips of earlier runs before a run starts, so the first clip belongs to the
@@ -267,10 +264,7 @@ def retained_clip(directory: str | Path) -> Path | None:
     """
     directory = Path(directory)
     clips = sorted(directory.glob("clip_*.mp4"))
-    if clips:
-        return clips[0]
-    legacy = directory / LEGACY_CLIP_NAME
-    return legacy if legacy.is_file() else None
+    return clips[0] if clips else None
 
 
 def clip_for_stem(

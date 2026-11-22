@@ -116,23 +116,6 @@ def test_missing_named_profile_names_search_dirs(
         load_profile("absent")
 
 
-def test_packaged_site_profile_is_deprecated(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    from imitationlab.runners.pipeline.cluster import config as config_module
-
-    monkeypatch.delenv(PROFILE_DIR_ENV, raising=False)
-    monkeypatch.setenv("XDG_CONFIG_HOME", str(tmp_path / "config"))
-    legacy = _write_profile(tmp_path / "pkg", "legacy")
-    monkeypatch.setattr(
-        config_module,
-        "_package_profile_path",
-        lambda name: tmp_path / "pkg" / f"profile_{name}.yaml",
-    )
-    with pytest.warns(DeprecationWarning, match="deprecated"):
-        assert resolve_profile_path("legacy") == legacy
-
-
 def test_profile_rejects_relative_log_dir(tmp_path: Path) -> None:
     bad = tmp_path / "bad.yaml"
     bad.write_text(

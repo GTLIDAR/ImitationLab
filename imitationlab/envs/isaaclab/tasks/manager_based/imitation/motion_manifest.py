@@ -305,7 +305,7 @@ def manifest_role(payload: Any) -> str | None:
 
 
 def load_manifest_family(manifest_path: str | Path) -> str | None:
-    """Read ``metadata.family`` from a manifest file, tolerating legacy blobs."""
+    """Read ``metadata.family`` from a manifest file; ``None`` when absent or unreadable."""
     manifest_file = Path(manifest_path).expanduser().resolve()
     if not manifest_file.is_file():
         return None
@@ -320,8 +320,8 @@ def read_manifest(manifest_path: str | Path) -> dict[str, Any]:
     """Read and validate a motion-dataset manifest, returning the raw payload.
 
     Motion paths are NOT resolved here; use :func:`load_clip_manifest` for
-    resolved loader entries. Legacy manifests without ``metadata.family`` or
-    ``metadata.role`` are accepted (the accessors return None for them).
+    resolved loader entries. ``metadata.family`` and ``metadata.role`` are
+    optional (the accessors return None without them).
     """
     manifest_file = Path(manifest_path).expanduser().resolve()
     if not manifest_file.is_file():

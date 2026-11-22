@@ -283,10 +283,7 @@ class ParallelTrajectoryManager:
     def storage_device(self) -> torch.device:
         return self._storage_device
 
-    # Public accessors for the per-trajectory index tensors and compute
-    # devices. The private attributes (``_start`` / ``_end`` / ``_length`` /
-    # ``_device`` / ``_state_device`` / ``_storage_device``) remain as
-    # aliases for legacy consumers; new code should use these properties.
+    # Public accessors for the per-trajectory index tensors and compute devices.
     @property
     def start(self) -> Tensor:
         """Per-trajectory start index (state-device int64)."""
@@ -517,11 +514,7 @@ class ParallelTrajectoryManager:
     def attach_reference_fields(
         self, td: TensorDict, *, use_buffers: bool
     ) -> TensorDict:
-        """Attach root/joint reference fields to a sampled transition.
-
-        Public API; ``_attach_reference_fields`` remains as the private
-        alias for legacy consumers.
-        """
+        """Attach root/joint reference fields to a sampled transition."""
         if td.get("qpos") is None or td.get("qvel") is None:
             raise AssertionError("qpos and qvel must be present in the reference data")
 
@@ -541,12 +534,6 @@ class ParallelTrajectoryManager:
                 use_buffers=False,
             )
         return td
-
-    def _attach_reference_fields(
-        self, td: TensorDict, *, use_buffers: bool
-    ) -> TensorDict:
-        """Private alias of :meth:`attach_reference_fields`."""
-        return self.attach_reference_fields(td, use_buffers=use_buffers)
 
     def set_reconstructed_action_targets(self, action_targets: Tensor | None) -> None:
         """Register cached reconstructed action targets in target-joint order."""
@@ -593,7 +580,7 @@ class ParallelTrajectoryManager:
         reference = self.rb[global_indices.to(device=self._storage_device)]
         if self._device is not None:
             reference = reference.to(self._device)
-        reference = self._attach_reference_fields(reference, use_buffers=False)
+        reference = self.attach_reference_fields(reference, use_buffers=False)
         return reference, env_ids_tm, global_indices
 
     def sample(
@@ -624,7 +611,7 @@ class ParallelTrajectoryManager:
             int(env_ids_t.numel()),
             advance,
         )
-        return self._attach_reference_fields(td, use_buffers=use_buffers)
+        return self.attach_reference_fields(td, use_buffers=use_buffers)
 
     def current_global_indices(
         self, env_ids: Sequence[int] | Tensor | None = None
@@ -762,7 +749,7 @@ class ParallelTrajectoryManager:
             mode,
             advance,
         )
-        return self._attach_reference_fields(td, use_buffers=False)
+        return self.attach_reference_fields(td, use_buffers=False)
 
     def _advance_steps(self, env_ids: Tensor) -> None:
         env_ids = self._normalize_env_ids(env_ids)
