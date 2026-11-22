@@ -43,11 +43,10 @@ not a statistically reliable ranking.
 Success, local and global MPJPE are defined as in the
 [30-minute learning-speed study](g1-learning-speed-30min.md).
 
-**Source revisions.** Explicit runs use the first public release, commit
-`fb4b33d`. FSQ and spectral runs use the revision that makes
-`reference_heading` the default encoder window; explicit runs were not
-repeated at that revision. `summary.json` records the training-source
-fingerprint of every run.
+**Source revisions.** The release-history revisions corresponding to the training runs are
+`fb4b33d` for explicit and `5a626b4` for FSQ and spectral. The latent policies use the
+`reference_heading` encoder window. The explicit policies consume reference
+frames directly. `summary.json` retains each measured training-source fingerprint.
 
 **Reruns.** Five runs on shared cluster GPUs are reruns, marked \* in the
 tables. Four latent runs first ran at about half the usual frames per second

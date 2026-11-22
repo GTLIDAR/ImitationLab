@@ -153,6 +153,11 @@ fi
 
 echo "[INFO] Checking G1 dataset under '\${cluster_g1_data_root}' (npz_count=\${cluster_g1_npz_count}, expected=\${cluster_g1_expected_motion_count})"
 
+if { [ "\${cluster_g1_force_download}" = "1" ] || [ "\${cluster_g1_npz_count}" -lt "\${cluster_g1_expected_motion_count}" ]; } && [ -z "\${cluster_g1_repo_id}" ]; then
+    echo "[ERROR] Set CLUSTER_G1_REPO_ID to download the prepared G1 NPZ dataset." >&2
+    exit 1
+fi
+
 if [ "\${cluster_g1_force_download}" = "1" ]; then
     echo "[INFO] Force-refreshing G1 dataset from Hugging Face repo '\${cluster_g1_repo_id}' at revision '\${cluster_g1_repo_revision}'."
     /isaac-sim/python.sh scripts/data/setup_g1_lafan1_npz_dataset.py \\
@@ -347,7 +352,7 @@ allow_torch_compile_debug="${CLUSTER_ALLOW_TORCH_COMPILE_DEBUG:-0}"
 auto_setup_g1_data="${CLUSTER_AUTO_SETUP_G1_DATA:-1}"
 cluster_g1_expected_motion_count="${CLUSTER_G1_EXPECTED_MOTION_COUNT:-40}"
 cluster_g1_data_root="${CLUSTER_G1_DATA_ROOT:-${CLUSTER_DATA_DIR}/lafan1}"
-cluster_g1_repo_id="${CLUSTER_G1_REPO_ID:-GeorgiaTech/g1_lafan1_50hz}"
+cluster_g1_repo_id="${CLUSTER_G1_REPO_ID:-}"
 cluster_g1_repo_revision="${CLUSTER_G1_REPO_REVISION:-main}"
 cluster_g1_force_download="${CLUSTER_G1_FORCE_DOWNLOAD:-0}"
 cluster_g1_manifest_path="${CLUSTER_G1_MANIFEST_PATH:-${cluster_g1_data_root}/manifests/g1_lafan1_manifest.json}"

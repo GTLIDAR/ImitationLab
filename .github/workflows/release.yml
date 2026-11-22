@@ -20,6 +20,13 @@ jobs:
         run: pipx run build
       - name: Check the distributions
         run: pipx run twine check --strict dist/*
+      - name: Verify the packaged versions and notices
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          args=(dist)
+          if [[ "$GITHUB_EVENT_NAME" == release ]]; then args+=(--tag "$RELEASE_TAG"); fi
+          python3 .github/scripts/check_dist.py "${args[@]}"
       - name: Upload the distributions
         uses: actions/upload-artifact@v4
         with:
@@ -31,7 +38,10 @@ jobs:
   # list this workflow and the `pypi` environment as a trusted publisher of
   # the `imitationlab` project. A manual run builds and checks only.
   publish:
-    if: github.event_name == 'release' && github.repository == 'GTLIDAR/ImitationLab'
+    if: >-
+      github.event_name == 'release'
+      && github.repository == 'GTLIDAR/ImitationLab'
+      && !github.event.repository.private
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 10

@@ -11,10 +11,10 @@ CSV-based workflow, it only handles an ``npz/g1`` subtree that is already ready
 for this repo's NPZ loader tooling.
 
 Examples:
-    pixi run python scripts/data/setup_g1_lafan1_npz_dataset.py
+    pixi run python -m imitationlab.data_tools.lafan1.hub --repo-id ORG/DATASET
 
     pixi run python scripts/data/setup_g1_lafan1_npz_dataset.py \
-        --mode upload --token "$HF_TOKEN"
+        --mode upload --repo-id ORG/DATASET
 """
 
 from __future__ import annotations
@@ -34,16 +34,7 @@ except ImportError as exc:  # pragma: no cover - import guard for misconfigured 
     ) from exc
 
 
-DEFAULT_REPO_ID = "GeorgiaTech/g1_lafan1_50hz"
 DEFAULT_REPO_SUBDIR = "npz/g1"
-
-
-def _repo_root() -> Path:
-    return Path(__file__).resolve().parents[3]
-
-
-def _default_data_root() -> Path:
-    return _repo_root() / "data" / "lafan1"
 
 
 def _normalize_repo_subdir(repo_subdir: str) -> str:
@@ -95,7 +86,7 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--repo-id",
         type=str,
-        default=DEFAULT_REPO_ID,
+        required=True,
         help="Hugging Face dataset repo id.",
     )
     parser.add_argument(
@@ -107,7 +98,7 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--data-root",
         type=str,
-        default=str(_default_data_root()),
+        default="data/lafan1",
         help=(
             "Local root used to mirror the Hugging Face dataset subtree. "
             "With the default repo_subdir this writes under data/lafan1/npz/g1."
@@ -295,7 +286,8 @@ def main() -> None:
 
         preview_cmd = [
             args.python,
-            str(_repo_root() / "scripts" / "data" / "write_lafan1_npz_manifest.py"),
+            "-m",
+            "imitationlab.data_tools.lafan1.manifest",
             "--npz-dir",
             str(local_npz_dir),
             "--manifest-path",

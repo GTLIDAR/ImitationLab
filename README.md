@@ -91,8 +91,10 @@ Omniverse license; see [setup](docs/setup.md).
 Then train and evaluate a tracker:
 
 ```bash
+RUN=outputs/quickstart/supermimic
 pixi run -e isaaclab imitationlab train \
-  --policy supermimic --interface explicit --data "$BANK"
+  --policy supermimic --interface explicit --data "$BANK" \
+  "agent.logger.log_dir=$RUN"
 
 pixi run -e isaaclab imitationlab evaluate --checkpoint "$RUN" --data "$BANK" \
   --num-envs 4 --trajectory-ranks 0 1 2 3
@@ -104,6 +106,11 @@ new `--output` when re-running.
 Explicit overrides take precedence over automatic sizing, and a resumed run
 keeps its saved sizes. [Training and evaluation](docs/training.md) covers
 encoder pretraining, checkpoints, export and benchmarks.
+
+## Pretrained checkpoints
+
+The Hugging Face release location for G1 policy checkpoints and their encoders is
+[GeorgiaTech/ImitationLab-G1](https://huggingface.co/GeorgiaTech/ImitationLab-G1).
 
 ## Learners and interfaces
 

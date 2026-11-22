@@ -26,10 +26,7 @@ from imitationlab.data_tools.bones_seed.sonic import (
     matched_keywords,
 )
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
-DEFAULT_METADATA_CSV = (
-    REPO_ROOT / "data" / "bones_seed" / "raw" / "metadata" / "seed_metadata_v004.csv"
-)
+DEFAULT_METADATA_CSV = Path("data/bones_seed/raw/metadata/seed_metadata_v004.csv")
 
 
 def main(argv: list[str] | None = None) -> None:

@@ -128,3 +128,13 @@ def test_merge_cli_options_are_kebab_case() -> None:
     help_text = parser.format_help()
     assert "--output-manifest" in help_text
     assert "--output_manifest" not in help_text
+
+
+def test_inputs_are_explicit_and_language_sidecars_are_optional(tmp_path: Path) -> None:
+    args = build_parser().parse_args([])
+    assert (args.lafan1_manifest, args.bones_manifest) == (None, None)
+    assert (args.lafan1_language, args.bones_language) == (None, None)
+    argv = _sources(tmp_path)
+    main([*argv, "--exclude-bones"])
+    manifest = json.loads((tmp_path / "out/manifest.json").read_text())
+    assert len(manifest["dataset"]["trajectories"]["lafan1_csv"]) == 2

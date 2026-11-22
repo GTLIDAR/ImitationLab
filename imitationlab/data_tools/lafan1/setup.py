@@ -29,19 +29,10 @@ import shlex
 import sys
 from pathlib import Path
 
-
 DATASET_REPO_ID = "lvhaidong/LAFAN1_Retargeting_Dataset"
 DATASET_REPO_URL = f"https://huggingface.co/datasets/{DATASET_REPO_ID}"
 ROOT_ALLOW_PATTERNS = ["README.md", "LICENSE", "dataset_infos.json", "meta_data/*"]
 ROBOT_CHOICES = ("g1", "h1", "h1_2", "all")
-
-
-def _repo_root() -> Path:
-    return Path(__file__).resolve().parents[3]
-
-
-def _default_data_root() -> Path:
-    return _repo_root() / "data" / "lafan1"
 
 
 def _resolve_batch_converter_script(explicit_path: str | None) -> Path | None:
@@ -177,7 +168,7 @@ def add_arguments(
     parser.add_argument(
         "--data-root",
         type=str,
-        default=str(_default_data_root()),
+        default="data/lafan1",
         help="Root folder for raw CSV files, converted NPZ files, and manifest output.",
     )
     parser.add_argument(

@@ -9,9 +9,11 @@ a ``language_goal`` and ``natural_descriptions`` for building a language-goal
 embedding table (the ``{motion_name: embedding}`` format read by
 ``imitationlab.encoders.diffsr.skill_commander.load_language_embedding_table``).
 
-Relative paths resolve against the repository root. Example::
+Relative paths resolve against the current directory. Example::
 
     pixi run python -m imitationlab.data_tools.merge_manifests \
+        --lafan1-manifest data/lafan1/manifests/g1_lafan1_manifest.json \
+        --bones-manifest data/bones_seed/manifests/g1_bones_seed_manifest.json \
         --output-manifest data/unified/manifests/g1_lafan1_bones_seed_manifest.json \
         --output-language data/unified/language/g1_lafan1_bones_seed_language.json
 """
@@ -33,24 +35,11 @@ from imitationlab.data_tools.common.manifest_io import (
     write_json,
 )
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-
-DEFAULT_LAFAN1_MANIFEST = REPO_ROOT / "data/lafan1/manifests/g1_lafan1_manifest.json"
-DEFAULT_LAFAN1_LANGUAGE = (
-    REPO_ROOT
-    / "data/lafan1/language/g1_lafan1_manifest.with_language.json"
+DEFAULT_OUTPUT_MANIFEST = Path(
+    "data/unified/manifests/g1_lafan1_bones_seed_manifest.json"
 )
-DEFAULT_BONES_MANIFEST = (
-    REPO_ROOT / "data/bones_seed/manifests/g1_bones_seed_manifest.json"
-)
-DEFAULT_BONES_LANGUAGE = (
-    REPO_ROOT / "data/bones_seed/language/g1_bones_seed_language.json"
-)
-DEFAULT_OUTPUT_MANIFEST = (
-    REPO_ROOT / "data/unified/manifests/g1_lafan1_bones_seed_manifest.json"
-)
-DEFAULT_OUTPUT_LANGUAGE = (
-    REPO_ROOT / "data/unified/language/g1_lafan1_bones_seed_language.json"
+DEFAULT_OUTPUT_LANGUAGE = Path(
+    "data/unified/language/g1_lafan1_bones_seed_language.json"
 )
 
 LANGUAGE_FIELD_PRIORITY = (
@@ -75,8 +64,6 @@ class SourceSpec:
 
 def _resolve_path(value: str | Path) -> Path:
     path = Path(value).expanduser()
-    if not path.is_absolute():
-        path = REPO_ROOT / path
     return path.resolve()
 
 
@@ -212,28 +199,32 @@ def _load_language_by_name(language_path: Path | None) -> dict[str, dict[str, An
 
 
 def _source_specs_from_args(args: argparse.Namespace) -> list[SourceSpec]:
-    specs = [
-        SourceSpec(
-            label="lafan1",
-            prefix=args.lafan1_prefix,
-            manifest_path=_resolve_path(args.lafan1_manifest),
-            language_path=_resolve_path(args.lafan1_language)
-            if args.lafan1_language
-            else None,
-        ),
-        SourceSpec(
-            label="bones_seed",
-            prefix=args.bones_prefix,
-            manifest_path=_resolve_path(args.bones_manifest),
-            language_path=_resolve_path(args.bones_language)
-            if args.bones_language
-            else None,
-        ),
-    ]
+    specs = []
+
+    def add_source(
+        label: str, manifest: str | None, language: str | None, prefix: str
+    ) -> None:
+        if language and not manifest:
+            raise ValueError(
+                f"Supply the {label} manifest alongside its language sidecar."
+            )
+        if manifest:
+            specs.append(
+                SourceSpec(
+                    label,
+                    prefix,
+                    _resolve_path(manifest),
+                    _resolve_path(language) if language else None,
+                )
+            )
+
+    if not args.exclude_lafan1:
+        add_source(
+            "lafan1", args.lafan1_manifest, args.lafan1_language, args.lafan1_prefix
+        )
     if args.dance102_manifest and not args.exclude_dance102:
         # Optional: the Dance102 clip is not distributed with the repository.
-        specs.insert(
-            1,
+        specs.append(
             SourceSpec(
                 label="unitree_dance102",
                 prefix=args.dance102_prefix,
@@ -244,10 +235,10 @@ def _source_specs_from_args(args: argparse.Namespace) -> list[SourceSpec]:
                 ),
             ),
         )
-    if args.exclude_lafan1:
-        specs = [spec for spec in specs if spec.label != "lafan1"]
-    if args.exclude_bones:
-        specs = [spec for spec in specs if spec.label != "bones_seed"]
+    if not args.exclude_bones:
+        add_source(
+            "bones_seed", args.bones_manifest, args.bones_language, args.bones_prefix
+        )
     return specs
 
 
@@ -413,16 +404,16 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Merge G1 clip manifests and their language sidecars."
     )
-    parser.add_argument("--lafan1-manifest", default=str(DEFAULT_LAFAN1_MANIFEST))
-    parser.add_argument("--lafan1-language", default=str(DEFAULT_LAFAN1_LANGUAGE))
+    parser.add_argument("--lafan1-manifest")
+    parser.add_argument("--lafan1-language")
     parser.add_argument(
         "--dance102-manifest",
         default=None,
         help="Manifest of a Unitree Dance102 clip to include. The clip is not "
         "distributed with the repository; without this option it is left out.",
     )
-    parser.add_argument("--bones-manifest", default=str(DEFAULT_BONES_MANIFEST))
-    parser.add_argument("--bones-language", default=str(DEFAULT_BONES_LANGUAGE))
+    parser.add_argument("--bones-manifest")
+    parser.add_argument("--bones-language")
     parser.add_argument("--output-manifest", default=str(DEFAULT_OUTPUT_MANIFEST))
     parser.add_argument("--output-language", default=str(DEFAULT_OUTPUT_LANGUAGE))
     parser.add_argument(

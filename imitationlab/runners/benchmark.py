@@ -45,8 +45,6 @@ def runtime_details() -> dict:
         "packages": versions,
         "python": sys.version,
         "cuda_visible_devices": os.environ.get("CUDA_VISIBLE_DEVICES"),
-        "slurm_job_id": os.environ.get("SLURM_JOB_ID"),
-        "hostname": os.uname().nodename,
     }
 
 
@@ -389,8 +387,6 @@ def run(args, rest: list[str]) -> int:
         else None,
         "points": [],
         "started_utc": datetime.now(timezone.utc).isoformat(),
-        "slurm_job_id": os.environ.get("SLURM_JOB_ID"),
-        "hostname": os.uname().nodename,
     }
     write_json(result_path, result)
     command = [

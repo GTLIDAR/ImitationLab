@@ -44,7 +44,8 @@ See [its license](third_party/licenses/supermimic_vibed.txt).
 
 The following files are derived from
 [Isaac Lab](https://github.com/isaac-sim/IsaacLab) and carry its BSD-3-Clause
-license header:
+license header. The [full Isaac Lab license](third_party/licenses/isaaclab.txt)
+accompanies the source and binary distributions:
 
 - `imitationlab/data_tools/common/isaac_batch.py`
 - `imitationlab/data_tools/lafan1/hub.py`

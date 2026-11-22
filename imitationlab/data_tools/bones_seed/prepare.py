@@ -637,7 +637,7 @@ def add_arguments(
     parser.add_argument(
         "--archive",
         type=Path,
-        default=REPO_ROOT / "data" / "bones_seed" / "raw" / "g1.tar.gz",
+        default=Path("data/bones_seed/raw/g1.tar.gz"),
     )
     parser.add_argument(
         "--stages",
