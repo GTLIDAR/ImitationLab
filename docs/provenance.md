@@ -9,7 +9,7 @@ source or pin the same versions. License terms are in
 | --- | --- |
 | Official SuperMimic | [HybridRobotics/supermimic `abc124c`](https://github.com/HybridRobotics/supermimic/commit/abc124c1bd5976341034668af3d12c087f2f1f55) |
 | Official SuperMimic simulator dependency | [HybridRobotics/mjlab_research `dd51a9f`](https://github.com/HybridRobotics/mjlab_research/commit/dd51a9fcc98791a2f0b018b3c7f71a3eefd5ecdd) |
-| Isaac Lab simulator dependency | [Isaac Lab `0612893`](https://github.com/isaac-sim/IsaacLab/commit/06128939c6f3264594483a73e4344e4fefcea6d3) |
+| Isaac Lab simulator dependency | [Isaac Lab `f9af6e3`](https://github.com/isaac-sim/IsaacLab/commit/f9af6e3c52ccb43533996713985808fed2cd46db) |
 
 ## Official SuperMimic
 

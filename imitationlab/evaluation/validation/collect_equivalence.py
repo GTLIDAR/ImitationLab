@@ -29,10 +29,10 @@ compared bit for bit; both arms get the same treatment:
 Usage (from the repository root, isaaclab env)::
 
     python -m imitationlab.evaluation.validation.collect_equivalence run \\
-        --out eager.json --iters 10 --physics record:/tmp/phys.pt -- <train.py argv>
+        --out eager.json --iters 10 --physics record:/tmp/phys.pt -- <imitationlab train argv>
     IMITATIONLAB_ENV_COLLECT_FASTPATH=1 IMITATIONLAB_COLLECT_FASTPATH=1 \\
     python -m imitationlab.evaluation.validation.collect_equivalence run \\
-        --out fast.json --iters 10 --physics replay:/tmp/phys.pt -- <train.py argv>
+        --out fast.json --iters 10 --physics replay:/tmp/phys.pt -- <imitationlab train argv>
     python -m imitationlab.evaluation.validation.collect_equivalence compare eager.json fast.json
 """
 
@@ -48,7 +48,6 @@ import time
 from pathlib import Path
 from typing import Any
 
-from imitationlab.paths import REPO_ROOT
 
 __all__ = ["compare_records", "main"]
 
@@ -82,10 +81,9 @@ def _install_deterministic_kernels() -> None:
     torch.multinomial = multinomial
 
 
-def _physics_arrays() -> list[tuple[str, Any]]:
+def _physics_arrays(backend: Any) -> list[tuple[str, Any]]:
     """Float arrays the scene reads after a physics step, in a stable order."""
     import warp as wp
-    from isaaclab_newton.physics.newton_manager import NewtonManager
 
     def floats(obj: Any):
         for name, value in sorted(vars(obj).items()):
@@ -97,13 +95,11 @@ def _physics_arrays() -> list[tuple[str, Any]]:
             ):
                 yield name, value
 
-    out = [(f"state_0.{n}", v) for n, v in floats(NewtonManager.backend.state_0)]
-    sensors = sorted(
-        NewtonManager._newton_contact_sensors.items(), key=lambda kv: str(kv[0])
-    )
+    out = [(f"state_0.{n}", v) for n, v in floats(backend.state_0)]
+    sensors = sorted(backend.contact_sensors.items(), key=lambda kv: str(kv[0]))
     for key, sensor in sensors:
         out += [(f"contact[{key}].{n}", v) for n, v in floats(sensor)]
-    for i, sensor in enumerate(NewtonManager._newton_imu_sensors):
+    for i, sensor in enumerate(backend.imu_sensors):
         out += [(f"imu[{i}].{n}", v) for n, v in floats(sensor)]
     return out
 
@@ -124,7 +120,7 @@ def _install_physics_trace(env: Any, spec: str):
 
     def traced_step(*args: Any, **kwargs: Any) -> Any:
         result = step(*args, **kwargs)
-        arrays = _physics_arrays()
+        arrays = _physics_arrays(env.sim.physics_manager.backend)
         names = [name for name, _ in arrays]
         if mode == "record":
             state["names"] = state["names"] or names
@@ -208,10 +204,8 @@ def _run(args: argparse.Namespace, train_argv: list[str]) -> None:
     import imitationlab.algorithms.ppo.ppo as ppo_module
 
     ppo_module.PPO.train = lambda agent: _collect(agent, args)
-    train = REPO_ROOT / "scripts" / "tracking" / "train.py"
-    sys.path.insert(0, str(train.parent))
-    sys.argv = [str(train), *train_argv]
-    runpy.run_path(str(train), run_name="__main__")
+    sys.argv = ["imitationlab.runners.train", *train_argv]
+    runpy.run_module("imitationlab.runners.train", run_name="__main__", alter_sys=True)
 
 
 def compare_records(a: dict[str, Any], b: dict[str, Any]) -> list[str]:
@@ -244,7 +238,8 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n", 1)[0])
     sub = parser.add_subparsers(dest="command", required=True)
     run = sub.add_parser(
-        "run", help="collect and hash a rollout (argv after -- goes to train.py)"
+        "run",
+        help="collect and hash a rollout (argv after -- goes to imitationlab train)",
     )
     run.add_argument("--out", required=True)
     run.add_argument("--iters", type=int, default=10)

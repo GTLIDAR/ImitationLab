@@ -148,16 +148,18 @@ UNITREE_G1_29DOF_CFG = UnitreeArticulationCfg(
     actuators={
         "N7520-14.3": ImplicitActuatorCfg(
             joint_names_expr=[".*_hip_pitch_.*", ".*_hip_yaw_.*", "waist_yaw_joint"],
-            effort_limit_sim=88,
-            velocity_limit_sim=32.0,
+            joint_effort_limit=88,
+            joint_velocity_limit=32.0,
+            actuator_velocity_limit=32.0,
             stiffness={".*_hip_.*": 100.0, "waist_yaw_joint": 200.0},
             damping={".*_hip_.*": 2.0, "waist_yaw_joint": 5.0},
             armature=0.01,
         ),
         "N7520-22.5": ImplicitActuatorCfg(
             joint_names_expr=[".*_hip_roll_.*", ".*_knee_.*"],
-            effort_limit_sim=139,
-            velocity_limit_sim=20.0,
+            joint_effort_limit=139,
+            joint_velocity_limit=20.0,
+            actuator_velocity_limit=20.0,
             stiffness={".*_hip_roll_.*": 100.0, ".*_knee_.*": 150.0},
             damping={".*_hip_roll_.*": 2.0, ".*_knee_.*": 4.0},
             armature=0.01,
@@ -171,8 +173,9 @@ UNITREE_G1_29DOF_CFG = UnitreeArticulationCfg(
                 "waist_roll_joint",
                 "waist_pitch_joint",
             ],
-            effort_limit_sim=25,
-            velocity_limit_sim=37,
+            joint_effort_limit=25,
+            joint_velocity_limit=37,
+            actuator_velocity_limit=37,
             stiffness=40.0,
             damping={
                 ".*_shoulder_.*": 1.0,
@@ -185,8 +188,9 @@ UNITREE_G1_29DOF_CFG = UnitreeArticulationCfg(
         ),
         "W4010-25": ImplicitActuatorCfg(
             joint_names_expr=[".*_wrist_pitch.*", ".*_wrist_yaw.*"],
-            effort_limit_sim=5,
-            velocity_limit_sim=22,
+            joint_effort_limit=5,
+            joint_velocity_limit=22,
+            actuator_velocity_limit=22,
             stiffness=40.0,
             damping=1.0,
             armature=0.01,
@@ -239,13 +243,19 @@ UNITREE_G1_29DOF_MIMIC_CFG = UnitreeArticulationCfg(
                 ".*_hip_pitch_joint",
                 ".*_knee_joint",
             ],
-            effort_limit_sim={
+            joint_effort_limit={
                 ".*_hip_yaw_joint": 88.0,
                 ".*_hip_roll_joint": 139.0,
                 ".*_hip_pitch_joint": 88.0,
                 ".*_knee_joint": 139.0,
             },
-            velocity_limit_sim={
+            joint_velocity_limit={
+                ".*_hip_yaw_joint": 32.0,
+                ".*_hip_roll_joint": 20.0,
+                ".*_hip_pitch_joint": 32.0,
+                ".*_knee_joint": 20.0,
+            },
+            actuator_velocity_limit={
                 ".*_hip_yaw_joint": 32.0,
                 ".*_hip_roll_joint": 20.0,
                 ".*_hip_pitch_joint": 32.0,
@@ -271,24 +281,27 @@ UNITREE_G1_29DOF_MIMIC_CFG = UnitreeArticulationCfg(
             },
         ),
         "feet": ImplicitActuatorCfg(
-            effort_limit_sim=50.0,
-            velocity_limit_sim=37.0,
+            joint_effort_limit=50.0,
+            joint_velocity_limit=37.0,
+            actuator_velocity_limit=37.0,
             joint_names_expr=[".*_ankle_pitch_joint", ".*_ankle_roll_joint"],
             stiffness=2.0 * STIFFNESS_5020,
             damping=2.0 * DAMPING_5020,
             armature=2.0 * ARMATURE_5020,
         ),
         "waist": ImplicitActuatorCfg(
-            effort_limit_sim=50,
-            velocity_limit_sim=37.0,
+            joint_effort_limit=50,
+            joint_velocity_limit=37.0,
+            actuator_velocity_limit=37.0,
             joint_names_expr=["waist_roll_joint", "waist_pitch_joint"],
             stiffness=2.0 * STIFFNESS_5020,
             damping=2.0 * DAMPING_5020,
             armature=2.0 * ARMATURE_5020,
         ),
         "waist_yaw": ImplicitActuatorCfg(
-            effort_limit_sim=88,
-            velocity_limit_sim=32.0,
+            joint_effort_limit=88,
+            joint_velocity_limit=32.0,
+            actuator_velocity_limit=32.0,
             joint_names_expr=["waist_yaw_joint"],
             stiffness=STIFFNESS_7520_14,
             damping=DAMPING_7520_14,
@@ -304,7 +317,7 @@ UNITREE_G1_29DOF_MIMIC_CFG = UnitreeArticulationCfg(
                 ".*_wrist_pitch_joint",
                 ".*_wrist_yaw_joint",
             ],
-            effort_limit_sim={
+            joint_effort_limit={
                 ".*_shoulder_pitch_joint": 25.0,
                 ".*_shoulder_roll_joint": 25.0,
                 ".*_shoulder_yaw_joint": 25.0,
@@ -313,7 +326,16 @@ UNITREE_G1_29DOF_MIMIC_CFG = UnitreeArticulationCfg(
                 ".*_wrist_pitch_joint": 5.0,
                 ".*_wrist_yaw_joint": 5.0,
             },
-            velocity_limit_sim={
+            joint_velocity_limit={
+                ".*_shoulder_pitch_joint": 37.0,
+                ".*_shoulder_roll_joint": 37.0,
+                ".*_shoulder_yaw_joint": 37.0,
+                ".*_elbow_joint": 37.0,
+                ".*_wrist_roll_joint": 37.0,
+                ".*_wrist_pitch_joint": 22.0,
+                ".*_wrist_yaw_joint": 22.0,
+            },
+            actuator_velocity_limit={
                 ".*_shoulder_pitch_joint": 37.0,
                 ".*_shoulder_roll_joint": 37.0,
                 ".*_shoulder_yaw_joint": 37.0,
@@ -358,7 +380,7 @@ UNITREE_G1_29DOF_MIMIC_CFG = UnitreeArticulationCfg(
 def _action_scale_from_actuators(cfg: ArticulationCfg) -> dict[str, float]:
     action_scale: dict[str, float] = {}
     for actuator in cfg.actuators.values():
-        effort_limit = actuator.effort_limit_sim
+        effort_limit = actuator.joint_effort_limit
         stiffness = actuator.stiffness
         names = actuator.joint_names_expr
         if not isinstance(effort_limit, dict):

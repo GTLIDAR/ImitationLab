@@ -27,7 +27,6 @@ import isaaclab.app
 import pytest
 from isaaclab.sim import SimulationCfg
 from isaaclab.utils import configclass
-from isaaclab.visualizers.visualizer_cfg import parse_visualizer_csv
 from imitationlab.runners import launch_compat
 from isaaclab_newton.physics import NewtonCfg
 from isaaclab_physx.physics import PhysxCfg
@@ -40,7 +39,7 @@ def _stand_in_launcher_args(parser: argparse.ArgumentParser) -> None:
     """Define the launcher arguments these tests read, without importing Kit."""
     parser.add_argument("--device", type=str, default="cuda:0")
     parser.add_argument(
-        "--visualizer", "--viz", type=parse_visualizer_csv, default=None
+        "--visualizer", "--viz", type=lambda value: value.split(","), default=None
     )
 
 
@@ -98,11 +97,13 @@ def test_preset_cli_keeps_hydra_tokens_next_to_legacy_flags():
             "agent.logger.backend=",
         ],
     )
-    assert args.visualizer == ["newton_gl"]
+    # The selection becomes a Hydra preset override.
+    assert not hasattr(args, "visualizer")
     assert remaining == [
         "physics=newton_mjwarp",
         "env.scene.num_envs=16",
         "agent.logger.backend=",
+        "visualizer=newton_gl",
     ]
 
 
@@ -266,41 +267,31 @@ def test_needs_kit_counts_an_explicit_experience_and_require_kit():
     assert launch_compat.needs_kit(_EnvCfg(), unset) is False
 
 
-def _launcher_kit_decision(cfg, args: dict) -> bool:
-    """The Kit decision of ``launch_simulation``, read from its own private helper."""
-    from isaaclab.app import scan, sim_launcher
-
-    helper = getattr(sim_launcher, "_get_kit_runtime_sources", None)
-    assert helper is not None, (
-        "isaaclab.app.sim_launcher._get_kit_runtime_sources moved. Read how "
-        "launch_simulation decides to start Kit and update launch_compat.needs_kit."
-    )
-    return bool(helper(scan(cfg, args), args))
-
-
 @pytest.mark.parametrize(
-    "args",
+    ("args", "newton_expected", "physx_expected"),
     [
-        {},
-        {"visualizer": ["kit"]},
-        {"visualizer": ["newton_gl"]},
-        {"experience": "my.python.kit"},
-        {"require_kit": True},
-        {"livestream": 1},
-        {"physics": "newton_mjwarp"},
+        ({}, False, True),
+        ({"visualizer": ["kit"]}, True, True),
+        ({"visualizer": ["newton_gl"]}, False, True),
+        ({"experience": "my.python.kit"}, True, True),
+        ({"require_kit": True}, True, True),
+        ({"livestream": 1}, True, True),
+        ({"physics": "newton_mjwarp"}, False, False),
     ],
-    ids=lambda args: ",".join(f"{key}={value}" for key, value in args.items())
-    or "none",
+    ids=lambda value: (
+        ",".join(f"{key}={item}" for key, item in value.items()) or "none"
+        if isinstance(value, dict)
+        else None
+    ),
 )
 @pytest.mark.parametrize("physics_cfg", [NewtonCfg, PhysxCfg])
-def test_needs_kit_matches_the_launcher_decision(args, physics_cfg):
+def test_needs_kit_follows_the_launcher_inputs(
+    args, newton_expected, physx_expected, physics_cfg
+):
     """Run this test after every ``pixi update isaaclab``: it catches drift."""
-
-    def cfg():
-        return _EnvCfg(sim=SimulationCfg(physics=physics_cfg()))
-
-    expected = _launcher_kit_decision(cfg(), dict(args))
-    assert launch_compat.needs_kit(cfg(), dict(args)) is expected
+    cfg = _EnvCfg(sim=SimulationCfg(physics=physics_cfg()))
+    expected = newton_expected if physics_cfg is NewtonCfg else physx_expected
+    assert launch_compat.needs_kit(cfg, dict(args)) is expected
 
 
 def _video_cfg(num_envs: int) -> types.SimpleNamespace:
@@ -324,21 +315,25 @@ def test_attach_video_recorder_builds_recorder_and_headless_visualizer(tmp_path)
     assert recorder.output_dir == str(out_dir)
     assert (recorder.video_length, recorder.video_interval) == (120, 0)
 
-    (visualizer,) = cfg.sim.visualizer_cfgs
-    assert visualizer.visualizer_type == "newton_gl"
+    # The default settings-only declaration stays for ``--visualizer``.
+    settings, visualizer = cfg.sim.visualizer_cfgs
+    assert not settings.backend
+    assert visualizer.backend.visualizer_type == "newton_gl"
     assert visualizer.headless is True
     assert visualizer.visible_env_indices == list(range(8))
-    assert (visualizer.window_width, visualizer.window_height) == (1280, 720)
+    assert visualizer.window.size == (1280, 720)
 
 
 def test_attach_video_recorder_takes_camera_overrides_and_keeps_other_visualizers(
     tmp_path,
 ):
-    from isaaclab_visualizers.newton import NewtonGLVisualizerCfg
+    from isaaclab.visualizers.visualizer_cfg import VisualizerCfg
+    from isaaclab_visualizers.newton import NewtonGLBackendCfg
+    from isaaclab_visualizers.rerun import RerunBackendCfg
 
     cfg = _video_cfg(num_envs=4096)
-    old_gl = NewtonGLVisualizerCfg(eye=(1.0, 1.0, 1.0))
-    other = types.SimpleNamespace(visualizer_type="rerun")
+    old_gl = VisualizerCfg(backend=NewtonGLBackendCfg(), eye=(1.0, 1.0, 1.0))
+    other = VisualizerCfg(backend=RerunBackendCfg())
     cfg.sim.visualizer_cfgs = [old_gl, other]
 
     launch_compat.attach_video_recorder(
@@ -357,7 +352,7 @@ def test_attach_video_recorder_takes_camera_overrides_and_keeps_other_visualizer
     assert visualizer is not old_gl and len(cfg.sim.visualizer_cfgs) == 2
     assert visualizer.eye == (3.0, 3.0, 2.0)
     assert visualizer.lookat == (0.0, 0.0, 1.0)
-    assert (visualizer.window_width, visualizer.window_height) == (640, 480)
+    assert visualizer.window.size == (640, 480)
     assert visualizer.headless is True
     visible = visualizer.visible_env_indices
     assert visible is not None and len(visible) == 16
@@ -474,9 +469,45 @@ def test_attach_video_recorder_rejects_bad_clip_timing(tmp_path):
         )
 
 
-def test_attached_recorder_survives_the_launcher_scan(tmp_path):
+def test_attach_video_recorder_drops_only_the_gl_backend_of_a_shared_declaration(
+    tmp_path,
+):
+    from isaaclab.visualizers.visualizer_cfg import VisualizerCfg
+    from isaaclab_visualizers.newton import NewtonGLBackendCfg
+    from isaaclab_visualizers.rerun import RerunBackendCfg
+
+    cfg = _video_cfg(num_envs=4)
+    shared = VisualizerCfg(backend=[NewtonGLBackendCfg(), RerunBackendCfg()])
+    settings_only = VisualizerCfg()
+    cfg.sim.visualizer_cfgs = [shared, settings_only]
+
+    launch_compat.attach_video_recorder(
+        cfg, output_dir=tmp_path, video_length=10, video_interval=0
+    )
+    kept, settings, recorded = cfg.sim.visualizer_cfgs
+    assert kept.backend.visualizer_type == "rerun"
+    assert settings is settings_only
+    assert recorded.backend.visualizer_type == "newton_gl"
+
+
+def test_a_gl_selection_opens_a_window_next_to_the_recorder(tmp_path):
+    from isaaclab.app import validate_launch
+
+    cfg = _video_cfg(num_envs=4)
+    launch_compat.attach_video_recorder(
+        cfg, output_dir=tmp_path, video_length=10, video_interval=0
+    )
+    _, kit_sources = validate_launch(cfg, {"visualizer": ["newton_gl"]})
+    assert kit_sources == ()
+    assert sorted(
+        (viewer.backend.visualizer_type, viewer.headless)
+        for viewer in cfg.sim.visualizer_cfgs
+    ) == [("newton_gl", False), ("newton_gl", True)]
+
+
+def test_attached_recorder_survives_the_launcher_validation(tmp_path):
     """The launcher must find the recorder and keep a headless GL visualizer."""
-    from isaaclab.visualizers.visualizer_cfg import resolve_visualizer_cfgs
+    from isaaclab.app import validate_launch
 
     cfg = _video_cfg(num_envs=4)
     launch_compat.attach_video_recorder(
@@ -484,16 +515,12 @@ def test_attached_recorder_survives_the_launcher_scan(tmp_path):
     )
     args = _launch_args()
     assert launch_compat.needs_kit(cfg, args) is False
+    _, kit_sources = validate_launch(cfg, args)
+    assert kit_sources == ()
     assert cfg.video_recorders[0].source == "viz:newton_gl"
-
-    from isaaclab.app import scan
-
-    video_visualizers = scan(cfg, args).video_visualizers
-    assert video_visualizers == ["newton_gl"]
-    (resolved,) = resolve_visualizer_cfgs(
-        cfg.sim.visualizer_cfgs, args.visualizer, None, video_visualizers
-    )
-    assert getattr(resolved, "headless") is True
+    (resolved,) = cfg.sim.visualizer_cfgs
+    assert resolved.backend.visualizer_type == "newton_gl"
+    assert resolved.headless is True
     assert resolved.eye == (2.0, 2.0, 2.0)
 
 
@@ -518,7 +545,7 @@ def test_recorder_attached_inside_launch_simulation_keeps_a_headless_gl_visualiz
     (recorder,) = cfg.video_recorders
     assert recorder.source == "viz:newton_gl"
     (visualizer,) = cfg.sim.visualizer_cfgs
-    assert visualizer.visualizer_type == "newton_gl"
+    assert visualizer.backend.visualizer_type == "newton_gl"
     assert visualizer.headless is True
     # Another scan after the launch still needs no Kit.
     assert launch_compat.needs_kit(cfg, args) is False
@@ -583,8 +610,9 @@ def test_real_launcher_args_run_under_the_strict_kitless_guard():
              "physics=newton_mjwarp", "env.scene.num_envs=16"],
         )
         assert args.headless is True and args.enable_cameras is True
-        assert args.visualizer == ["newton_gl"]
-        assert remaining == ["physics=newton_mjwarp", "env.scene.num_envs=16"]
+        assert remaining == [
+            "physics=newton_mjwarp", "env.scene.num_envs=16", "visualizer=newton_gl"
+        ]
 
         cfg = SimpleNamespace(sim=SimulationCfg(physics=NewtonCfg()))
         assert launch_compat.needs_kit(cfg, args) is False

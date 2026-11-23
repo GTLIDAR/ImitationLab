@@ -6,7 +6,8 @@
   The new parser has no ``--headless`` and no ``--enable-cameras`` flag.
   ``--headless`` is gone for good. ``enable_cameras`` is still a launcher key
   that Kit reads (see :func:`add_launcher_args`).
-- ``isaaclab_tasks.utils.compute_kit_requirements`` is gone. Use ``scan``.
+- ``isaaclab_tasks.utils.compute_kit_requirements`` is gone. Use
+  ``isaaclab.app.validate_launch``.
 - ``isaaclab_tasks.utils.hydra.hydra_task_config`` is gone. Use
   ``isaaclab_tasks.utils.resolve_task_config``.
 - ``gym.wrappers.RecordVideo`` does not record any more. The env records video
@@ -105,35 +106,24 @@ def add_launcher_args(parser: argparse.ArgumentParser) -> None:
 def needs_kit(env_cfg: Any, args: argparse.Namespace | dict | None) -> bool:
     """Return whether the launch of ``env_cfg`` with ``args`` starts Kit.
 
-    This is the repo's stand-in for the removed ``compute_kit_requirements``.
-    It copies the Kit decision of ``isaaclab.app.launch_simulation``. Kit starts
-    for Isaac Sim PhysX physics, for a Kit renderer camera, for the Kit
-    visualizer (chosen with ``--visualizer`` or recorded by a video recorder),
-    for an explicit Kit ``experience``, and when the caller sets
-    ``require_kit`` (``AppLauncher`` always does). Livestreaming adds the Kit
-    visualizer, so ``scan`` already reports it. ``launch_simulation`` keeps its
-    own list in a private helper, so ``test_needs_kit_matches_the_launcher_decision``
-    compares the two. Run that test after every ``pixi update isaaclab``.
+    Asks ``isaaclab.app.validate_launch``, the step ``launch_simulation`` runs
+    to choose its runtimes, and returns whether it names any component that
+    needs Kit: Isaac Sim PhysX physics, a Kit renderer camera, the Kit
+    visualizer or a Kit video source, an explicit ``experience``,
+    livestreaming, or ``require_kit``.
 
     Warning:
-        ``isaaclab.app.scan`` changes its inputs in place. It applies a
+        ``validate_launch`` changes its inputs in place. It applies a
         ``physics`` selector from ``args``, resolves automatic PhysX and RTX
-        placeholders in ``env_cfg``, rewrites the visualizer source of each
-        video recorder, and turns ``args.visualizer`` into a list of canonical
-        names. A second call gives the same result.
+        placeholders in ``env_cfg``, expands visualizer declarations, rewrites
+        the source of each video recorder, and writes derived launcher keys
+        such as ``enable_cameras`` back into ``args``. A second call gives the
+        same result.
     """
-    from isaaclab.app import scan
+    from isaaclab.app import validate_launch
 
-    config_scan = scan(env_cfg, args)
-    launcher_args = vars(args) if isinstance(args, argparse.Namespace) else args or {}
-    visualizers = launcher_args.get("visualizer") or []
-    return bool(
-        config_scan.needs_kit
-        or "kit" in visualizers
-        or "kit" in config_scan.video_visualizers
-        or launcher_args.get("experience")
-        or launcher_args.get("require_kit")
-    )
+    _, kit_sources = validate_launch(env_cfg, args)
+    return bool(kit_sources)
 
 
 def hydra_task_config(task_name: str, agent_cfg_entry_point: str | None) -> Callable:
@@ -230,6 +220,8 @@ def attach_video_recorder(
     video_length: int,
     video_interval: int,
     output_filename_prefix: str = DEFAULT_CLIP_PREFIX,
+    window_width: int = 1280,
+    window_height: int = 720,
     **camera_kwargs: Any,
 ) -> Path:
     """Record video from a headless Newton GL visualizer; return the output directory.
@@ -260,18 +252,19 @@ def attach_video_recorder(
     the call must come before ``gym.make``, and after ``env_cfg.scene.num_envs``
     is set.
 
-    The function replaces ``env_cfg.video_recorders``
-    and the ``newton_gl`` entry of ``env_cfg.sim.visualizer_cfgs``. Entries of
-    other visualizer types stay. ``launch_simulation`` runs that visualizer
-    headless, even when ``--visualizer`` selects it.
+    The function replaces ``env_cfg.video_recorders`` and the Newton GL backend
+    of ``env_cfg.sim.visualizer_cfgs``, and adds one headless Newton GL
+    visualizer for the recorder. Other backends, and declarations that name no
+    backend, stay. ``--visualizer newton_gl`` then opens a separate windowed
+    viewer next to the headless one.
 
     The camera defaults to a static bird view: window 1280 x 720, ``eye`` (11, 11,
     7), ``lookat`` (0, 0, 0.8). It shows a 4 x 4 block of environments near the grid
     center, or all environments when there are 16 or fewer. Set
-    ``env_cfg.scene.num_envs`` first. ``camera_kwargs`` go to
-    ``NewtonGLVisualizerCfg`` and override these defaults, for example
-    ``eye=...``, ``lookat=...``, ``window_width=...``, ``window_height=...``,
-    or ``visible_env_indices=[...]``. ``headless`` is always ``True``.
+    ``env_cfg.scene.num_envs`` first. ``window_width`` and ``window_height`` set
+    the frame size. ``camera_kwargs`` go to ``VisualizerCfg`` and override the
+    other defaults, for example ``eye=...``, ``lookat=...`` or
+    ``visible_env_indices=[...]``. ``headless`` is always ``True``.
 
     Note:
         The env must call ``recorder.step()`` for every entry of
@@ -286,7 +279,9 @@ def attach_video_recorder(
         video_interval: Env steps between clip starts, or ``0`` for one clip.
         output_filename_prefix: File name prefix of the clips. A plain name part
             of letters, digits, ``.``, ``_`` and ``-``.
-        **camera_kwargs: Extra ``NewtonGLVisualizerCfg`` fields.
+        window_width: Frame width in pixels.
+        window_height: Frame height in pixels.
+        **camera_kwargs: Extra ``VisualizerCfg`` fields.
 
     Returns:
         The absolute output directory. Print it, with the clip names, when the
@@ -306,7 +301,8 @@ def attach_video_recorder(
         )
 
     from isaaclab.envs.utils.video_recorder_cfg import VideoRecorderCfg
-    from isaaclab_visualizers.newton import NewtonGLVisualizerCfg
+    from isaaclab.visualizers.visualizer_cfg import VisualizerCfg, WindowCfg
+    from isaaclab_visualizers.newton import NewtonGLBackendCfg
 
     if not _CLIP_PREFIX_PATTERN.fullmatch(output_filename_prefix):
         raise ValueError(
@@ -328,8 +324,7 @@ def attach_video_recorder(
 
     num_envs = int(getattr(env_cfg.scene, "num_envs", 16) or 16)
     visualizer_kwargs: dict[str, Any] = {
-        "window_width": 1280,
-        "window_height": 720,
+        "window": WindowCfg(size=(int(window_width), int(window_height))),
         "eye": (11.0, 11.0, 7.0),
         "lookat": (0.0, 0.0, 0.8),
         "visible_env_indices": _center_env_block(num_envs),
@@ -344,11 +339,34 @@ def attach_video_recorder(
         existing = []
     elif not isinstance(existing, list):
         existing = [existing]
-    env_cfg.sim.visualizer_cfgs = [
-        cfg for cfg in existing if cfg.visualizer_type != "newton_gl"
-    ] + [NewtonGLVisualizerCfg(**visualizer_kwargs)]
+    env_cfg.sim.visualizer_cfgs = _without_newton_gl(existing) + [
+        VisualizerCfg(backend=NewtonGLBackendCfg(), **visualizer_kwargs)
+    ]
     env_cfg.video_recorders = [recorder_cfg]
     return out_dir
+
+
+def _without_newton_gl(visualizer_cfgs: list[Any]) -> list[Any]:
+    """Drop the Newton GL backend from each visualizer declaration.
+
+    A declaration may name one backend or a list of them. One left with no
+    backend is dropped; one that never named a backend only holds settings and
+    stays.
+    """
+    kept: list[Any] = []
+    for cfg in visualizer_cfgs:
+        backends = cfg.backend if isinstance(cfg.backend, list) else [cfg.backend]
+        if not backends:
+            kept.append(cfg)
+            continue
+        others = [
+            backend for backend in backends if backend.visualizer_type != "newton_gl"
+        ]
+        if len(others) == len(backends):
+            kept.append(cfg)
+        elif others:
+            kept.append(cfg.replace(backend=others if len(others) > 1 else others[0]))
+    return kept
 
 
 def run_then_close(main: Callable[[], object], close: Callable[[], object]) -> None:

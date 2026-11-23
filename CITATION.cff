@@ -4,7 +4,7 @@ message: >-
   please cite the paper below.
 type: software
 title: ImitationLab
-version: 0.1.0
+version: 0.1.1
 license: MIT
 repository-code: "https://github.com/GTLIDAR/ImitationLab"
 authors:

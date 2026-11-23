@@ -798,9 +798,7 @@ def _build_env(spec: dict[str, Any]):
     """The worker's simulation and env, as the replica readout configures them."""
     # Match train.py before importing isaaclab.app: its optional isaacsim probe
     # otherwise bootstraps Kit even for Newton in a fresh worker process.
-    from imitationlab.paths import REPO_ROOT
 
-    sys.path.insert(0, str(REPO_ROOT / "scripts" / "tracking"))
     from imitationlab.runners.runtime_bootstrap import (
         install_kit_import_guard,
         requested_backend,

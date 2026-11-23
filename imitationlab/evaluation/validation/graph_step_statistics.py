@@ -68,7 +68,6 @@ from imitationlab.evaluation.validation.step_statistics import (
     START_BINS,
     compare_statistics,
 )
-from imitationlab.paths import REPO_ROOT
 
 __all__ = ["compare_groups", "main", "reference_policy"]
 
@@ -192,7 +191,6 @@ class _Recorder:
 
 @contextlib.contextmanager
 def _env(args: argparse.Namespace, overrides: list[str]):
-    sys.path.insert(0, str(REPO_ROOT / "scripts" / "tracking"))
     from imitationlab.runners.runtime_bootstrap import install_kit_import_guard
 
     install_kit_import_guard()
@@ -375,16 +373,16 @@ def _writes(args: argparse.Namespace, overrides: list[str]) -> None:
     """Live physics: the simulator holds what each step's reset wrote."""
     import torch
     import warp as wp
-    from isaaclab_newton.physics.newton_manager import NewtonManager
 
     with _env(args, overrides) as env:
+        backend = env.sim.physics_manager.backend
         generator = torch.Generator(device=env.device).manual_seed(_POLICY_SEED)
         env.reset(seed=args.seed)
         n, device = int(env.num_envs), env.device
         robot = env.robot
         joint_ids = env._g1_joint_ids
         origins = env.scene.env_origins
-        solver_data = getattr(NewtonManager._solver, "mjw_data", None)
+        solver_data = getattr(backend.solver, "mjw_data", None)
         names = (
             "root_position",
             "root_orientation",
@@ -420,13 +418,9 @@ def _writes(args: argparse.Namespace, overrides: list[str]) -> None:
                 reset = reset.to(torch.bool)
                 kept = ~reset
                 # The raw arrays first: a robot.data read may run forward().
-                for mask in (
-                    NewtonManager._world_reset_mask,
-                    NewtonManager._fk_reset_mask,
-                ):
-                    if mask is not None:
-                        totals["pending_masks"] += wp.to_torch(mask).sum()
-                state = NewtonManager.backend.state_0
+                for mask in (backend.world_mask, backend.fk_mask):
+                    totals["pending_masks"] += wp.to_torch(mask).sum()
+                state = backend.state_0
                 joint_q = wp.to_torch(state.joint_q).reshape(n, -1)
                 body_q = wp.to_torch(state.body_q).reshape(n, -1, 7)
                 worst_on(

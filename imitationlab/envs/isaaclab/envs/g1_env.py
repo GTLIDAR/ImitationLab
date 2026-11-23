@@ -210,7 +210,7 @@ class G1RLEnv(ImitationRLEnv):
             body_ids=[torso_id],
         )
         manager = self.sim.physics_manager
-        model = manager.get_model()
+        model = manager.backend.model
         mu_view = self.robot._root_view.get_attribute("shape_material_mu", model)[:, 0]
         wp.to_torch(mu_view)[:] = self._g1_context[:, :1]
         # MuJoCo combines friction with max(), so the ground is the range floor.

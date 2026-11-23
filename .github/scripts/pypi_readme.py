@@ -4,7 +4,7 @@ PyPI renders the package description outside the repository, where relative
 links and images in ``README.md`` do not resolve. The release workflow runs
 this script on its checkout before it builds the distributions:
 
-    python .github/scripts/pypi_readme.py --ref v0.1.0
+    python .github/scripts/pypi_readme.py --ref v0.1.1
 
 A link to a file that does not exist stops the script.
 """

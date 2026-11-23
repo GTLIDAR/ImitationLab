@@ -47,7 +47,6 @@ from imitationlab.evaluation.validation.collect_equivalence import (
     _install_deterministic_kernels,
     _install_physics_trace,
 )
-from imitationlab.paths import REPO_ROOT
 
 __all__ = ["compare_records", "imported_packages", "main"]
 
@@ -197,7 +196,6 @@ def imported_packages() -> dict[str, str]:
 
 
 def _run(args: argparse.Namespace, overrides: list[str]) -> None:
-    sys.path.insert(0, str(REPO_ROOT / "scripts" / "tracking"))
     from imitationlab.runners.runtime_bootstrap import install_kit_import_guard
 
     install_kit_import_guard()

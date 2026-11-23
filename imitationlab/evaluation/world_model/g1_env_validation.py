@@ -185,7 +185,7 @@ def qualify_g1_environment(
     )
 
     manager = env.sim.physics_manager
-    live_solver = manager._solver
+    live_solver = manager.backend.solver
     opt = live_solver.mjw_model.opt
 
     def scalar(value):
@@ -200,8 +200,8 @@ def qualify_g1_environment(
         "integrator": int(scalar(opt.integrator)),
         "mujoco_contacts": bool(scalar(opt.run_collision_detection)),
         "tolerance": float(scalar(opt.tolerance)),
-        "substep_dt": float(manager._solver_dt),
-        "num_substeps": int(manager._num_substeps),
+        "substep_dt": float(manager.backend.solver_dt),
+        "num_substeps": int(manager.backend.num_substeps),
     }
     check(
         "applied_solver_options",
@@ -213,7 +213,7 @@ def qualify_g1_environment(
         and actual_options["num_substeps"] == 4,
         actual=actual_options,
     )
-    model = manager.get_model()
+    model = manager.backend.model
     view = env.robot._root_view
     context_before = env._g1_context.clone()
     friction = wp.to_torch(view.get_attribute("shape_material_mu", model)[:, 0])

@@ -375,7 +375,7 @@ class MaskedStepper:
         """
         env = self.env
         if substep == 0:
-            _mark_kinematics_dirty()
+            _mark_kinematics_dirty(env)
         env._sim_step_counter += self._counter_per_substep
         env.sim.step(render=False)
 
@@ -781,19 +781,18 @@ def _raise_problems(problems: list[str]) -> None:
         )
 
 
-def _mark_kinematics_dirty() -> None:
+def _mark_kinematics_dirty(env: Any) -> None:
     """Make Newton's next step consume its device FK/solver-reset masks.
 
     Newton gates ``forward()`` (solver reset and FK for written worlds) on a
-    Python flag that its ``_mask`` writes set when they run in Python. Under
-    graph replay the writes run but the flag is never set, so it is raised
-    before every physics step; the device masks select the worlds.
+    Python flag of its backend that its mask writes set when they run in
+    Python. Under graph replay the writes run but the flag is never set, so it
+    is raised before every physics step; the device masks select the worlds.
+    PhysX has no Newton backend, and nothing is raised.
     """
-    try:
-        from isaaclab_newton.physics.newton_manager import NewtonManager
-    except ImportError:  # pragma: no cover - PhysX builds
-        return
-    NewtonManager.kinematics_dirty = True
+    backend = getattr(env.sim.physics_manager, "backend", None)
+    if backend is not None:
+        backend.kinematics_dirty = True
 
 
 __all__ = ["MaskedStepper", "UnsupportedMaskedStep"]

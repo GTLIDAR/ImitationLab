@@ -5,6 +5,8 @@ Notable changes to ImitationLab are recorded in this file. The format follows
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-23
+
 ### Added
 
 - A documentation site built from the Markdown guides with Sphinx:
@@ -16,6 +18,22 @@ Notable changes to ImitationLab are recorded in this file. The format follows
 
 ### Changed
 
+- The simulator stack moves to Isaac Lab
+  [`f9af6e3`](https://github.com/isaac-sim/IsaacLab/commit/f9af6e3c52ccb43533996713985808fed2cd46db),
+  Isaac Sim 6.2.0.0, Newton 1.8.0 and MuJoCo/MJWarp 3.17.0, from Isaac Lab
+  `0612893`, Isaac Sim 6.1.0.0, Newton 1.6.1 and MuJoCo/MJWarp 3.12.0. Warp
+  stays at 1.17.0 and PyTorch at 2.12.0. Isaac Lab now brings Hydra 1.4.
+  Released checkpoints score the same on both stacks, and training throughput
+  is unchanged.
+- G1 actuator configs use Isaac Lab's limit fields: `joint_effort_limit`,
+  `joint_velocity_limit` and `actuator_velocity_limit` replace
+  `effort_limit_sim` and `velocity_limit_sim`, with the same values.
+- `attach_video_recorder` builds a `VisualizerCfg` with a Newton GL backend and
+  takes the frame size as `window_width` and `window_height`. With
+  `--visualizer newton_gl`, a recording run now opens a windowed viewer next to
+  the headless one that records.
+- `launch_compat.needs_kit` asks Isaac Lab's `validate_launch` instead of
+  repeating its rules.
 - Environment variables use the `IMITATIONLAB_` prefix:
   `IMITATIONLAB_ENV_COLLECT_FASTPATH`, `IMITATIONLAB_UNITREE_USD_PATH`,
   `IMITATIONLAB_UNITREE_USD_CACHE_ROOT`, `IMITATIONLAB_COMPILE_MDP` and
@@ -51,6 +69,8 @@ Notable changes to ImitationLab are recorded in this file. The format follows
 
 ### Fixed
 
+- `collect_equivalence run` starts training with `imitationlab.runners.train`;
+  it still pointed at the removed `scripts/tracking/train.py`.
 - The wheel now contains the three USD layers under
   `g1_description/configuration/` that the G1 robot file references. They were
   missing from the package data, so only an editable install could load the

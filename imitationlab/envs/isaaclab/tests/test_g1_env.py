@@ -111,8 +111,9 @@ def test_robot_and_physics_are_the_replica_contract():
             for a in cfg.scene.robot.actuators.values()
             if any(re.fullmatch(pat, name) for pat in a.joint_names_expr)
         )
-        assert value_for(actuator.effort_limit_sim, name) == effort
-        assert value_for(actuator.velocity_limit_sim, name) == velocity
+        assert value_for(actuator.joint_effort_limit, name) == effort
+        assert value_for(actuator.joint_velocity_limit, name) == velocity
+        assert value_for(actuator.actuator_velocity_limit, name) == velocity
         assert value_for(actuator.armature, name) == pytest.approx(armature)
         assert value_for(actuator.stiffness, name) == pytest.approx(
             armature * natural_frequency**2
