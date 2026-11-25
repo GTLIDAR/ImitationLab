@@ -349,11 +349,13 @@ class G1TrackingTask:
         self.default_q = q0[0, ids].to(device=self.device, dtype=torch.float32).clone()
         self.mdp = getattr(self.isaac_env, "g1_mdp", None)
         if self.mdp is None:
+            env_cfg = getattr(self.isaac_env, "cfg", None)
             self.mdp = G1MDP(
                 self.library,
                 self.default_q,
-                reward_kernel_scale=getattr(
-                    getattr(self.isaac_env, "cfg", None), "reward_kernel_scale", 1.0
+                reward_kernel_scale=getattr(env_cfg, "reward_kernel_scale", 1.0),
+                reward_heading_velocity=getattr(
+                    env_cfg, "reward_heading_velocity", False
                 ),
             )
             self.isaac_env.g1_mdp = self.mdp

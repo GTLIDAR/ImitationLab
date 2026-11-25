@@ -408,6 +408,25 @@ def test_env_refuses_a_scale_the_shared_mdp_did_not_take(mdp, scale, refused):
         G1RLEnv._g1_check_reward_kernels(env)
 
 
+def test_heading_velocity_reward_is_off_by_default_and_must_reach_the_mdp():
+    assert ImitationG1EnvCfg().reward_heading_velocity is False
+    cfg = SimpleNamespace(reward_kernel_scale=1.0, reward_heading_velocity=True)
+    with pytest.raises(ValueError, match="reward_heading_velocity"):
+        G1RLEnv._g1_check_reward_kernels(
+            SimpleNamespace(g1_mdp=SimpleNamespace(), cfg=cfg)
+        )
+    mdp = SimpleNamespace(reward_heading_velocity=True)
+    G1RLEnv._g1_check_reward_kernels(SimpleNamespace(g1_mdp=mdp, cfg=cfg))
+
+
+def test_a_pinned_readout_keeps_world_frame_velocity_targets():
+    cfg = _readout_cfg()
+    cfg.resolve()
+    cfg.reward_heading_velocity = True
+    with pytest.raises(ValueError, match="reward_heading_velocity"):
+        cfg.resolve()
+
+
 def test_persist_reset_stats_defaults_off_and_rejects_a_useless_setting():
     assert ImitationG1EnvCfg().persist_reset_stats is False
     readout = _readout_cfg()

@@ -242,6 +242,7 @@ def _run_evaluate(args, rest: list[str]) -> int:
             'env.reset_exclude_names_file=""',
             "env.persist_reset_stats=false",
             "env.reward_kernel_scale=1.0",
+            "env.reward_heading_velocity=false",
         ]
     entry = flag_value(previous, "--agent")
     if entry:

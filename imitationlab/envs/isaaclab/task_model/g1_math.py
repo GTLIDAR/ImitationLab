@@ -20,6 +20,10 @@ on a small bank can ask for tables of goals and body states (``wm.goal_table``,
 ``third_party/licenses/ndm_gym.txt``). At ``k = 1`` the arithmetic is the
 unscaled one bit for bit.
 
+``G1MDP(reward_heading_velocity=True)`` turns the reference body velocities by
+the same heading offset as the re-anchored pose targets before the two velocity
+terms compare them, as upstream SuperMimic ``5fb9229`` does. Off by default.
+
 ``drift_weight``, ``semi_implicit_drift``, ``structured_targets`` and
 ``structured_integrate`` (``wm.wm_structured``) port the drift, ``targets`` and
 ``integrate`` of NDM Gym's ``SemiImplicitIncrementWorldModel``
@@ -831,9 +835,11 @@ class G1MDP:
         default_q: Tensor,
         limits: Tensor | None = None,
         reward_kernel_scale: float = 1.0,
+        reward_heading_velocity: bool = False,
     ) -> None:
         self.library = library
         self.reward_kernel_scale = float(reward_kernel_scale)
+        self.reward_heading_velocity = bool(reward_heading_velocity)
         self.kin = library.kin
         self.body_names = library.body_names
         self.default_q = default_q
@@ -883,10 +889,19 @@ class G1MDP:
         )
 
     @staticmethod
+    def heading_offset(rotation: Tensor, ref: G1ReferenceFrames) -> Tensor:
+        """Yaw from the reference root to the robot root, (..., 1, 3, 3)."""
+        return heading(rotation @ ref.root_rot.transpose(-1, -2)).unsqueeze(-3)
+
+    @classmethod
     def reanchor(
-        p: Tensor, rotation: Tensor, ref: G1ReferenceFrames
+        cls, p: Tensor, rotation: Tensor, ref: G1ReferenceFrames
     ) -> tuple[Tensor, Tensor]:
-        delta = heading(rotation @ ref.root_rot.transpose(-1, -2)).unsqueeze(-3)
+        """Reference body poses moved to the robot's root xy and heading.
+
+        The reference root keeps its height, roll and pitch.
+        """
+        delta = cls.heading_offset(rotation, ref)
         origin = torch.cat((p[..., :2], ref.root_pos[..., 2:3]), -1)
         return (
             origin.unsqueeze(-2)
@@ -949,6 +964,15 @@ class G1MDP:
         p, quat, _, _, q, _ = unpack(state)
         rotation = quat_wxyz_to_matrix(quat)
         target_pos, target_rot = self.reanchor(p, rotation, ref)
+        target_lin_vel, target_ang_vel = ref.body_lin_vel, ref.body_ang_vel
+        if self.reward_heading_velocity:
+            # Velocity targets turn with the same heading offset as the pose
+            # targets, so a yaw offset is scored once, by root_ori, and not
+            # again by the two velocity terms (upstream SuperMimic 5fb9229 and
+            # mjlab#1274).
+            delta = self.heading_offset(rotation, ref)
+            target_lin_vel = rotate(delta, target_lin_vel)
+            target_ang_vel = rotate(delta, target_ang_vel)
         k = self.reward_kernel_scale
         terms = {
             "body_pos": torch.exp(
@@ -958,10 +982,10 @@ class G1MDP:
                 -rotation_error_sq(target_rot, br).mean(-1) / (0.4 * k) ** 2
             ),
             "body_lin_vel": torch.exp(
-                -(ref.body_lin_vel - bv).square().sum(-1).mean(-1) / k**2
+                -(target_lin_vel - bv).square().sum(-1).mean(-1) / k**2
             ),
             "body_ang_vel": torch.exp(
-                -(ref.body_ang_vel - bw).square().sum(-1).mean(-1) / (3.14 * k) ** 2
+                -(target_ang_vel - bw).square().sum(-1).mean(-1) / (3.14 * k) ** 2
             ),
             "root_pos": torch.exp(
                 -(ref.root_pos - p).square().sum(-1) / (0.3 * k) ** 2

@@ -395,6 +395,12 @@ class ImitationG1EnvCfg(ManagerBasedRLEnvCfg):
     # first and the agent's task reuses it, so env and imagined rewards move
     # together. Evaluation scores at 1.
     reward_kernel_scale: float = 1.0
+    # Compare body velocities with reference velocities turned by the same
+    # heading offset as the re-anchored pose targets, as upstream SuperMimic
+    # `5fb9229` does, so a yaw offset is scored only by root orientation. Env
+    # and imagined rewards change together. Off: on BONES-SEED it tracked no
+    # better than the world-frame comparison. Evaluation scores with it off.
+    reward_heading_velocity: bool = False
     # Keep the reset sampler's bin statistics in the checkpoints and restore them
     # on resume, so a walltime segment does not repeat their start-up transient.
     persist_reset_stats: bool = False
@@ -529,6 +535,11 @@ class ImitationG1EnvCfg(ManagerBasedRLEnvCfg):
             raise ValueError(
                 "A pinned_reset readout scores the task's own kernels; keep "
                 "reward_kernel_scale 1."
+            )
+        if self.pinned_reset and self.reward_heading_velocity:
+            raise ValueError(
+                "A pinned_reset readout scores the task's own kernels; keep "
+                "reward_heading_velocity off."
             )
 
     def _bind_skill_encoder(self) -> None:

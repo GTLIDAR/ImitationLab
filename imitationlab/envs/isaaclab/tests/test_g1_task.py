@@ -176,6 +176,42 @@ def test_root_xy_reanchoring_removes_local_body_translation_error():
     )
 
 
+def test_heading_velocity_option_turns_the_velocity_targets():
+    lib = bank((5,), moving=True)
+    mdp = G1MDP(lib, joint_limits("cpu").mean(-1), reward_heading_velocity=True)
+    rank, frame = torch.tensor([0]), torch.tensor([3])
+    ref = lib.gather(rank, frame)
+    assert ref.body_lin_vel.abs().max() > 0.1
+    # The robot matches the reference motion but faces 90 degrees to its left.
+    yaw = torch.tensor([[0.0, -1.0, 0.0], [1.0, 0.0, 0.0], [0.0, 0.0, 1.0]])
+    state = lib.ref_state(rank, frame).clone()
+    w, z = math.cos(math.pi / 4), math.sin(math.pi / 4)
+    qw, qx, qy, qz = state[0, 3:7].tolist()
+    state[0, 3:7] = torch.tensor(
+        [w * qw - z * qz, w * qx - z * qy, w * qy + z * qx, w * qz + z * qw]
+    )
+    turned = (
+        ref.body_pos,
+        yaw @ ref.body_rot,
+        ref.body_lin_vel @ yaw.T,
+        ref.body_ang_vel @ yaw.T,
+    )
+    zero = torch.zeros(1, 29)
+    _, terms = mdp.reward(state, zero, zero, rank, frame, body_state=turned)
+    for name in ("body_ori", "body_lin_vel", "body_ang_vel"):
+        assert torch.allclose(terms[name], torch.tensor([0.02]), atol=1e-6), name
+    # World-frame velocities now disagree with the turned targets.
+    world = (*turned[:2], ref.body_lin_vel, ref.body_ang_vel)
+    _, terms = mdp.reward(state, zero, zero, rank, frame, body_state=world)
+    assert terms["body_lin_vel"] < 0.02 - 1e-4
+    # Off by default: the velocity terms compare world-frame velocities.
+    default = G1MDP(lib, joint_limits("cpu").mean(-1))
+    assert not default.reward_heading_velocity
+    _, terms = default.reward(state, zero, zero, rank, frame, body_state=world)
+    for name in ("body_lin_vel", "body_ang_vel"):
+        assert torch.allclose(terms[name], torch.tensor([0.02]), atol=1e-6), name
+
+
 def test_transition_reward_uses_next_reference_frame():
     lib = bank((5,), moving=True)
     t = task(lib)

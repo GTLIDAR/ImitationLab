@@ -146,13 +146,17 @@ class G1RLEnv(ImitationRLEnv):
         )
 
     def _g1_check_reward_kernels(self):
-        """Refuse a scale the shared MDP did not take; it would change nothing."""
-        built = getattr(self.g1_mdp, "reward_kernel_scale", 1.0)
-        if built != self.cfg.reward_kernel_scale:
-            raise ValueError(
-                f"env.reward_kernel_scale={self.cfg.reward_kernel_scale} but the "
-                f"shared G1MDP was built with {built}."
-            )
+        """Refuse reward options the shared MDP did not take; they would change nothing."""
+        for name, default in (
+            ("reward_kernel_scale", 1.0),
+            ("reward_heading_velocity", False),
+        ):
+            built = getattr(self.g1_mdp, name, default)
+            wanted = getattr(self.cfg, name, default)
+            if built != wanted:
+                raise ValueError(
+                    f"env.{name}={wanted} but the shared G1MDP was built with {built}."
+                )
 
     def _make_tracking_task(self):
         from imitationlab.envs.isaaclab.task_model.g1_task import G1TrackingTask

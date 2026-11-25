@@ -5,6 +5,16 @@ Notable changes to ImitationLab are recorded in this file. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `env.reward_heading_velocity`, off by default: the `imitation-g1-v1`
+  tracking reward compares body velocities with reference velocities turned by
+  the same heading offset as the re-anchored pose targets, as upstream
+  SuperMimic `5fb9229` and mujocolab/mjlab#1274 do, so a yaw offset lowers
+  only the root orientation term. The simulator and world-model rewards change
+  together. On BONES-SEED (SuperMimic explicit, H200, 30 minutes, seeds 42 and
+  43) it tracked no better than the default on the 256-clip board.
+
 ## [0.1.1] - 2026-11-23
 
 ### Added

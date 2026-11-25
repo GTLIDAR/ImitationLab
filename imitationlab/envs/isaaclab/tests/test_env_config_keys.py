@@ -39,6 +39,7 @@ TASK_OPTIONS = {
     "wm_only_observations": "true",
     "reset_fail_share": "0.3",
     "reward_kernel_scale": "0.7",
+    "reward_heading_velocity": "true",
     "persist_reset_stats": "true",
 }
 # Every key the data plane reads with `getattr`, with a value a run used.
