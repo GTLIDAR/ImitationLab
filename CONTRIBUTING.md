@@ -9,6 +9,8 @@ questions; the
 [feature request](.github/ISSUE_TEMPLATE/feature_request.md) templates list
 what to include. Report security problems privately as described in
 [SECURITY.md](SECURITY.md).
+Everyone taking part in the project is expected to follow the
+[code of conduct](CODE_OF_CONDUCT.md).
 
 **Before you start.** Install [Pixi](https://pixi.sh) and the environments
 described in [setup](docs/setup.md). Run all commands from the repository
